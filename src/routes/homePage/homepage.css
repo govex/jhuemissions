@@ -1,0 +1,74 @@
+.Info {
+    width: 100%;
+    height: 436px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: start;
+    justify-content: space-evenly;
+    font-family: Montserrat;
+    background-color: #0E2D72;
+    color: #FFF;
+    padding-top: 77px;
+    padding-bottom: 56px;
+    padding-left: 20px;
+}
+
+.btn-abt {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid #A15B96;
+    border-radius: 40px;
+    width: 50%;
+    height: 40px;
+    margin-top: 1REM;
+
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 635px;
+    height: 199px;
+
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+
+    color: #FFF;
+    width: 637px;
+    height: 300px;
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.c-heading {
+    color: #FFF;
+    width: 1010px;
+    height: 76px;
+    font-family: Montserrat;
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+
+}
+
+.para {
+    color: #FFF;
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.graph{
+    z-index: 1000;
+}
