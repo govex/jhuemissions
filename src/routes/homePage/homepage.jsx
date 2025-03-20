@@ -5,7 +5,7 @@ import TopBar from "../../components/topBar/topbar"
 import Footer from "../../components/footer/footer"
 import {useState, useEffect} from "react"
 
-import BarChart from "../../utils/BarChart";
+// import BarChart from "../../utils/BarChart";
 import * as d3 from "d3";
 function Homepage() {
 
@@ -43,10 +43,10 @@ function Homepage() {
         </section>
 
 
-          <div className="graph">
+          {/* <div className="graph">
             {loading && <div>loading</div>}
             {!loading && <BarChart data={data} />}
-          </div>
+          </div> */}
 
 
       </div>
