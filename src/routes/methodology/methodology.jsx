@@ -1,8 +1,13 @@
 import "./methodology.css"
 
+
 function Methodology() {
+
+
   return (
-    <div>methodology</div>
+    <div>
+      Method
+    </div>
   )
 }
 
