@@ -13,7 +13,7 @@ function Homepage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    d3.csv("../data/chart-data.csv").then((d) => {
+    d3.csv("./chart-data.csv").then((d) => {
       setData(d);
       setLoading(false);
     });
