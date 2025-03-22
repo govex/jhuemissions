@@ -1,0 +1,38 @@
+.card {
+    width: 350px;
+    height: 274px;
+    flex-shrink: 0;
+    border-radius: 40px;
+    border: 2px solid #CCC;
+    background: #FFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  .text1 {
+    color: #000;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+  
+  .text2 {
+    color: #A15B96;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 64px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+  
+  .text3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }

@@ -1,5 +1,3 @@
-
-
 const Button = ({ type, color, height, width, children }) => {
   // Default colors if no props are provided
   const solidColor = color || '#A15B96'; // Default color for solid buttons

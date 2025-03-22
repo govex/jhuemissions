@@ -5,7 +5,7 @@ import TopBar from "../../components/topBar/topbar"
 import Footer from "../../components/footer/footer"
 import { useState, useEffect } from "react"
 import  Button  from "../../components/button/button"
-
+import Card from "../../components/card/card"
 // import BarChart from "../../utils/BarChart";
 import * as d3 from "d3";
 function Homepage() {
@@ -58,6 +58,21 @@ function Homepage() {
         <Button type="solid" color="#0E2D72" height="40px" width="150px">
           Border Button
         </Button>
+      </div>
+      <div className="cards">
+      <Card 
+        text1="Total Emissions (EPA)"  
+        text3Color="#FF5733" 
+      />
+      <Card 
+        text1="Total Trips Taken (miles)" 
+        text3Color="#E49835" 
+      />
+      <Card 
+        text1="Carbon Footprint" 
+
+        text3Color="#558D1C" 
+      />
       </div>
     </>
   )
