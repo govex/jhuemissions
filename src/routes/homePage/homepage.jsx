@@ -9,6 +9,7 @@ import Card from "../../components/card/card"
 import ModalRoot from '../../components/modal/ModalRoot';
 import ModalService from '../../components/modal/ModalServices';
 import TestModal from '../../components/modal/TestModal';
+import  Form  from "../../components/form/Form"
 // import BarChart from "../../utils/BarChart";
 import * as d3 from "d3";
 function Homepage() {
@@ -82,6 +83,9 @@ function Homepage() {
       <div>
         <ModalRoot />
         <button onClick={addModal} className="btn btn-primary m-4">Open modal</button>
+      </div>
+      <div>
+        <Form />
       </div>
     </>
   )
