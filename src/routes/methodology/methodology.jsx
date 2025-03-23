@@ -6,7 +6,7 @@ function Methodology() {
 
   return (
     <div>
-      Method
+        Methods
     </div>
   )
 }

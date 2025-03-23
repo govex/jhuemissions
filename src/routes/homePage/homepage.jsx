@@ -4,12 +4,17 @@ import TopBar from "../../components/topBar/topbar"
 
 import Footer from "../../components/footer/footer"
 import { useState, useEffect } from "react"
-import  Button  from "../../components/button/button"
+import Button from "../../components/button/button"
 import Card from "../../components/card/card"
+import ModalRoot from '../../components/modal/ModalRoot';
+import ModalService from '../../components/modal/ModalServices';
+import TestModal from '../../components/modal/TestModal';
 // import BarChart from "../../utils/BarChart";
 import * as d3 from "d3";
 function Homepage() {
-
+  const addModal = () => {
+    ModalService.open(TestModal);
+  };
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,19 +65,23 @@ function Homepage() {
         </Button>
       </div>
       <div className="cards">
-      <Card 
-        text1="Total Emissions (EPA)"  
-        text3Color="#FF5733" 
-      />
-      <Card 
-        text1="Total Trips Taken (miles)" 
-        text3Color="#E49835" 
-      />
-      <Card 
-        text1="Carbon Footprint" 
+        <Card
+          text1="Total Emissions (EPA)"
+          text3Color="#FF5733"
+        />
+        <Card
+          text1="Total Trips Taken (miles)"
+          text3Color="#E49835"
+        />
+        <Card
+          text1="Carbon Footprint"
 
-        text3Color="#558D1C" 
-      />
+          text3Color="#558D1C"
+        />
+      </div>
+      <div>
+        <ModalRoot />
+        <button onClick={addModal} className="btn btn-primary m-4">Open modal</button>
       </div>
     </>
   )
