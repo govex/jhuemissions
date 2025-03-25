@@ -3,23 +3,31 @@ import styles from "./homepage.module.scss"
 import cx from "classnames";
 import TopBar from "../../components/topBar/topbar"
 import Footer from "../../components/footer/footer"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Button from "../../components/button/button"
-import Card from "../../components/card/card"
-import ModalRoot from '../../components/modal/ModalRoot';
-import ModalService from '../../components/modal/ModalServices';
-import TestModal from '../../components/modal/TestModal';
+import Card from "../../components/card/card";
+import { Popover } from "@mui/material";
+import Filter from "../../components/filter/Filter";
 import  Form  from "../../components/form/Form"
 import Donut from "../../components/donut/donut";
 import Infographic from "../../components/infographic/infographic";
 // import BarChart from "../../utils/BarChart";
 import * as d3 from "d3";
 function Homepage() {
-  const addModal = () => {
-    ModalService.open(TestModal);
-  };
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+
+  const handleFilterClick = (event) => {
+    setFilterAnchorEl(event.currentTarget);
+  };
+
+  const handleFilterClose = () => {
+    setFilterAnchorEl(null);
+  };
+
+  const filterOpen = Boolean(filterAnchorEl);
+  const filterId = filterOpen ? 'simple-popover' : undefined;
 
   useEffect(() => {
     d3.csv("./chart-data.csv").then((d) => {
@@ -58,9 +66,26 @@ function Homepage() {
               text="Filters"
               color="secondary"
               size="medium"
-              onClick={addModal}
+              onClick={handleFilterClick}
             />
-            <ModalRoot />
+            <Popover
+              id={filterId}
+              open={filterOpen}
+              anchorEl={filterAnchorEl}
+              onClose={handleFilterClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              sx={{
+                "& .MuiPopover-paper": {
+                  "background-color": "transparent",
+                  "border-radius": "30px"
+                }
+              }}         
+              >
+              <Filter close={handleFilterClose} />
+            </Popover>
           </div>
           <div className={styles.kpi1}>
             <Card
