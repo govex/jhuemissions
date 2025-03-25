@@ -28,9 +28,8 @@ function Homepage() {
 
   return (
     <>
+      <TopBar />
       <div>
-        <TopBar />
-        <Footer />
         <section className={styles.Info}>
 
           <div className={styles.left}>
@@ -64,6 +63,14 @@ function Homepage() {
 
       </div>
       <div>
+        <ModalRoot />
+        <Button 
+          type="solid"
+          text="Filters"
+          color="secondary"
+          size="medium"
+          onClick={addModal}
+        />
       </div>
       <div className={styles.cards}>
         <Card
@@ -81,18 +88,10 @@ function Homepage() {
         />
       </div>
       <div>
-        <ModalRoot />
-        <Button 
-          type="solid"
-          text="Filters"
-          color="secondary"
-          size="medium"
-          onClick={addModal}
-        />
-      </div>
-      <div>
         <Form />
       </div>
+      <Footer />
+
     </>
   )
 }

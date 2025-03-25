@@ -18,9 +18,6 @@ const Footer = () => {
             {/* Bottom Section */}
             <div className="foot-bottom">
                 <span>Privacy Policy | Copyright 2024</span>
-                <div className="up-arrow">
-                    
-                </div>
             </div>
         </div>
     );
