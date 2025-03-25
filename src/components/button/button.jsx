@@ -1,39 +1,47 @@
-const Button = ({ type, color, height, width, children }) => {
+import { Link } from 'react-router'
+import { ReactComponent as RightArrow } from "../icons/right-arrow";
+import { ReactComponent as ChevronDown } from "../icons/chevron-down";
+import { ReactComponent as ArrowUpCircle } from "../icons/arrow-up-circle";
+import { ReactComponent as CloseX } from "../icons/close-x";
+import cx from "classnames";
+import styles from "./button.module.scss"
 
-    const solidColor = color || '#A15B96';
-    const borderColor = color || '#0E2D72';
+const Button = ({ 
+    type="solid", 
+    icon=undefined, 
+    text=undefined, 
+    color="primary", 
+    size="small", 
+    onClick=undefined,
+    href=undefined
+}) => {
 
-
-    const buttonStyle = {
-        height: height || '40px',
-        width: width || '150px',
-        backgroundColor: type === 'solid' ? solidColor : 'transparent',
-        border: type === 'border' ? `2px solid ${borderColor}` : 'none',
-        color: type === 'solid' ? '#fff' : borderColor,
-        padding: '10px',
-        fontSize: '16px',
-        cursor: 'pointer',
-        borderRadius: '5px',
-        transition: 'all 0.3s ease',
-        borderRadius: '40px',
-        fontFamily: 'Montserrat',
-    };
-
-
-    const hoverStyle = {
-        ...buttonStyle,
-        backgroundColor: type === 'solid' ? '#A15B96' : 'transparent',
-        color: type === 'border' ? '#A15B96' : '#fff',
-        border: type === 'border' ? '2px solid #A15B96' : 'none',
-    };
-
-    return (
+    const innerContent = () => (
         <button
-            style={buttonStyle}
-
+            className={cx(styles[type], styles[color], styles[size])}
+            onClick={onClick || null}
         >
-            {children}
+            {text &&
+                <label className={styles.label}>{text}</label>
+            }
+            {icon === "chevron-down" &&
+                <ChevronDown />
+            }
+            {icon === "close-x" && 
+                <CloseX />
+            }
+            {icon === "arrow-up-circle" &&
+                <ArrowUpCircle />
+            }
+            {icon === "right-arrow" &&
+                <RightArrow />
+            }
         </button>
+    )
+    return !!href ? (
+        <Link to={href}>{innerContent()}</Link>
+    ) : (
+        innerContent()
     );
 };
 

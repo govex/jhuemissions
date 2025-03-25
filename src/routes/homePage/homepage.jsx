@@ -1,7 +1,6 @@
 
-import "./homepage.css"
+import styles from "./homepage.module.scss"
 import TopBar from "../../components/topBar/topbar"
-
 import Footer from "../../components/footer/footer"
 import { useState, useEffect } from "react"
 import Button from "../../components/button/button"
@@ -32,19 +31,26 @@ function Homepage() {
       <div>
         <TopBar />
         <Footer />
-        <section className='Info'>
+        <section className={styles.Info}>
 
-          <div className="left">
+          <div className={styles.left}>
 
-            <span className='c-heading'>Climate Dashboard</span>
-            <p className='para'>
+            <span className={styles['c-heading']}>Climate Dashboard</span>
+            <p className={styles.para}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
             </p>
 
           </div>
-          <div className="right">
-            <p className="para">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-            <p className='btn-abt'>Go to the About Section</p>
+          <div className={styles.right}>
+            <p className={styles.para}>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <Button 
+              type="border"
+              icon="right-arrow"
+              text="Go to the About Section"
+              color="secondary"
+              size="large"
+              href="/about"
+            />
           </div>
 
         </section>
@@ -58,14 +64,8 @@ function Homepage() {
 
       </div>
       <div>
-        <Button type="border" color="#A15B96" height="50px" width="200px">
-          Solid Button
-        </Button>
-        <Button type="solid" color="#0E2D72" height="40px" width="150px">
-          Border Button
-        </Button>
       </div>
-      <div className="cards">
+      <div className={styles.cards}>
         <Card
           text1="Total Emissions (EPA)"
           text3Color="#FF5733"
@@ -82,7 +82,13 @@ function Homepage() {
       </div>
       <div>
         <ModalRoot />
-        <button onClick={addModal} className="btn btn-primary m-4">Open modal</button>
+        <Button 
+          type="solid"
+          text="Filters"
+          color="secondary"
+          size="medium"
+          onClick={addModal}
+        />
       </div>
       <div>
         <Form />
