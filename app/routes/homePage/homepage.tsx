@@ -1,18 +1,23 @@
 
 import styles from "./homepage.module.scss"
-import cx from "classnames";
-import TopBar from "../../components/topBar/topbar"
-import Footer from "../../components/footer/footer"
-import { useState, useEffect, useRef } from "react"
-import Button from "../../components/button/button"
-import Card from "../../components/card/card";
+import { useState, useEffect } from "react"
+import Button from "~/components/button/button";
+import Card from "~/components/card/card";
 import { Popover } from "@mui/material";
-import Filter from "../../components/filter/Filter";
-import  Form  from "../../components/form/Form"
-import Donut from "../../components/donut/donut";
-import Infographic from "../../components/infographic/infographic";
+import Filter from "~/components/filter/Filter";
+import Form from "~/components/form/Form";
+import Donut from "~/components/donut/donut";
+import Infographic from "~/components/infographic/infographic";
 // import BarChart from "../../utils/BarChart";
 import * as d3 from "d3";
+import type { Route } from "./+types/homepage";
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "JHU Travel Emissions Dashboard" },
+    { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
+  ];
+}
 function Homepage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +44,6 @@ function Homepage() {
 
   return (
     <>
-      <TopBar />
       <section className={styles.Info}>
         <div className={styles.left}>
           <span className={styles['c-heading']}>Climate Dashboard</span>
@@ -143,8 +147,6 @@ function Homepage() {
             <Form />
           </div>
       </section>
-      <Footer />
-
     </>
   )
 }

@@ -1,6 +1,6 @@
-import Button from '../button/button';
+import Button from 'app/components/button/button';
 import { Link } from 'react-router';
-import { ReactComponent as ChevronDown } from '../icons/chevron-down';
+import { ReactComponent as ChevronDown } from 'app/components/icons/chevron-down';
 import './topBar.css';
 
 const TopBar = () => {
@@ -15,13 +15,16 @@ const TopBar = () => {
             <div className="navs">
                 <ul className="topList">
                     <li className="topListItem">
+                        <Link className='link down-arrow' to="/"> Dashboard <ChevronDown/></Link>
+                    </li>
+                    <li className="topListItem">
                         <Link className='link down-arrow' to="/about"> About <ChevronDown/></Link>
                     </li>
                     <li className="topListItem">
                         <Link className='link' to="/methodology"> Methodology <ChevronDown/></Link>
                     </li>
                     <li className="topListItem">
-                        <Link className='link' to="#"> Contact <ChevronDown/></Link>
+                        <Link className='link' to="https://form.asana.com/?k=4W32Fdf5p7zPNIV-3gKh5A&d=1108016200678557"> Contact <ChevronDown/></Link>
                     </li>
                     <li className="topListItem">
                         <Button 
