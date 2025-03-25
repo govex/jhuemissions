@@ -8,71 +8,61 @@
     font-family: "Montserrat";
     background-color: #0E2D72;
     color: #FFF;
-    padding-top: 77px;
-    padding-bottom: 56px;
-    padding-left: 20px;
-}
-
-.btn-abt {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 3px solid #A15B96;
-    border-radius: 40px;
-    width: 50%;
-    height: 40px;
-    margin-top: 1REM;
-
-}
-
-.left {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    width: 635px;
-    height: 199px;
-
-}
-
-.right {
-    display: flex;
-    flex-direction: column;
-
-    color: #FFF;
-    width: 637px;
-    height: 300px;
-    font-family: Montserrat;
-    font-size: 24px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
+    padding: 77px 20px 56px 20px;
+    margin-bottom: 30px;
 }
 
 .c-heading {
     color: #FFF;
     width: 1010px;
     height: 76px;
-    font-family: Montserrat;
+    font-family: "Montserrat";
     font-size: 40px;
     font-style: normal;
     font-weight: 600;
     line-height: normal;
-
 }
 
 .para {
     color: #FFF;
-    font-family: Montserrat;
+    font-family: "Montserrat";
     font-size: 24px;
     font-style: normal;
     font-weight: 600;
     line-height: normal;
 }
 
-.graph{
-    z-index: 1000;
+.grid {
+    display: grid;
+    grid-template-areas: 
+        "filter . . . . . tool tool"
+        "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
+        "donut donut donut method method method tool tool";
+    width: 100vw;
+    padding: 20px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 50px 300px 485px;
+    gap: 40px;
+    margin-bottom: 30px;
 }
-.cards{
-    display: flex;
-    
+.filter {
+    grid-area: filter;
+}
+.tool {
+    grid-area: tool;
+}
+.kpi1 {
+    grid-area: kpi1;
+}
+.kpi2 {
+    grid-area: kpi2;
+}
+.kpi3 {
+    grid-area: kpi3;
+}
+.donut {
+    grid-area: donut;
+}
+.method {
+    grid-area: method;
 }
