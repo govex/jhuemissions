@@ -2,7 +2,7 @@
 
 function ModalBody(props) {
     return (
-        <div className="modal-body">
+        <div className={`modal-body ${props.className || ''}`}>
             {props.children}
         </div>
     );
