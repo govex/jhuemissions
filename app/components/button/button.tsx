@@ -19,7 +19,7 @@ const Button = ({
     const innerContent = () => (
         <button
             className={cx(styles[type], styles[color], styles[size])}
-            onClick={onClick || null}
+            onClick={onClick || undefined}
         >
             {text &&
                 <label className={styles.label}>{text}</label>

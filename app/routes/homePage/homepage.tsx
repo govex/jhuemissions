@@ -23,7 +23,7 @@ function Homepage() {
   const [loading, setLoading] = useState(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
 
-  const handleFilterClick = (event) => {
+  const handleFilterClick = (event:any) => {
     setFilterAnchorEl(event.currentTarget);
   };
 
