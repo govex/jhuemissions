@@ -1,7 +1,7 @@
 
 import styles from "./homepage.module.scss";
-import { useState, useEffect } from "react";
-import type { MouseEvent, SyntheticEvent } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { MouseEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover } from "@mui/material";
@@ -11,12 +11,17 @@ import Donut from "~/components/donut/donut";
 import Infographic from "~/components/infographic/infographic";
 import * as d3 from "d3";
 import type { Route } from "./+types/homepage";
-import { BarChart } from "@mui/x-charts/BarChart"
-
+import BarChartVariants from "~/components/barChart/barChart";
 
 interface DataPoint {
+  [index: string]: number | string;
   label: string;
   value: number;
+}
+
+interface DataSet {
+  year: number;
+  data: DataPoint[];
 }
 
 
@@ -27,10 +32,10 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 function Homepage() {
-  const [data, setData] = useState<DataPoint[]>([]);
+  const [data, setData] = useState<DataSet[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
-
+  const bar1ref = useRef<HTMLDivElement | null>(null);
   const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
     setFilterAnchorEl(event.currentTarget);
   };
@@ -48,19 +53,11 @@ function Homepage() {
         label: d.group,
         value: +d.val, // Convert value to a number
       }));
-      setData(formattedData);
+      setData([{year: 2024, data: formattedData}]);
       setLoading(false);
     }).catch((error) => console.error("Error loading CSV:", error));
   }, []);
-  const maxVal = Math.max(...data.map((d) => d.value));
-  const barColors = data.map((val) => {
-    if (val.value === maxVal) {
-      return "#002D72";
-    
-    } else {
-      return "#AAA"; // non-max and non-min values take default color of series
-    }
-  });
+
   return (
     <>
       <section className={styles.hero}>
@@ -189,55 +186,21 @@ function Homepage() {
         <div className={styles.bar1}>
           <Card
             title="What group is traveling the most"
-
           >
-            <BarChart className={styles.bar11}
-
-              layout="horizontal"
-              xAxis={[
-                { 
-                  scaleType: "linear",
-                
-                }]}
-              yAxis={[
-                { scaleType: "band", 
-                  data: data.map((item) => item.label), 
-                  disableTicks: true,
-                  colorMap: {
-                    type: "ordinal",
-                    
-                    colors: barColors,
-                  },
-                }
-
-              ]}
-              series={[
-                {
-                  data: data.map((item) => item.value),
-                  
-                },
-              ]}
-              width={600}
-              height={400}
-              bottomAxis={null}
-              sx={{
-                // Customize x-axis line (grey, thick)
-                "& .MuiChartsAxis-left .MuiChartsAxis-line": {
-                  stroke: "#CCC",
-                  strokeWidth: 4,
-                  color: "#000",
-                  
-                  
-
-                },
-
-
-              }}
-              barLabel="value"
-
-
-            />
-
+            <div className={styles.chartContainer} ref={bar1ref}>
+              {!loading && bar1ref?.current && data.length > 0 &&
+                <BarChartVariants 
+                  data={data}
+                  orientation="horizontal"
+                  xScale="linear"
+                  yScale="band"
+                  parentRect={bar1ref.current.getBoundingClientRect()}
+                  labelField="label"
+                  valueField="value"
+              
+                />
+              }
+            </div>
           </Card>
         </div>
         <div className={styles.bar2}>
