@@ -38,7 +38,7 @@
         "filter . . . . . tool tool"
         "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
         "donut donut donut method method method tool tool";
-    width: 100vw;
+    width: 90vw;
     padding: 20px;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 50px 300px 485px;
@@ -69,4 +69,10 @@
 .filterPopover {
     background-color: transparent;
     border-radius: 30px;
+}
+.right {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
 }

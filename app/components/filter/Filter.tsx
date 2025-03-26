@@ -72,12 +72,12 @@ function Filter({close}:{close: (event:MouseEvent)=>null}) {
                 options={["School 1", "School 2", "School 3"]}
                 renderInput={(params) => <TextField {...params} label="School or Division" />}
                 sx={{
-                  "background-color": "#FFFFFFCC",
+                  "backgroundColor": "#FFFFFFCC",
                   "color": "#A15B96",
-                  "font-weight": "600",
-                  "font-size": "24px",
+                  "fontWeight": "600",
+                  "fontSize": "24px",
                   "margin": "20px",
-                  "border-radius": "30px",
+                  "borderRadius": "30px",
                   "border": "none"
                 }}
               />                

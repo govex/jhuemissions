@@ -1,6 +1,7 @@
 
-import styles from "./homepage.module.scss"
-import { useState, useEffect } from "react"
+import styles from "./homepage.module.scss";
+import { useState, useEffect } from "react";
+import type { MouseEvent, SyntheticEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover } from "@mui/material";
@@ -8,7 +9,6 @@ import Filter from "~/components/filter/Filter";
 import Form from "~/components/form/Form";
 import Donut from "~/components/donut/donut";
 import Infographic from "~/components/infographic/infographic";
-// import BarChart from "../../utils/BarChart";
 import * as d3 from "d3";
 import type { Route } from "./+types/homepage";
 
@@ -21,9 +21,9 @@ export function meta({}: Route.MetaArgs) {
 function Homepage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+  const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const handleFilterClick = (event) => {
+  const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
     setFilterAnchorEl(event.currentTarget);
   };
 
@@ -83,9 +83,9 @@ function Homepage() {
               }}
               sx={{
                 "& .MuiPopover-paper": {
-                  "background-color": "transparent",
-                  "border-radius": "30px",
-                  "margin-top": "10px",
+                  "backgroundColor": "transparent",
+                  "borderRadius": "30px",
+                  "marginTop": "10px",
                 }
               }}         
               >
