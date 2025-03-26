@@ -1,13 +1,14 @@
-import Button from "../button/button";
-import { Autocomplete } from "@mui/material";
-import { TextField } from "@mui/material";
-import { styled } from '@mui/material/styles';
-import Checkbox from '@mui/material/Checkbox';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import { ReactComponent as CloseX } from "../icons/close-x";
+import type { MouseEvent } from 'react';
+import Button from "~/components/button/button";
+import { styled, 
+  TextField, 
+  Autocomplete, 
+  Checkbox, 
+  FormLabel, 
+  FormControl, 
+  FormGroup, 
+  FormControlLabel } from '@mui/material';
+import { ReactComponent as CloseX } from "~/components/icons/close-x";
 import styles from './filter.module.scss';
 
 const BpIcon = styled('span')(({ theme }) => ({
@@ -59,7 +60,7 @@ const BpCheckedIcon = styled(BpIcon)({
   },
 });
 
-function Filter({close}) {
+function Filter({close}:{close: (event:MouseEvent)=>null}) {
   return (
         <div className={styles.modalContainer}>
           <div className={styles.header}>
@@ -69,14 +70,15 @@ function Filter({close}) {
             <div className=" content department">
               <Autocomplete 
                 options={["School 1", "School 2", "School 3"]}
-                renderInput={(params) => <TextField {...params} label="School or Department" />}
+                renderInput={(params) => <TextField {...params} label="School or Division" />}
                 sx={{
-                  "background-color": "#FFFFFFCC",
+                  "backgroundColor": "#FFFFFFCC",
                   "color": "#A15B96",
-                  "font-weight": 600,
-                  "font-size": "24px",
-                  "margin": "10px",
-                  "border-radius": "30px"
+                  "fontWeight": "600",
+                  "fontSize": "24px",
+                  "margin": "20px",
+                  "borderRadius": "30px",
+                  "border": "none"
                 }}
               />                
             </div>

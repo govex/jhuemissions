@@ -1,8 +1,8 @@
 import { Link } from 'react-router'
-import { ReactComponent as RightArrow } from "../icons/right-arrow";
-import { ReactComponent as ChevronDown } from "../icons/chevron-down";
-import { ReactComponent as ArrowUpCircle } from "../icons/arrow-up-circle";
-import { ReactComponent as CloseX } from "../icons/close-x";
+import { ReactComponent as RightArrow } from "~/components/icons/right-arrow";
+import { ReactComponent as ChevronDown } from "~/components/icons/chevron-down";
+import { ReactComponent as ArrowUpCircle } from "~/components/icons/arrow-up-circle";
+import { ReactComponent as CloseX } from "~/components/icons/close-x";
 import cx from "classnames";
 import styles from "./button.module.scss"
 
@@ -12,7 +12,7 @@ const Button = ({
     text=undefined, 
     color="primary", 
     size="small", 
-    onClick=undefined,
+    onClick=null,
     href=undefined
 }) => {
 
@@ -22,7 +22,7 @@ const Button = ({
             onClick={onClick || undefined}
         >
             {text &&
-                <label className={styles.label}>{text}</label>
+                <label className={cx(styles.label, icon ? styles.icon : "")}>{text}</label>
             }
             {icon === "chevron-down" &&
                 <ChevronDown />

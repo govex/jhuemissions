@@ -4,9 +4,9 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist'] },
+  { ignores: ['build/', 'node_modules/', '.react-router/'] },
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['**/*.{js,jsx,tsx,ts}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

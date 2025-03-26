@@ -1,6 +1,7 @@
 
-import styles from "./homepage.module.scss"
-import { useState, useEffect } from "react"
+import styles from "./homepage.module.scss";
+import { useState, useEffect } from "react";
+import type { MouseEvent, SyntheticEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover } from "@mui/material";
@@ -8,7 +9,6 @@ import Filter from "~/components/filter/Filter";
 import Form from "~/components/form/Form";
 import Donut from "~/components/donut/donut";
 import Infographic from "~/components/infographic/infographic";
-// import BarChart from "../../utils/BarChart";
 import * as d3 from "d3";
 import type { Route } from "./+types/homepage";
 
@@ -21,9 +21,9 @@ export function meta({}: Route.MetaArgs) {
 function Homepage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+  const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const handleFilterClick = (event:any) => {
+  const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
     setFilterAnchorEl(event.currentTarget);
   };
 
@@ -44,9 +44,10 @@ function Homepage() {
 
   return (
     <>
-      <section className={styles.Info}>
-        <div className={styles.left}>
-          <span className={styles['c-heading']}>Climate Dashboard</span>
+      <section className={styles.hero}>
+      <h1>Travel Emissions Dashboard</h1>
+      <div className={styles.info}>
+      <div className={styles.left}>
           <p className={styles.para}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
           </p>
@@ -62,6 +63,7 @@ function Homepage() {
             href="/about"
           />
         </div>
+      </div>
       </section>
       <section className={styles.grid}>
           <div className={styles.filter}>
@@ -83,8 +85,9 @@ function Homepage() {
               }}
               sx={{
                 "& .MuiPopover-paper": {
-                  "background-color": "transparent",
-                  "border-radius": "30px"
+                  "backgroundColor": "transparent",
+                  "borderRadius": "30px",
+                  "marginTop": "10px",
                 }
               }}         
               >
