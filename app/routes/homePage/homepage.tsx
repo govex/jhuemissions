@@ -84,7 +84,8 @@ function Homepage() {
               sx={{
                 "& .MuiPopover-paper": {
                   "background-color": "transparent",
-                  "border-radius": "30px"
+                  "border-radius": "30px",
+                  "margin-top": "10px",
                 }
               }}         
               >

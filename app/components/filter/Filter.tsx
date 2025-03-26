@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import Button from "../button/button";
 import { Autocomplete } from "@mui/material";
 import { TextField } from "@mui/material";
@@ -59,7 +60,7 @@ const BpCheckedIcon = styled(BpIcon)({
   },
 });
 
-function Filter({close}) {
+function Filter({close}:{close: (event:MouseEvent)=>null}) {
   return (
         <div className={styles.modalContainer}>
           <div className={styles.header}>
@@ -69,14 +70,15 @@ function Filter({close}) {
             <div className=" content department">
               <Autocomplete 
                 options={["School 1", "School 2", "School 3"]}
-                renderInput={(params) => <TextField {...params} label="School or Department" />}
+                renderInput={(params) => <TextField {...params} label="School or Division" />}
                 sx={{
                   "background-color": "#FFFFFFCC",
                   "color": "#A15B96",
-                  "font-weight": 600,
+                  "font-weight": "600",
                   "font-size": "24px",
-                  "margin": "10px",
-                  "border-radius": "30px"
+                  "margin": "20px",
+                  "border-radius": "30px",
+                  "border": "none"
                 }}
               />                
             </div>
