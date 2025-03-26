@@ -37,7 +37,8 @@
     grid-template-areas: 
         "filter . . . . . tool tool"
         "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
-        "donut donut donut method method method tool tool";
+        "donut donut donut method method method tool tool"
+        "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" ;
     width: 100vw;
     padding: 20px;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -69,4 +70,12 @@
 .filterPopover {
     background-color: transparent;
     border-radius: 30px;
+}
+
+.bar1{
+    grid-area: bar1;
+    align-items: center;
+}
+.bar2{
+    grid-area: bar2;
 }

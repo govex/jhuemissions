@@ -1,4 +1,6 @@
-year,efficiency ,sales,
-1980.00,24.30,8949000.00,
-1985.00,27.60,10979000.00,
-1900.00,21.40,56565656.00,
+group,val
+Student,500
+Professors,250
+Researchers,900
+Profes,550
+Miscellaneous, 100
