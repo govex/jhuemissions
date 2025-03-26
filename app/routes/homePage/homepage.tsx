@@ -44,9 +44,10 @@ function Homepage() {
 
   return (
     <>
-      <section className={styles.Info}>
-        <div className={styles.left}>
-          <span className={styles['c-heading']}>Climate Dashboard</span>
+      <section className={styles.hero}>
+      <h1>Travel Emissions Dashboard</h1>
+      <div className={styles.info}>
+      <div className={styles.left}>
           <p className={styles.para}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
           </p>
@@ -62,6 +63,7 @@ function Homepage() {
             href="/about"
           />
         </div>
+      </div>
       </section>
       <section className={styles.grid}>
           <div className={styles.filter}>
