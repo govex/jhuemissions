@@ -21,6 +21,10 @@
         justify-content: center;
         border-width: 6px;
     }
+
+    &.small {
+        border-width: 1px;
+    }
 }
 
 .solid {

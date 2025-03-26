@@ -19,9 +19,9 @@ const Footer = () => {
                     <li className={styles.footListItem}>
                         <Button 
                             text="GovEx"
-                            color='primary'
+                            color='secondary'
                             href="http://govex.jhu.edu"
-                            type='solid'
+                            type='border'
                             size='small'
                         />
                     </li>
@@ -30,7 +30,7 @@ const Footer = () => {
 
             {/* Bottom Section */}
             <div className={styles.footBottom}>
-                <span>Privacy Policy | Copyright 2024</span>
+                <span><Link to={"https://it.johnshopkins.edu/policies-privacystatement/"}>Privacy Policy</Link> | Copyright 2024</span>
             </div>
         </div>
     );
