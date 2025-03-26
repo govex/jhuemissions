@@ -1,7 +1,7 @@
 import Button from 'app/components/button/button';
 import { Link } from 'react-router';
 import { ReactComponent as ChevronDown } from 'app/components/icons/chevron-down';
-import './topBar.css';
+import './topbar.css';
 
 const TopBar = () => {
     return (
