@@ -1,12 +1,14 @@
 import type { MouseEvent } from 'react';
-import Button from "../button/button";
-import { styled, TextField, Autocomplete } from '@mui/material';
-import Checkbox from '@mui/material/Checkbox';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import { ReactComponent as CloseX } from "../icons/close-x";
+import Button from "~/components/button/button";
+import { styled, 
+  TextField, 
+  Autocomplete, 
+  Checkbox, 
+  FormLabel, 
+  FormControl, 
+  FormGroup, 
+  FormControlLabel } from '@mui/material';
+import { ReactComponent as CloseX } from "~/components/icons/close-x";
 import styles from './filter.module.scss';
 
 const BpIcon = styled('span')(({ theme }) => ({
