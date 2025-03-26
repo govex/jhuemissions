@@ -22,7 +22,7 @@ const Button = ({
             onClick={onClick || null}
         >
             {text &&
-                <label className={styles.label}>{text}</label>
+                <label className={cx(styles.label, icon ? styles.icon : "")}>{text}</label>
             }
             {icon === "chevron-down" &&
                 <ChevronDown />

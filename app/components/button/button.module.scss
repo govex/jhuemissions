@@ -16,18 +16,20 @@
     }
 
     &.large {
-        border-width: 6px;    
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-width: 6px;
     }
 }
 
 .solid {
     border-radius: 40px;
     border: none;
-    padding: 4px;
+    padding: 4px 20px;
     color: #fff;
     font-family: "Montserrat";
     font-weight: 600;
-    line-height: 100%;
     text-align: center;
     background-color: var(--Heritage-Blue, #002D72);
 
@@ -52,9 +54,14 @@
     font-size: 14px;
     font-weight: 400;
     width: 72px;
+    padding: 4px;
     height: 35px;
 }
 
 .label {
     pointer-events: none;
+}
+
+.icon {
+    margin-right: 10px;
 }
