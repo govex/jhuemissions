@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.8",
     "@mui/material": "^6.4.8",
+    "@mui/x-charts": "^7.28.0",
     "@react-router/node": "^7.4.0",
     "@react-router/serve": "^7.4.0",
     "classnames": "^2.5.1",

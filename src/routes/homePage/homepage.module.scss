@@ -1,17 +1,26 @@
-.hero {
+.Info {
     width: 100%;
-    min-height: 436px;
-    background-color: #0E2D72;
-    color: #FFF;
-    padding: 70px;
-    margin-bottom: 30px;
-}
-.info {
-    height: 100%;
+    height: 436px;
+    flex-shrink: 0;
     display: flex;
     align-items: start;
     justify-content: space-evenly;
-    gap: 80px;
+    font-family: "Montserrat";
+    background-color: #0E2D72;
+    color: #FFF;
+    padding: 77px 20px 56px 20px;
+    margin-bottom: 30px;
+}
+
+.c-heading {
+    color: #FFF;
+    width: 1010px;
+    height: 76px;
+    font-family: "Montserrat";
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
 }
 
 .para {
@@ -28,9 +37,7 @@
     grid-template-areas: 
         "filter . . . . . tool tool"
         "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
-        "donut donut donut method method method tool tool"
-        "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" ;
-    width: 90vw;
+        "donut donut donut method method method tool tool";
     width: 100vw;
     padding: 20px;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -58,21 +65,4 @@
 }
 .method {
     grid-area: method;
-}
-.filterPopover {
-    background-color: transparent;
-    border-radius: 30px;
-}
-.right {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 60px;
-}
-.bar1{
-    grid-area: bar1;
-    align-items: center;
-}
-.bar2{
-    grid-area: bar2;
 }
