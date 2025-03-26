@@ -1,8 +1,6 @@
 import type { MouseEvent } from 'react';
 import Button from "../button/button";
-import { Autocomplete } from "@mui/material";
-import { TextField } from "@mui/material";
-import { styled } from '@mui/material/styles';
+import { styled, TextField, Autocomplete } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
