@@ -1,7 +1,7 @@
 
 import styles from "./homepage.module.scss";
-import { useState, useEffect } from "react";
-import type { MouseEvent, SyntheticEvent } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { MouseEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover } from "@mui/material";
@@ -11,6 +11,7 @@ import Donut from "~/components/donut/donut";
 import Infographic from "~/components/infographic/infographic";
 import * as d3 from "d3";
 import type { Route } from "./+types/homepage";
+import { Map } from "~/components/map/map";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -18,10 +19,12 @@ export function meta({}: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
+
 function Homepage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const mapRef = useRef<HTMLDivElement | null>(null);
 
   const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
     setFilterAnchorEl(event.currentTarget);
@@ -35,7 +38,7 @@ function Homepage() {
   const filterId = filterOpen ? 'simple-popover' : undefined;
 
   useEffect(() => {
-    d3.csv("./chart-data.csv").then((d) => {
+    d3.csv("./data/chart-data.csv").then((d) => {
       setData(d);
       setLoading(false);
     });
@@ -146,6 +149,31 @@ function Homepage() {
               />
             </Card>
             </div>
+            <div className={styles.bar1}>
+              <Card
+                title="What group is traveling the most"
+              >
+                <p>chart placeholder</p>
+              </Card>
+            </div>
+            <div className={styles.bar2}>
+              <Card
+                title="What group is traveling the most"
+              >
+                <p>chart placeholder</p>
+              </Card>
+          </div>
+          <div className={styles.map}>
+            <Card title="Where are people travelling?">
+              <div className={styles.chartContainer} ref={mapRef}>
+                {mapRef?.current &&
+                  <Map
+                    parentRect={mapRef.current.getBoundingClientRect()} 
+                  />
+                }
+              </div>
+            </Card>
+          </div>
           <div className={styles.tool}>
             <Form />
           </div>
