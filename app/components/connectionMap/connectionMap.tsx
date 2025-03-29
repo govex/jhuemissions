@@ -28,7 +28,7 @@ type Connection = {
     school: string;
 }
 
-export const Map = ({ parentRect, data }: MapProps) => {
+export const ConnectionMap = ({ parentRect, data }: MapProps) => {
     const lineWidthScale = d3.scaleLinear().range([2, 8])
     const [lineWidthDomain, setLineWidthDomain] = useState([1,100]);
     const [world, setWorld] = useState({
@@ -126,11 +126,10 @@ export const Map = ({ parentRect, data }: MapProps) => {
         geoPathGenerator.projection(projection);
         if (!loading) {
             let paths = world.features
-            .map((shape) => {
-                console.log(shape.iso_a3);
+            .map((shape,i) => {
                 return (
                     <path
-                    key={shape.iso_a3}
+                    key={`${shape.iso_a3}${i}`}
                     d={geoPathGenerator(shape)}
                     stroke="lightGrey"
                     strokeWidth={0.5}

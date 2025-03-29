@@ -1,0 +1,68 @@
+.Info {
+    width: 100%;
+    height: 436px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: start;
+    justify-content: space-evenly;
+    font-family: "Montserrat";
+    background-color: #0E2D72;
+    color: #FFF;
+    padding: 77px 20px 56px 20px;
+    margin-bottom: 30px;
+}
+
+.c-heading {
+    color: #FFF;
+    width: 1010px;
+    height: 76px;
+    font-family: "Montserrat";
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.para {
+    color: #FFF;
+    font-family: "Montserrat";
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.grid {
+    display: grid;
+    grid-template-areas: 
+        "filter . . . . . tool tool"
+        "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
+        "donut donut donut method method method tool tool";
+    width: 100vw;
+    padding: 20px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 50px 300px 485px;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+.filter {
+    grid-area: filter;
+}
+.tool {
+    grid-area: tool;
+}
+.kpi1 {
+    grid-area: kpi1;
+}
+.kpi2 {
+    grid-area: kpi2;
+}
+.kpi3 {
+    grid-area: kpi3;
+}
+.donut {
+    grid-area: donut;
+}
+.method {
+    grid-area: method;
+}
