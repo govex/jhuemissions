@@ -223,7 +223,8 @@ function Homepage() {
             {mapRef?.current &&
               <ConnectionMap
                 parentRect={mapRef.current.getBoundingClientRect()} 
-              />
+                year={["FY202425"]}
+                />
             }
           </div>
         </Card>

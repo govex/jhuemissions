@@ -12,12 +12,13 @@ type MapProps = {
     x: number,
     y: number
   };  
-  data?: any;
+  year: string[];
 };
 
+type ConnectionData = Map<string, Connection[]>
 type Connection = {
-    from: string;
-    to: string;
+    from_full: string;
+    to_full: string;
     from_lat: number;
     from_lng: number;
     to_lat: number;
@@ -28,9 +29,7 @@ type Connection = {
     school: string;
 }
 
-export const ConnectionMap = ({ parentRect, data }: MapProps) => {
-    const lineWidthScale = d3.scaleLinear().range([2, 8])
-    const [lineWidthDomain, setLineWidthDomain] = useState([1,100]);
+export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => {
     const [world, setWorld] = useState({
         "type": "FeatureCollection",
         "features": [
@@ -69,7 +68,7 @@ export const ConnectionMap = ({ parentRect, data }: MapProps) => {
     });
     const [loading, setLoading] = useState(true);
     const [countryPaths, setCountryPaths] = useState<any[] | undefined>(undefined);
-    const [mapData, setMapData] = useState<Connection[]>([]);
+    const [mapData, setMapData] = useState<ConnectionData | undefined>(undefined);
     const [connections, setConnections] = useState<any[] | undefined>(undefined);
     useEffect(() => {
       d3.json("./data/ne_world_countries.json").then((d) => {
@@ -79,18 +78,31 @@ export const ConnectionMap = ({ parentRect, data }: MapProps) => {
       return () => undefined;
     }, []);
     useEffect(()=>{
-        d3.csv("./data/map_example.csv").then((d) => {
-            setMapData(d);
-            let domain = d3.extent(d.map(m => +m.total_trips));
-            setLineWidthDomain(domain);
+        d3.csv("./data/trips_between_locations_by_school.csv", (d) => {
+            return {
+                from_full: d.from_full,
+                to_full: d.to_full,
+                from_lat: +d.from_lat,
+                from_lng: +d.from_lng,
+                to_lat: +d.to_lat,
+                to_lng: +d.to_lng,
+                total_trips: +d.total_trips,
+                total_emissions: +d.total_emissions,
+                fiscalyear: d.fiscalyear.replace("-", ""),
+                school: d.school            
+            } as Connection
+        }).then((d) => {
+            let grouped = d3.group(d, d=>d.fiscalyear)
+            setMapData(grouped);
         })
     },[])
     useEffect(()=>{
         if (!loading) {
             projection.fitSize([parentRect.width, parentRect.height], world); 
             geoPathGenerator.projection(projection);    
-            if (mapData.length > 0) {
-                let lines = mapData.map((connection, i) => {
+            if (mapData) {
+                if (year.length === 1) {
+                let lines = mapData.get(year[0]).map((connection, i) => {
                     const path = geoPathGenerator({
                         type: 'LineString',
                         coordinates: [
@@ -98,20 +110,21 @@ export const ConnectionMap = ({ parentRect, data }: MapProps) => {
                             [connection.to_lng, connection.to_lat]
                         ]
                     })
-                    const keyId = connection.from.slice(0,2) + "_" + connection.to.slice(0,2) + i
+                    const keyId = connection.from_full.slice(0,2) + "_" + connection.to_full.slice(0,2) + i
 
                     return (
                         <path
                           key={keyId}
                           d={path ?? undefined}
                           stroke="#A15B96"
-                          strokeWidth={lineWidthScale.domain(lineWidthDomain)(connection.total_trips)}
+                          strokeWidth={0.5}
                           fill="none"
-                          opacity={0.5}
+                          opacity={0.25}
                         />
                       );
                 })
                 setConnections(lines);
+            }
             }
         }
         
@@ -145,7 +158,7 @@ export const ConnectionMap = ({ parentRect, data }: MapProps) => {
         <div>
         <svg width={parentRect.width} height={parentRect.height}>
             {!loading && countryPaths}
-            {!loading && mapData.length > 0 && connections}
+            {!loading && !!mapData && connections}
         </svg>
         </div>
     );
