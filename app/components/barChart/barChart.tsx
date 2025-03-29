@@ -1,7 +1,7 @@
 import { BarChart } from "@mui/x-charts/node/BarChart";
 import styles from "./barChart.module.scss";
 import { useEffect, useState, type ReactNode } from "react";
-import type { DataPoint } from "~/routes/homePage/homepage";
+import type { DataPoint, DataPoint2 } from "~/routes/homePage/homepage";
 import type { InternMap } from "d3";
 import { schemeCategory10, scaleOrdinal } from "d3";
   
@@ -15,7 +15,7 @@ export default function BarChartVariants({
     valueField,
     year = ["FY202425"]
 }:{
-    data: InternMap<string, DataPoint[]>,
+    data: InternMap<string, DataPoint[] | DataPoint2[]>,
     orientation: "horizontal" | "vertical" | undefined,
     xScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
     yScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
@@ -29,17 +29,17 @@ export default function BarChartVariants({
         x: number,
         y: number
     },
-    labelField: keyof DataPoint,
-    valueField: keyof DataPoint,
+    labelField: keyof DataPoint | keyof DataPoint2,
+    valueField: keyof DataPoint | keyof DataPoint2,
     year: string[],
 }) {
-    const colorScale = scaleOrdinal(schemeCategory10).domain(["FY202425", "FY202324", "FY202223", "FY202122","FY202021"])
+    const colorScale = scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"]).domain(["FY202425", "FY202324", "FY202223", "FY202122","FY202021"])
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [marginLeft, setMarginLeft] = useState(0);
     useEffect(() => {
         if (data !== undefined) {
             if (year.length === 1) {
-                let labelMap = data.get(year[0]).map((item) => item[labelField]);
+                let labelMap = data.get(year[0])?.map((item) => item[labelField]);
                 console.log(labelMap)
                 setGroupLabels(labelMap);
                 setMarginLeft(Math.max(...labelMap.map(d => d.length * 10)));

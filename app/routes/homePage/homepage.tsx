@@ -30,12 +30,25 @@ export type DataPoint = {
   total_miles: number;
   average_miles: number;
 }
+export type DataPoint2 = {
+  fiscalyear: string;
+  traveler_type: string;
+  total_emissions: number;
+  total_trips: number;
+  percent_total_emissions: number;
+  percent_total_trips: number;
+  total_miles: number;
+  average_miles: number;
+}
 
 function Homepage() {
   const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
+  const [data2, setData2] = useState<InternMap<string,DataPoint2[]> | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loading2, setLoading2] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
   const bar1ref = useRef<HTMLDivElement | null>(null);
+  const bar2ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
 
   const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
@@ -65,6 +78,22 @@ function Homepage() {
       let grouped = d3.group(d, d => d.fiscalyear)
       setData(grouped);
       setLoading(false);
+    }).catch((error) => console.error("Error loading CSV:", error));
+    d3.csv("./data/chart_data_traveler.csv", (d)=>{
+      return {
+        fiscalyear: d.fiscalyear,
+        traveler_type: d.traveler_type,
+        total_emissions: +d.total_emissions,
+        total_trips: +d.total_trips,
+        percent_total_emissions: +d.percent_total_emissions,
+        percent_total_trips: +d.percent_total_trips,
+        total_miles: +d.total_miles,
+        average_miles: +d.average_miles
+      } as DataPoint2;
+    }).then((d) => {
+      let grouped = d3.group(d, d => d.fiscalyear)
+      setData2(grouped);
+      setLoading2(false);
     }).catch((error) => console.error("Error loading CSV:", error));
   }, []);
 
@@ -192,19 +221,19 @@ function Homepage() {
         </div>
         <div className={styles.bar1}>
           <Card
-            title="What group is traveling the most"
+            title="What traveler type is traveling the most?"
           >
             <div className={styles.chartContainer} ref={bar1ref}>
-              {!loading && bar1ref?.current && !!data &&
+              {!loading2 && bar1ref?.current && !!data2 &&
                 <BarChartVariants 
-                  data={data}
+                  data={data2}
                   orientation="horizontal"
                   xScale="linear"
                   yScale="band"
                   parentRect={bar1ref.current.getBoundingClientRect()}
-                  labelField={"school" as keyof DataPoint["school"]}
-                  valueField={"total_trips" as keyof DataPoint["total_trips"]}
-                  year={["FY202425"]}
+                  labelField={"traveler_type" as keyof DataPoint2["traveler_type"]}
+                  valueField={"total_trips" as keyof DataPoint2["total_trips"]}
+                  year={["FY202425","FY202324","FY202223","FY202122","FY202021"]}
                 />
               }
             </div>
@@ -212,9 +241,22 @@ function Homepage() {
         </div>
         <div className={styles.bar2}>
           <Card
-            title="What group is traveling the most"
+            title="What school/division is traveling the most?"
           >
-            <p>chart placeholder</p>
+            <div className={styles.chartContainer} ref={bar2ref}>
+              {!loading && bar2ref?.current && !!data &&
+                <BarChartVariants 
+                  data={data}
+                  orientation="horizontal"
+                  xScale="linear"
+                  yScale="band"
+                  parentRect={bar2ref.current.getBoundingClientRect()}
+                  labelField={"school" as keyof DataPoint["school"]}
+                  valueField={"total_trips" as keyof DataPoint["total_trips"]}
+                  year={["FY202425","FY202324","FY202223","FY202122","FY202021"]}
+                />
+              }
+            </div>
           </Card>
       </div>
       <div className={styles.map}>
