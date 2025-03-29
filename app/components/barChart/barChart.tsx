@@ -1,4 +1,4 @@
-import { BarChart, BarLabel, type BarLabelProps, getBarLabelUtilityClass } from "@mui/x-charts/BarChart";
+import pkg from "@mui/x-charts/BarChart/index.js";
 import styles from "./barChart.module.scss";
 import { useEffect, useState, type ReactNode } from "react";
 import type { DataPoint } from "~/routes/homePage/homepage";
@@ -33,6 +33,7 @@ export default function BarChartVariants({
     valueField: keyof DataPoint,
     year: string[],
 }) {
+    const { BarChart } = pkg;
     const colorScale = scaleOrdinal(schemeCategory10).domain(["FY202425", "FY202324", "FY202223", "FY202122","FY202021"])
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [marginLeft, setMarginLeft] = useState(0);
