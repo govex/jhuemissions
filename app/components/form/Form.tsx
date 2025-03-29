@@ -1,6 +1,6 @@
-import './form.css';
+import styles from './form.module.scss';
 import { useState } from 'react';
-import Button from '../button/button';
+import Button from '~/components/button/button';
 const EmissionCalculator = () => {
     const [formData, setFormData] = useState({
       origin: '',
@@ -19,23 +19,21 @@ const EmissionCalculator = () => {
     };
   
     return (
-      <div className="container">
-        <h1 className="heading">Emission Calculator</h1>
+      <div className={styles.formcontainer}>
         <form onSubmit={handleSubmit}>
-          <label className="label">Origin of Travel</label>
-          <input type="text" name="origin" className="input" value={formData.origin} onChange={handleChange} />
+          <label className={styles.label}>Origin of Travel</label>
+          <input type="text" name="origin" className={styles.input} value={formData.origin} onChange={handleChange} />
           
-          <label className="label">Travel Destination</label>
-          <input type="text" name="destination" className="input" value={formData.destination} onChange={handleChange} />
+          <label className={styles.label}>Travel Destination</label>
+          <input type="text" name="destination" className={styles.input} value={formData.destination} onChange={handleChange} />
           
-          <label className="label">Mode</label>
-          <input type="text" name="mode" className="input" value={formData.mode} onChange={handleChange} />
+          <label className={styles.label}>Mode</label>
+          <input type="text" name="mode" className={styles.input} value={formData.mode} onChange={handleChange} />
           
-          <label className="label">Days You’re Travelling</label>
-          <input type="number" name="days" className="input" value={formData.days} onChange={handleChange} />
-          <Button type="solid" color="#0E2D72" height="40px" width="150px">
-            Submit
-          </Button>
+          <label className={styles.label}>Days You’re Travelling</label>
+          <input type="number" name="days" className={styles.input} value={formData.days} onChange={handleChange} />
+          <Button 
+            type="solid" color="primary" size='medium' text="Submit" />
           
         </form>
       </div>

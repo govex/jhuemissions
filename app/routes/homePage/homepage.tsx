@@ -114,9 +114,9 @@ function Homepage() {
       <section className={styles.hero}>
       <h1>Travel Emissions Dashboard</h1>
       <div className={styles.info}>
-      <div className={styles.left}>
-          <p className={styles.para}>
-          This dashboard aims to communicate the climate emissions impact of business travel to faculty and administrative leaders, inform estimates of JHU air travel scope 3 emissions to allow for better decision making, and foster an enabling environment, driven by faculty priorities, for mitigation efforts that address scope 3 emissions.</p>
+        <div className={styles.left}>
+            <p className={styles.para}>
+            This dashboard aims to communicate the climate emissions impact of business travel to faculty and administrative leaders, inform estimates of JHU air travel scope 3 emissions to allow for better decision making, and foster an enabling environment, driven by faculty priorities, for mitigation efforts that address scope 3 emissions.</p>
         </div>
         <div className={styles.right}>
           <p className={styles.para}>For additional background, please see <a href="https://sustainability.jhu.edu/news/a-climate-dashboard-on-jhu-business-travel-is-scheduled-to-take-off-in-april/">this article</a>. (This instance of the dashboard is a live public beta.)</p>
@@ -228,7 +228,9 @@ function Homepage() {
           </Card>
         </div>
         <div className={styles.tool}>
-          <Form />
+          <Card title="Emissions Calculator">
+            <Form />
+          </Card>
         </div>
         <div className={styles.bar1}>
           <Card
@@ -289,9 +291,6 @@ function Homepage() {
             }
           </div>
         </Card>
-      </div>
-      <div className={styles.tool}>
-        <Form />
       </div>
     </section>
     </>
