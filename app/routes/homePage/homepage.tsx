@@ -12,12 +12,8 @@ import Infographic from "~/components/infographic/infographic";
 import * as d3 from "d3";
 import type { InternMap } from "d3";
 import type { Route } from "./+types/homepage";
-<<<<<<< HEAD
-import { Map } from "~/components/map/map";
-=======
 import BarChartVariants from "~/components/barChart/barChart";
 import { ConnectionMap } from "~/components/connectionMap/connectionMap";
->>>>>>> bar-init
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -25,8 +21,6 @@ export function meta({ }: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
-<<<<<<< HEAD
-=======
 export type DataPoint = {
   fiscalyear: string;
   school: string;
@@ -37,16 +31,12 @@ export type DataPoint = {
   total_miles: number;
   average_miles: number;
 }
->>>>>>> bar-init
 
 function Homepage() {
   const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
-<<<<<<< HEAD
-=======
   const bar1ref = useRef<HTMLDivElement | null>(null);
->>>>>>> bar-init
   const mapRef = useRef<HTMLDivElement | null>(null);
 
   const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
@@ -61,10 +51,6 @@ function Homepage() {
   const filterId = filterOpen ? 'simple-popover' : undefined;
 
   useEffect(() => {
-<<<<<<< HEAD
-    d3.csv("./data/chart-data.csv").then((d) => {
-      setData(d);
-=======
     d3.csv("./data/chart-data.csv", (d)=>{
       return {
         fiscalyear: d.fiscalyear,
@@ -79,7 +65,6 @@ function Homepage() {
     }).then((d) => {
       let grouped = d3.group(d, d => d.fiscalyear)
       setData(grouped);
->>>>>>> bar-init
       setLoading(false);
     }).catch((error) => console.error("Error loading CSV:", error));
   }, []);
@@ -227,18 +212,26 @@ function Homepage() {
                 />
               }
             </div>
-<<<<<<< HEAD
             <div className={styles.bar1}>
               <Card
                 title="What group is traveling the most"
               >
-                <p>chart placeholder</p>
+                <div className={styles.chartContainer} ref={bar1ref}>
+                  {!loading && bar1ref?.current && !!data &&
+                    <BarChartVariants 
+                      data={data}
+                      orientation="horizontal"
+                      xScale="linear"
+                      yScale="band"
+                      parentRect={bar1ref.current.getBoundingClientRect()}
+                      labelField={"school" as keyof DataPoint["school"]}
+                      valueField={"total_trips" as keyof DataPoint["total_trips"]}
+                      year={["FY202425"]}
+                    />
+                  }
+                </div>
               </Card>
             </div>
-=======
-          </Card>
-        </div>
->>>>>>> bar-init
             <div className={styles.bar2}>
               <Card
                 title="What group is traveling the most"
@@ -250,11 +243,7 @@ function Homepage() {
             <Card title="Where are people travelling?">
               <div className={styles.chartContainer} ref={mapRef}>
                 {mapRef?.current &&
-<<<<<<< HEAD
-                  <Map
-=======
                   <ConnectionMap
->>>>>>> bar-init
                     parentRect={mapRef.current.getBoundingClientRect()} 
                   />
                 }
