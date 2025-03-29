@@ -1,4 +1,5 @@
-year,efficiency ,sales,
-1980.00,24.30,8949000.00,
-1985.00,27.60,10979000.00,
-1900.00,21.40,56565656.00,
+fiscalyear,school,total_emissions,total_trips,percent_total_emissions,percent_total_trips,total_miles,average_miles
+FY202425,school1,23920390,829,.23,.15,37923,323
+FY202425,school2,46736422,3923,.5,.63,624602,932
+FY202425,school3,724379,102,.01,.023,17294,189
+FY202425,school4,7893258,729,.22,.37,329048,382
