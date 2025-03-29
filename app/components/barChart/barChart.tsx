@@ -1,15 +1,9 @@
-import { BarChart, type BarItem, type BarLabelContext } from "@mui/x-charts/BarChart";
+import { BarChart, BarLabel, type BarLabelProps, getBarLabelUtilityClass } from "@mui/x-charts/BarChart";
 import styles from "./barChart.module.scss";
-import { useEffect, useState, type ReactElement } from "react";
-
-interface DataPoint {
-    [index: string]: number | string;
-  }
-  
-  interface DataSet {
-    year: number;
-    data: DataPoint[];
-  }
+import { useEffect, useState, type ReactNode } from "react";
+import type { DataPoint } from "~/routes/homePage/homepage";
+import type { InternMap } from "d3";
+import { schemeCategory10, scaleOrdinal } from "d3";
   
 export default function BarChartVariants({
     data,
@@ -18,9 +12,10 @@ export default function BarChartVariants({
     yScale,
     parentRect,
     labelField,
-    valueField
+    valueField,
+    year = ["FY202425"]
 }:{
-    data: DataSet[],
+    data: InternMap<string, DataPoint[]>,
     orientation: "horizontal" | "vertical" | undefined,
     xScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
     yScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
@@ -34,53 +29,100 @@ export default function BarChartVariants({
         x: number,
         y: number
     },
-    labelField: string,
-    valueField: string
+    labelField: keyof DataPoint,
+    valueField: keyof DataPoint,
+    year: string[],
 }) {
-    console.log(data)
+    const colorScale = scaleOrdinal(schemeCategory10).domain(["FY202425", "FY202324", "FY202223", "FY202122","FY202021"])
+    const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [marginLeft, setMarginLeft] = useState(0);
     useEffect(() => {
-        let labelMap = data[0].data.map((item) => typeof item[labelField] === "string" ? item[labelField].length : 0)
-        setMarginLeft(Math.max(...labelMap) * 8)
-    }, [data, labelField])
-    console.log(marginLeft)
-    const maxVal = Math.max(...data[0].data.map((d) => typeof d[valueField] === "number" ? d[valueField] : 0));
-    const barColors = data[0].data.map((val) => {
-      if (val[valueField] === maxVal) {
-        return "#002D72";
-      
-      } else {
-        return "#AAA"; // non-max and non-min values take default color of series
-      }
-    });
-    if (marginLeft > 0) {
+        if (data !== undefined) {
+            if (year.length === 1) {
+                let labelMap = data.get(year[0]).map((item) => item[labelField]);
+                console.log(labelMap)
+                setGroupLabels(labelMap);
+                setMarginLeft(Math.max(...labelMap.map(d => d.length * 10)));
+            } else {
+                let maxLength = 0;
+                let labels = new Set();
+                for (const g of data.values()) {
+                    g.forEach(i => {
+                        if (i[labelField].length > maxLength) {
+                            maxLength = i[labelField].length
+                        }
+                        labels.add(i[labelField]);
+                    })
+                }
+                setMarginLeft(maxLength * 8);
+                setGroupLabels(Array.from(labels));
+            }
+        }
+    }, [data, labelField, year])
+    const [maxVal, setMaxVal] = useState(0)
+    useEffect(() => {
+        if (data !== undefined) {
+            if (year.length === 1) {
+                setMaxVal(Math.max(...data.get(year[0]).map((item) => item[valueField])))
+            } else {
+                let max = 0;
+                for (const g of data.values()) {
+                    g.forEach(i => {
+                        if (i[valueField] > max) {
+                            max = i[valueField]
+                        }    
+                    })
+                }
+                setMaxVal(max)
+            }
+        }
+    },[data, year, valueField])
+    const [seriesData, setSeriesData] = useState<{label: string, color: string, data: number[]}[]>([])
+    useEffect(()=>{
+        let serieses = [];
+        for (const [y,g] of data.entries()) {
+            let series = {
+                label: y,
+                color: colorScale(y),
+                data: g.map(d => d[valueField])
+            }
+            serieses.push(series)
+        }
+        setSeriesData(serieses);
+    },[data, valueField])
+    const [render, setRender] = useState(false);
+    useEffect(()=>{
+        if (
+            marginLeft > 0 &&
+            seriesData.length > 0 &&
+            maxVal > 0 &&
+            groupLabels.length > 0
+        ) {
+            setRender(true);
+        }
+    },[marginLeft, seriesData, maxVal, groupLabels])
+    // const barClasses = getBarLabelUtilityClass("barLabel")
+    // console.log(barClasses);
+    // const BarLabelComponent = (x:BarLabelProps) => {
+    //     return (
+    //         <BarLabel {...x}></BarLabel>
+    //     )
+    // }
+    // const newBarLabel:ReactNode<BarLabelProps> = BarLabelComponent;
+    if (render) {
         return (
             <BarChart className={styles.bar11}
-            margin={{left: marginLeft}}
+            margin={{left: marginLeft, right: 70}}
             layout={orientation}
-            xAxis={[
-            { 
-                scaleType: xScale,
-            
+            yAxis={[{ 
+                scaleType: yScale,
+                data: groupLabels      
             }]}
-            yAxis={[
-            { scaleType: yScale, 
-                data: data[0].data.map((item) => item[labelField]), 
+            xAxis={[{ scaleType: xScale, 
+                data: [0, maxVal], 
                 disableTicks: true,
-                colorMap: {
-                type: "ordinal",
-                
-                colors: barColors,
-                },
-            }
-    
-            ]}
-            series={[
-            {
-                data: data[0].data.map((item) => item[valueField]),
-                
-            },
-            ]}
+            }]}
+            series={seriesData}
             width={parentRect?.width}
             height={parentRect?.height}
             bottomAxis={null}
@@ -90,9 +132,13 @@ export default function BarChartVariants({
                     stroke: "#CCC",
                     strokeWidth: 4,
                     color: "#000",
+                },
+                "& .MuiBarLabel-root": {
+                    textAnchor: "start"
                 }
             }}
-            barLabel={valueField}
+            // slots={{barLabel: newBarLabel}}
+            barLabel="value"
             />
         )    
     } else {

@@ -29,12 +29,13 @@
         "filter . . . . . tool tool"
         "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
         "donut donut donut method method method tool tool"
-        "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" ;
+        "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" 
+        "map map map map map map map map";
     width: 90vw;
     width: 100vw;
     padding: 20px;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 50px 300px 485px 485px;
+    grid-template-rows: 50px 300px 485px 485px 485px;
     gap: 40px;
     margin-bottom: 30px;
 }
@@ -58,6 +59,20 @@
 }
 .method {
     grid-area: method;
+}
+.bar1 {
+    grid-area: bar1;
+}
+.bar2 {
+    grid-area: bar2;
+}
+.map {
+    grid-area: map;
+}
+.chartContainer {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 .filterPopover {
     background-color: transparent;
