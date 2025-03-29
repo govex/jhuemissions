@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import * as d3 from 'd3';
+import type { ExtendedFeatureCollection } from "d3";
 
 type MapProps = {
   parentRect: {
@@ -30,7 +31,7 @@ type Connection = {
 }
 
 export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => {
-    const [world, setWorld] = useState({
+    const [world, setWorld] = useState<ExtendedFeatureCollection>({
         "type": "FeatureCollection",
         "features": [
         {
@@ -71,11 +72,12 @@ export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => 
     const [mapData, setMapData] = useState<ConnectionData | undefined>(undefined);
     const [connections, setConnections] = useState<any[] | undefined>(undefined);
     useEffect(() => {
-      d3.json("./data/ne_world_countries.json").then((d) => {
-        setWorld(d);
-        setLoading(false);
+      d3.json<ExtendedFeatureCollection>("./data/ne_world_countries.json").then((d) => {
+        if (d) {
+            setWorld(d);
+            setLoading(false);    
+        }
       });
-      return () => undefined;
     }, []);
     useEffect(()=>{
         d3.csv("./data/trips_between_locations_by_school.csv", (d) => {
@@ -102,7 +104,7 @@ export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => 
             geoPathGenerator.projection(projection);    
             if (mapData) {
                 if (year.length === 1) {
-                let lines = mapData.get(year[0]).map((connection, i) => {
+                let lines = mapData.get(year[0])?.map((connection, i) => {
                     const path = geoPathGenerator({
                         type: 'LineString',
                         coordinates: [
@@ -140,10 +142,11 @@ export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => 
         if (!loading) {
             let paths = world.features
             .map((shape,i) => {
+                let country = geoPathGenerator(shape);
                 return (
                     <path
                     key={`${shape.iso_a3}${i}`}
-                    d={geoPathGenerator(shape)}
+                    d={country ?? undefined}
                     stroke="lightGrey"
                     strokeWidth={0.5}
                     fill="grey"
