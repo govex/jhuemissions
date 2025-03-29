@@ -1,4 +1,4 @@
-import { BarChart, BarLabel, type BarLabelProps, getBarLabelUtilityClass } from "@mui/x-charts/BarChart";
+import { BarChart } from "@mui/x-charts/node/BarChart";
 import styles from "./barChart.module.scss";
 import { useEffect, useState, type ReactNode } from "react";
 import type { DataPoint } from "~/routes/homePage/homepage";

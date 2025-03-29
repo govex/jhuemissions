@@ -7,7 +7,6 @@ import Card from "~/components/card/card";
 import { Popover } from "@mui/material";
 import Filter from "~/components/filter/Filter";
 import Form from "~/components/form/Form";
-import Donut from "~/components/donut/donut";
 import Infographic from "~/components/infographic/infographic";
 import * as d3 from "d3";
 import type { InternMap } from "d3";
@@ -151,9 +150,6 @@ function Homepage() {
           <Card
             title="How complete is our data?"
           >
-            <Donut
-              data={.75}
-            />
             <p>There is a gap between reporting in data and totals we know.</p>
             <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proid</p>
           </Card>
@@ -214,28 +210,29 @@ function Homepage() {
             </div>
           </Card>
         </div>
-            <div className={styles.bar2}>
-              <Card
-                title="What group is traveling the most"
-              >
-                <p>chart placeholder</p>
-              </Card>
+        <div className={styles.bar2}>
+          <Card
+            title="What group is traveling the most"
+          >
+            <p>chart placeholder</p>
+          </Card>
+      </div>
+      <div className={styles.map}>
+        <Card title="Where are people travelling?">
+          <div className={styles.chartContainer} ref={mapRef}>
+            {mapRef?.current &&
+              <ConnectionMap
+                parentRect={mapRef.current.getBoundingClientRect()} 
+                year={["FY202425"]}
+                />
+            }
           </div>
-          <div className={styles.map}>
-            <Card title="Where are people travelling?">
-              <div className={styles.chartContainer} ref={mapRef}>
-                {mapRef?.current &&
-                  <ConnectionMap
-                    parentRect={mapRef.current.getBoundingClientRect()} 
-                  />
-                }
-              </div>
-            </Card>
-          </div>
-          <div className={styles.tool}>
-            <Form />
-          </div>
-      </section>
+        </Card>
+      </div>
+      <div className={styles.tool}>
+        <Form />
+      </div>
+    </section>
     </>
   )
 }
