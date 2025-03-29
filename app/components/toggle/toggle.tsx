@@ -2,8 +2,8 @@
 import { Switch, styled } from "@mui/material";
 
 const Toggle = styled(Switch)(({ theme }) => ({
-    width: 173,
-    height: 52,
+    width: 134,
+    height: 40,
     padding: 0,
     display: "flex",
     alignItems: "center",
@@ -12,7 +12,7 @@ const Toggle = styled(Switch)(({ theme }) => ({
       top: "50%",
       transform: "translateY(-50%)",
       "&.Mui-checked": {
-        transform: "translateX(121px) translateY(-50%)", // Moves fully across
+        transform: "translateX(97px) translateY(-50%)", // Moves fully across
         "& + .MuiSwitch-track": {
           backgroundColor: "#A15B96", // Filled color when checked
           borderColor: "#A15B96",
@@ -20,8 +20,8 @@ const Toggle = styled(Switch)(({ theme }) => ({
       },
     },
     "& .MuiSwitch-thumb": {
-      width: 40,
-      height: 40,
+      width: 26,
+      height: 26,
       backgroundColor: "#A15B96",
       transition: "transform 0.3s ease",
     },

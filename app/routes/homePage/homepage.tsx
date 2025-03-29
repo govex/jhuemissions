@@ -1,7 +1,7 @@
 
 import styles from "./homepage.module.scss";
 import { useState, useEffect, useRef } from "react";
-import type { MouseEvent } from "react";
+import type { ChangeEvent, MouseEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover } from "@mui/material";
@@ -13,6 +13,7 @@ import type { InternMap } from "d3";
 import type { Route } from "./+types/homepage";
 import BarChartVariants from "~/components/barChart/barChart";
 import { ConnectionMap } from "~/components/connectionMap/connectionMap";
+import Toggle from "~/components/toggle/toggle";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -29,6 +30,7 @@ export type DataPoint = {
   percent_total_trips: number;
   total_miles: number;
   average_miles: number;
+  percapita_trips: number;
 }
 export type DataPoint2 = {
   fiscalyear: string;
@@ -47,6 +49,7 @@ function Homepage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [loading2, setLoading2] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [toggleState, setToggleState] = useState<"percapita_trips" | "total_trips">("total_trips");
   const bar1ref = useRef<HTMLDivElement | null>(null);
   const bar2ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -58,6 +61,14 @@ function Homepage() {
   const handleFilterClose = () => {
     setFilterAnchorEl(null);
   };
+
+  const handleToggleChange = (event:ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setToggleState("total_trips")
+    } else {
+      setToggleState("percapita_trips")
+    }
+  }
 
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popover' : undefined;
@@ -72,7 +83,8 @@ function Homepage() {
         percent_total_emissions: +d.percent_total_emissions,
         percent_total_trips: +d.percent_total_trips,
         total_miles: +d.total_miles,
-        average_miles: +d.average_miles
+        average_miles: +d.average_miles,
+        percapita_trips: +d.percapita_trips
       } as DataPoint;
     }).then((d) => {
       let grouped = d3.group(d, d => d.fiscalyear)
@@ -104,11 +116,10 @@ function Homepage() {
       <div className={styles.info}>
       <div className={styles.left}>
           <p className={styles.para}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-          </p>
+          This dashboard aims to communicate the climate emissions impact of business travel to faculty and administrative leaders, inform estimates of JHU air travel scope 3 emissions to allow for better decision making, and foster an enabling environment, driven by faculty priorities, for mitigation efforts that address scope 3 emissions.</p>
         </div>
         <div className={styles.right}>
-          <p className={styles.para}>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <p className={styles.para}>For additional background, please see <a href="https://sustainability.jhu.edu/news/a-climate-dashboard-on-jhu-business-travel-is-scheduled-to-take-off-in-april/">this article</a>. (This instance of the dashboard is a live public beta.)</p>
           <Button
             type="border"
             icon="right-arrow"
@@ -243,6 +254,13 @@ function Homepage() {
           <Card
             title="What school/division is traveling the most?"
           >
+            <div className={styles.toggleBox}><span>Per Capita</span>
+            <Toggle 
+              checked={toggleState === "total_trips" ? true : false} 
+              onChange={handleToggleChange} 
+            />
+            <span>Total</span>
+            </div>
             <div className={styles.chartContainer} ref={bar2ref}>
               {!loading && bar2ref?.current && !!data &&
                 <BarChartVariants 
@@ -252,7 +270,8 @@ function Homepage() {
                   yScale="band"
                   parentRect={bar2ref.current.getBoundingClientRect()}
                   labelField={"school" as keyof DataPoint["school"]}
-                  valueField={"total_trips" as keyof DataPoint["total_trips"]}
+                  valueField={toggleState as keyof DataPoint["percapita_trips" | "total_trips"]
+                  }
                   year={["FY202425","FY202324","FY202223","FY202122","FY202021"]}
                 />
               }
