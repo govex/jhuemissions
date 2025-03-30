@@ -30,12 +30,13 @@
         "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
         "donut donut donut method method method tool tool"
         "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" 
+        "time time time time time time time time"
         "map map map map map map map map";
     width: 90vw;
     width: 100vw;
     padding: 20px;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 50px 300px 436px 90vh 80vh;
+    grid-template-rows: 50px 300px 436px 90vh 442px 80vh;
     gap: 40px;
     margin-bottom: 30px;
 }
@@ -68,6 +69,9 @@
 }
 .map {
     grid-area: map;
+}
+.time {
+    grid-area: time;
 }
 .chartContainer {
     width: 100%;

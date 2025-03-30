@@ -1,10 +1,10 @@
 
 import styles from "./homepage.module.scss";
 import { useState, useEffect, useRef } from "react";
-import type { ChangeEvent, MouseEvent } from "react";
+import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
-import { Popover } from "@mui/material";
+import { Popover, type AutocompleteChangeReason } from "@mui/material";
 import Filter from "~/components/filter/Filter";
 import Form from "~/components/form/Form";
 import Infographic from "~/components/infographic/infographic";
@@ -14,6 +14,8 @@ import type { Route } from "./+types/homepage";
 import BarChartVariants from "~/components/barChart/barChart";
 import { ConnectionMap } from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
+import {toTitleCase} from "~/utils/titleCase";
+import {filterInternMap} from "~/utils/mapFilter";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -42,6 +44,7 @@ export type DataPoint2 = {
   total_miles: number;
   average_miles: number;
 }
+type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 
 function Homepage() {
   const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
@@ -50,10 +53,12 @@ function Homepage() {
   const [loading2, setLoading2] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [toggleState, setToggleState] = useState<"percapita_trips" | "total_trips">("total_trips");
+  const [timeToggleState, setTimeToggleState] = useState<"month" | "quarter">("month");
   const bar1ref = useRef<HTMLDivElement | null>(null);
   const bar2ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
-
+  const filterErrorTooMany = "Only five years may be displayed at once.";
+  const filterErrorNotEnough = "At least one year must be selected.";
   const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
     setFilterAnchorEl(event.currentTarget);
   };
@@ -68,16 +73,58 @@ function Homepage() {
     } else {
       setToggleState("percapita_trips")
     }
+  }  
+  const handleTimeToggleChange = (event:ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setTimeToggleState("quarter")
+    } else {
+      setTimeToggleState("month")
+    }
   }
-
+  function yearFilterCallback(k,v) {
+    let selected = filters.years.flatMap(y => y.split(","));
+    return selected.includes(k);
+  }
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popover' : undefined;
-
+  const [filters, setFilters] = useState<{years: string[], school: string}>({years: ["FY23-24,FY2324,FY2023-24"], school: "All"});
+  const [filterError, setFilterError] = useState<errorText>(undefined); 
+  const handleFilters = (event: ChangeEvent<HTMLInputElement> | {event: SyntheticEvent, value: string, reason: AutocompleteChangeReason}) => {
+    if (event.target.checked === false) {
+      let checked = Array.from(filters.years);
+      console.log(checked);
+      if (checked.length === 1) {
+        setFilterError(filterErrorNotEnough as errorText);
+      } else if (checked.length <= 5) {
+        if (checked.indexOf(event.target.value) != -1) {
+          if (checked.indexOf(event.target.value) == 0) {
+            checked.shift();
+          } else {
+            checked.splice(checked.indexOf(event.target.value),1)
+          }
+          setFilterError(undefined)
+          setFilters({...filters, years: checked})
+        }      
+      }
+    } else if (event.target.checked) {
+      let checked = Array.from(filters.years);
+      if (checked.length >= 5) {
+        setFilterError(filterErrorTooMany as errorText)
+      } else {
+        setFilterError(undefined)
+        checked.push(event.target.value);
+        setFilters({...filters, years: checked})  
+      }
+    } else {
+      setFilters({...filters, school: event.currentTarget.innerText !== '' ? event.currentTarget.innerText : 'All'})
+    }
+  }
+  const [schoolOptions, setSchoolOptions] = useState<string[] | undefined>(undefined)
   useEffect(() => {
-    d3.csv("./data/chart-data.csv", (d)=>{
+    d3.csv("./data/FYDraft.csv", (d)=>{
       return {
         fiscalyear: d.fiscalyear,
-        school: d.school,
+        school: toTitleCase(d.school),
         total_emissions: +d.total_emissions,
         total_trips: +d.total_trips,
         percent_total_emissions: +d.percent_total_emissions,
@@ -87,6 +134,8 @@ function Homepage() {
         percapita_trips: +d.percapita_trips
       } as DataPoint;
     }).then((d) => {
+      let schools = Array.from(new Set(d.map(r => r.school))).sort()
+      setSchoolOptions(["All", ...schools]);
       let grouped = d3.group(d, d => d.fiscalyear)
       setData(grouped);
       setLoading(false);
@@ -108,7 +157,16 @@ function Homepage() {
       setLoading2(false);
     }).catch((error) => console.error("Error loading CSV:", error));
   }, []);
-
+  const fiscalYearOptions = [
+    {label: "FY24-25", value: "FY24-25,FY2425,FY2024-25"},
+    {label: "FY23-24", value: "FY23-24,FY2324,FY2023-24"},
+    {label: "FY22-23", value: "FY22-23,FY2223,FY2022-23"},
+    {label: "FY21-22", value: "FY21-22,FY2122,FY2021-22"},
+    {label: "FY20-21", value: "FY20-21,FY2021,FY2020-21"},
+    {label: "FY19-20", value: "FY19-20,FY1920,FY2019-20"},
+    {label: "FY18-19", value: "FY18-19,FY1819,FY2018-19"},
+    {label: "FY17-18", value: "FY17-18,FY1718,FY2017-18"}
+  ]
   return (
     <>
       <section className={styles.hero}>
@@ -140,6 +198,8 @@ function Homepage() {
             size="medium"
             onClick={handleFilterClick}
           />
+          {schoolOptions?.length && schoolOptions.length > 0 &&
+          <>
           <Popover
             id={filterId}
             open={filterOpen}
@@ -150,14 +210,24 @@ function Homepage() {
               horizontal: 'left',
             }}
             sx={{
+              marginTop: "6px",
               "& .MuiPopover-paper": {
-                "background-color": "transparent",
-                "border-radius": "30px"
+                backgroundColor: "transparent",
+                borderRadius: "30px"
               }
             }}
           >
-            <Filter close={handleFilterClose} />
+            <Filter 
+              close={handleFilterClose} 
+              change={handleFilters}
+              yearOptions={fiscalYearOptions} 
+              schoolOptions={schoolOptions} 
+              error={filterError}
+              filters={filters}
+            />
           </Popover>
+          </>
+          }
         </div>
         <div className={styles.kpi1}>
           <Card
@@ -206,25 +276,6 @@ function Homepage() {
               size="medium"
               href="/methodology"
             />
-            <Popover
-              id={filterId}
-              open={filterOpen}
-              anchorEl={filterAnchorEl}
-              onClose={handleFilterClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              sx={{
-                "& .MuiPopover-paper": {
-                  "backgroundColor": "transparent",
-                  "borderRadius": "30px",
-                  "marginTop": "10px",
-                }
-              }}
-            >
-              <Filter close={handleFilterClose} />
-            </Popover>
           </Card>
         </div>
         <div className={styles.tool}>
@@ -239,14 +290,14 @@ function Homepage() {
             <div className={styles.chartContainer} ref={bar1ref}>
               {!loading2 && bar1ref?.current && !!data2 &&
                 <BarChartVariants 
-                  data={data2}
+                  data={filterInternMap(data2, yearFilterCallback)}
                   orientation="horizontal"
                   xScale="linear"
                   yScale="band"
                   parentRect={bar1ref.current.getBoundingClientRect()}
                   labelField={"traveler_type" as keyof DataPoint2["traveler_type"]}
                   valueField={"total_trips" as keyof DataPoint2["total_trips"]}
-                  year={["FY202425","FY202324","FY202223","FY202122","FY202021"]}
+                  school={filters.school}
                 />
               }
             </div>
@@ -266,7 +317,7 @@ function Homepage() {
             <div className={styles.chartContainer} ref={bar2ref}>
               {!loading && bar2ref?.current && !!data &&
                 <BarChartVariants 
-                  data={data}
+                  data={filterInternMap(data, yearFilterCallback)}
                   orientation="horizontal"
                   xScale="linear"
                   yScale="band"
@@ -274,10 +325,23 @@ function Homepage() {
                   labelField={"school" as keyof DataPoint["school"]}
                   valueField={toggleState as keyof DataPoint["percapita_trips" | "total_trips"]
                   }
-                  year={["FY202425","FY202324","FY202223","FY202122","FY202021"]}
+                  school={filters.school}
                 />
               }
             </div>
+          </Card>
+      </div>
+      <div className={styles.time}>
+          <Card title="How does total emissions change over the course of a year?">
+            <div className={styles.toggleBox}>
+              <span>Month</span>
+              <Toggle 
+                checked={timeToggleState === "quarter" ? true : false} 
+                onChange={handleTimeToggleChange} 
+              />
+              <span>Quarter</span>
+            </div>
+            <p>timeline placeholder</p>
           </Card>
       </div>
       <div className={styles.map}>

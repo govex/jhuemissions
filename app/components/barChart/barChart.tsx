@@ -13,7 +13,7 @@ export default function BarChartVariants({
     parentRect,
     labelField,
     valueField,
-    year = ["FY202425"]
+    school
 }:{
     data: InternMap<string, DataPoint[] | DataPoint2[]>,
     orientation: "horizontal" | "vertical" | undefined,
@@ -31,52 +31,42 @@ export default function BarChartVariants({
     },
     labelField: keyof DataPoint | keyof DataPoint2,
     valueField: keyof DataPoint | keyof DataPoint2,
-    year: string[],
+    school: string,
 }) {
-    const colorScale = scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"]).domain(["FY202425", "FY202324", "FY202223", "FY202122","FY202021"])
+    const colorScale = scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"])
+        .domain(Array.from(data.keys()))
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [marginLeft, setMarginLeft] = useState(0);
     useEffect(() => {
         if (data !== undefined) {
-            if (year.length === 1) {
-                let labelMap = data.get(year[0])?.map((item) => item[labelField]);
-                setGroupLabels(labelMap);
-                setMarginLeft(Math.max(...labelMap.map(d => d.length * 10)));
-            } else {
-                let maxLength = 0;
-                let labels = new Set();
-                for (const g of data.values()) {
-                    g.forEach(i => {
-                        if (i[labelField].length > maxLength) {
-                            maxLength = i[labelField].length
-                        }
-                        labels.add(i[labelField]);
-                    })
-                }
-                setMarginLeft(maxLength * 10);
-                console.log(labels)
-                setGroupLabels(Array.from(labels));
+            let maxLength = 0;
+            let labels = new Set();
+            for (const g of data.values()) {
+                g.forEach(i => {
+                    if (i[labelField].length > maxLength) {
+                        maxLength = i[labelField].length
+                    }
+                    labels.add(i[labelField]);
+                })
             }
+            setMarginLeft(maxLength * 10);
+            setGroupLabels(Array.from(labels));
         }
-    }, [data, labelField, year])
+    }, [data, labelField])
     const [maxVal, setMaxVal] = useState(0)
     useEffect(() => {
         if (data !== undefined) {
-            if (year.length === 1) {
-                setMaxVal(Math.max(...data.get(year[0]).map((item) => item[valueField])))
-            } else {
-                let max = 0;
-                for (const g of data.values()) {
-                    g.forEach(i => {
-                        if (i[valueField] > max) {
-                            max = i[valueField]
-                        }    
-                    })
-                }
-                setMaxVal(max)
+            let max = 0;
+            for (const g of data.values()) {
+                g.forEach(i => {
+                    if (i[valueField] > max) {
+                        max = i[valueField]
+                    }    
+                })
             }
+            setMaxVal(max)
         }
-    },[data, year, valueField])
+    },[data, valueField])
     const [seriesData, setSeriesData] = useState<{label: string, color: string, data: number[]}[]>([])
     useEffect(()=>{
         let serieses = [];

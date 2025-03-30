@@ -1,114 +1,152 @@
-import type { MouseEvent } from 'react';
+import type { ChangeEvent, MouseEvent } from 'react';
 import Button from "~/components/button/button";
 import { styled, 
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   TextField, 
   Autocomplete, 
   Checkbox, 
   FormLabel, 
   FormControl, 
   FormGroup, 
-  FormControlLabel } from '@mui/material';
+  FormControlLabel,
+  FormHelperText
+ } from '@mui/material';
 import { ReactComponent as CloseX } from "~/components/icons/close-x";
+import { ReactComponent as ChevronDown } from '../icons/chevron-down';
 import styles from './filter.module.scss';
 
 const BpIcon = styled('span')(({ theme }) => ({
   borderRadius: 3,
-  width: 16,
-  height: 16,
-  boxShadow: 'inset 0 0 0 1px rgba(16,22,26,.2), inset 0 -1px 0 rgba(16,22,26,.1)',
-  backgroundColor: '#f5f8fa',
-  backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))',
+  width: 25,
+  height: 25,
+  backgroundColor: '#fff',
+  border: "3px solid #AAAAAA",
   '.Mui-focusVisible &': {
-    outline: '2px auto rgba(19,124,189,.6)',
+    outline: '2px auto #A15A95',
     outlineOffset: 2,
   },
   'input:hover ~ &': {
-    backgroundColor: '#ebf1f5',
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#30404d',
-    }),
+    backgroundColor: '#A15A9599',
   },
   'input:disabled ~ &': {
     boxShadow: 'none',
     background: 'rgba(206,217,224,.5)',
-    ...theme.applyStyles('dark', {
-      background: 'rgba(57,75,89,.5)',
-    }),
   },
-  ...theme.applyStyles('dark', {
-    boxShadow: '0 0 0 1px rgb(16 22 26 / 40%)',
-    backgroundColor: '#394b59',
-    backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.05),hsla(0,0%,100%,0))',
-  }),
 }));
 
 const BpCheckedIcon = styled(BpIcon)({
-  backgroundColor: '#137cbd',
-  backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
-  '&::before': {
-    display: 'block',
-    width: 16,
-    height: 16,
-    backgroundImage:
-      "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath" +
-      " fill-rule='evenodd' clip-rule='evenodd' d='M12 5c-.28 0-.53.11-.71.29L7 9.59l-2.29-2.3a1.003 " +
-      "1.003 0 00-1.42 1.42l3 3c.18.18.43.29.71.29s.53-.11.71-.29l5-5A1.003 1.003 0 0012 5z' fill='%23fff'/%3E%3C/svg%3E\")",
-    content: '""',
-  },
+  backgroundColor: '#A15A95',
   'input:hover ~ &': {
-    backgroundColor: '#106ba3',
+    backgroundColor: '#A15A9599',
   },
 });
 
-function Filter({close}:{close: (event:MouseEvent)=>null}) {
+function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
+  close: (event:MouseEvent) => void,
+  change: (event:ChangeEvent) => void, 
+  yearOptions: {label:string, value: string[]}[],
+  schoolOptions: string[],
+  error?: string,
+  filters: {years: string[], school: string}
+}) {
+  console.log(filters)
+  console.log(error)
   return (
         <div className={styles.modalContainer}>
           <div className={styles.header}>
-            <h3 id="modal-modal-title"> Filter Menu </h3>
+            <h3 className={styles.filterTitle}>Filter Menu</h3>
             <button className={styles.buttonX} onClick={close}><CloseX /></button>
           </div>
-            <div className=" content department">
-              <Autocomplete 
-                options={["School 1", "School 2", "School 3"]}
-                renderInput={(params) => <TextField {...params} label="School or Division" />}
-                sx={{
-                  "backgroundColor": "#FFFFFFCC",
-                  "color": "#A15B96",
-                  "fontWeight": "600",
-                  "fontSize": "24px",
-                  "margin": "20px",
-                  "borderRadius": "30px",
-                  "border": "none"
-                }}
-              />                
+          <div className={styles.modalBody}>
+            <Accordion
+              sx={{
+                borderRadius: "10px",
+                boxShadow: "0px 4px 4px 0px #00000040",
+                backgroundColor: "#FFFFFFCC",
+                fontFamily: "Montserrat",
+                fontWeight: "600",
+                fontSize: "24px",
+                color: "#A15B96",
+                marginBottom: "20px",
+                "&:first-of-type": {borderRadius: "10px"}                
+              }}
+            >
+              <AccordionSummary
+                expandIcon={<ChevronDown />}
+                id="school-division"
+                aria-controls="school-division-input"
+              >
+                <h3 className={styles.accordionTitle}>School/Division</h3>       
+              </AccordionSummary>
+              <AccordionDetails>
+                <Autocomplete 
+                  onChange={change}
+                  value={filters.school}
+                  options={schoolOptions}
+                  renderInput={(params) => <TextField {...params} />}
+                  sx={{
+                    backgroundColor: "transparent",
+                    color: "#A15B96",
+                    fontWeight: "600",
+                    fontSize: "24px",
+                    border: "none"
+                  }}
+                />                
+              </AccordionDetails>
+            </Accordion>
+            <Accordion
+              sx={{
+                borderRadius: "10px",
+                boxShadow: "0px 4px 4px 0px #00000040",
+                backgroundColor: "#FFFFFFCC",
+                fontFamily: "Montserrat",
+                fontWeight: "600",
+                fontSize: "24px",
+                color: "#A15B96",
+                "&:last-of-type": {borderRadius: "10px"}
+              }}
+            >
+              <AccordionSummary
+                expandIcon={<ChevronDown />}
+                id="years"
+                aria-controls="years-input"
+              >
+                <h3 className={styles.accordionTitle}>Fiscal Year</h3>       
+              </AccordionSummary>
+              <AccordionDetails>
+                <FormControl component="fieldset" variant="standard" error={!!error}>
+                  <FormLabel component="legend">Pick up to 5</FormLabel>
+                  <FormGroup row={true}>
+                    {yearOptions?.length > 0 && yearOptions.map((chk) => {
+                      return (
+                        <FormControlLabel
+                        sx={{fontFamily: "Montserrat", color: "#000000"}}
+                        control={
+                          <Checkbox
+                            onChange={change}
+                            sx={{ '&:hover': { bgcolor: 'transparent' }}}
+                            disableRipple
+                            color="default"
+                            checkedIcon={<BpCheckedIcon />}
+                            icon={<BpIcon />}
+                          />
+                        }
+                        label={chk.label}
+                        value={chk.value}
+                        checked={filters.years.includes(chk.value)}
+                      />  
+                      )
+                    })}
+                  </FormGroup>
+                  {!!error &&
+                    <FormHelperText>{error}</FormHelperText>
+                  }
+                </FormControl>
+              </AccordionDetails>
+            </Accordion>
             </div>
-            <div className={styles.content}>
-            <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
-        <FormLabel component="legend">Year</FormLabel>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                sx={{ '&:hover': { bgcolor: 'transparent' } }}
-                disableRipple
-                color="default"
-                checkedIcon={<BpCheckedIcon />}
-                icon={<BpIcon />}
-              />
-            }
-            label="2024"
-          />
-        </FormGroup>
-      </FormControl>
-
-            </div>
-             <Button 
-                type="solid"
-                text="Apply"
-                color="secondary"
-                size="medium"
-                onClick={close}
-             />
         </div>
       );
 }
