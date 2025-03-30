@@ -16,6 +16,7 @@ import { ConnectionMap } from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
 import {toTitleCase} from "~/utils/titleCase";
 import {filterInternMap} from "~/utils/mapFilter";
+import Timeline from "~/components/timeline/timeline";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -49,6 +50,7 @@ type errorText = "Only five years may be displayed at once" | "At least one year
 function Homepage() {
   const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
   const [data2, setData2] = useState<InternMap<string,DataPoint2[]> | undefined>(undefined);
+  const [timelineData, setTimelineData] = useState<InternMap<string, any[]> | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [loading2, setLoading2] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -57,6 +59,7 @@ function Homepage() {
   const bar1ref = useRef<HTMLDivElement | null>(null);
   const bar2ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const timeRef = useRef<HTMLDivElement | null>(null);
   const filterErrorTooMany = "Only five years may be displayed at once.";
   const filterErrorNotEnough = "At least one year must be selected.";
   const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
@@ -155,6 +158,19 @@ function Homepage() {
       let grouped = d3.group(d, d => d.fiscalyear)
       setData2(grouped);
       setLoading2(false);
+    }).catch((error) => console.error("Error loading CSV:", error));
+    d3.csv("./data/monthly_emissions_per_year.csv", (d) => {
+      let date = Date.UTC(d.year, d.month);
+      return {
+        month: date.toLocaleString(undefined, {month: "short"}),
+        total_emissions_concur: +d.total_emissions_concur,
+        total_emissions_epa: +d.total_emissions_epa,
+        fiscalyear: d.fiscalyear,
+        total_trips: +d.total_trips
+      }
+    }).then(d => {
+      let grouped = d3.group(d, d => d.fiscalyear);
+      setTimelineData(grouped);
     }).catch((error) => console.error("Error loading CSV:", error));
   }, []);
   const fiscalYearOptions = [
@@ -341,7 +357,14 @@ function Homepage() {
               />
               <span>Quarter</span>
             </div>
-            <p>timeline placeholder</p>
+            <div className={styles.chartContainer} ref={timeRef}>
+              {!!timelineData && timeRef?.current &&
+                <Timeline 
+                  data={filterInternMap(timelineData, yearFilterCallback)}
+                  parentRect={timeRef.current.getBoundingClientRect()}
+                />
+              }
+            </div>
           </Card>
       </div>
       <div className={styles.map}>
