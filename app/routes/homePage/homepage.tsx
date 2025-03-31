@@ -88,7 +88,7 @@ function Homepage() {
   }
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popover' : undefined;
-  const [filters, setFilters] = useState<{years: string[], school: string}>({years: ["FY23-24,FY2324,FY2023-24"], school: "All"});
+  const [filters, setFilters] = useState<{years: string[], school: string}>({years: ["FY23-24"], school: "All"});
   const [filterError, setFilterError] = useState<errorText>(undefined); 
   const handleFilters = (event: ChangeEvent<HTMLInputElement> | {event: SyntheticEvent, value: string, reason: AutocompleteChangeReason}) => {
     if (event.target.checked === false) {

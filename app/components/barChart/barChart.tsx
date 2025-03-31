@@ -2,9 +2,14 @@ import { BarChart } from "@mui/x-charts/node/BarChart";
 import styles from "./barChart.module.scss";
 import { useEffect, useState } from "react";
 import type { DataPoint, DataPoint2 } from "~/routes/homePage/homepage";
-import type { InternMap } from "d3";
-import { scaleOrdinal } from "d3";
-  
+import { InternMap } from "d3";
+import { scaleOrdinal, rollups, sum } from "d3";
+
+type SeriesRolls = {
+    year: string;
+    rollup: InternMap<string, any[]>
+}[];
+
 export default function BarChartVariants({
     data,
     orientation,
@@ -35,51 +40,59 @@ export default function BarChartVariants({
 }) {
     const colorScale = scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"])
         .domain(Array.from(data.keys()))
+    const [rolled, setRolled] = useState<SeriesRolls | undefined>(undefined);
+    useEffect(() => {
+        let seriesRolls = []
+        for (const [y,g] of data.entries()) {
+            let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
+            seriesRolls.push({
+                year: y,
+                rollup: rolled.sort((a,b)=>b[1]-a[1])
+            })
+        }
+        setRolled(seriesRolls as SeriesRolls);
+    },[data, labelField, valueField])
+    console.log(rolled);
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [marginLeft, setMarginLeft] = useState(0);
-    useEffect(() => {
-        if (data !== undefined) {
-            let maxLength = 0;
-            let labels = new Set();
-            for (const g of data.values()) {
-                g.forEach(i => {
-                    if (i[labelField].length > maxLength) {
-                        maxLength = i[labelField].length
-                    }
-                    labels.add(i[labelField]);
-                })
-            }
-            setMarginLeft(maxLength * 10);
-            setGroupLabels(Array.from(labels).sort());
-        }
-    }, [data, labelField])
     const [maxVal, setMaxVal] = useState(0)
     useEffect(() => {
-        if (data !== undefined) {
-            let max = 0;
-            for (const g of data.values()) {
-                g.forEach(i => {
-                    if (i[valueField] > max) {
-                        max = i[valueField]
+        if (rolled !== undefined) {
+            let maxLength = 0;
+            let maxVal = 0;
+            let labels = new Set();
+            for (const g of rolled.values()) {
+                g.rollup.forEach(i => {
+                    if (i[0].length > maxLength) {
+                        maxLength = i[0].length
+                    }
+                    if (i[1] > maxVal) {
+                        maxVal = i[1]
                     }    
+                    labels.add(i[0]);
                 })
             }
-            setMaxVal(max)
+            setMaxVal(maxVal)
+            setMarginLeft(maxLength * 10);
+            setGroupLabels(Array.from(labels));
         }
-    },[data, valueField])
+    }, [rolled])
     const [seriesData, setSeriesData] = useState<{label: string, color: string, data: number[]}[]>([])
     useEffect(()=>{
-        let serieses = [];
-        for (const [y,g] of data.entries()) {
-            let series = {
-                label: y,
-                color: colorScale(y),
-                data: g.map(d => d[valueField])
+        if (rolled !== undefined) {
+            let serieses = [];
+            for (const roll of rolled) {
+                let series = {
+                    label: roll.year,
+                    color: colorScale(roll.year),
+                    data: roll.rollup.map(d => d[1])
+                }
+                serieses.push(series)
             }
-            serieses.push(series)
+            setSeriesData(serieses);
         }
-        setSeriesData(serieses);
-    },[data, valueField])
+    },[rolled])
+    console.log(seriesData);
     const [render, setRender] = useState(false);
     useEffect(()=>{
         if (
