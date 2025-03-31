@@ -130,11 +130,11 @@ export default function BarChartVariants({
             height={parentRect?.height}
             sx={{
                 // Customize x-axis line (grey, thick)
-                "& .MuiChartsAxis-left .MuiChartsAxis-line": {
-                    stroke: "#CCC",
-                    strokeWidth: 4,
-                    color: "#000",
-                },
+                // "& .MuiChartsAxis-left .MuiChartsAxis-line": {
+                //     stroke: "#CCC",
+                //     strokeWidth: 4,
+                //     color: "#000",
+                // },
                 "& .MuiBarLabel-root": {
                     textAnchor: "start"
                 }
