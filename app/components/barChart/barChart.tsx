@@ -52,7 +52,6 @@ export default function BarChartVariants({
         }
         setRolled(seriesRolls as SeriesRolls);
     },[data, labelField, valueField])
-    console.log(rolled);
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [marginLeft, setMarginLeft] = useState(0);
     const [maxVal, setMaxVal] = useState(0)
@@ -92,7 +91,6 @@ export default function BarChartVariants({
             setSeriesData(serieses);
         }
     },[rolled])
-    console.log(seriesData);
     const [render, setRender] = useState(false);
     useEffect(()=>{
         if (
@@ -123,11 +121,13 @@ export default function BarChartVariants({
             }]}
             xAxis={[{ scaleType: xScale, 
                 disableTicks: true,
+                label: valueField === "percapita_trips" || valueField === "percapita_emissions" 
+                    ? "trips per 1,000 people"
+                    : "# of trips"
             }]}
             series={seriesData}
             width={parentRect?.width}
             height={parentRect?.height}
-            bottomAxis={null}
             sx={{
                 // Customize x-axis line (grey, thick)
                 "& .MuiChartsAxis-left .MuiChartsAxis-line": {
