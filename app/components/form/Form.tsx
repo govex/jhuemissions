@@ -22,18 +22,18 @@ const EmissionCalculator = () => {
       <div className={styles.formcontainer}>
         <form onSubmit={handleSubmit}>
           <label className={styles.label}>Origin of Travel</label>
-          <input type="text" name="origin" className={styles.input} value={formData.origin} onChange={handleChange} />
+          <input type="text" name="origin" className={styles.input} value={formData.origin} onChange={handleChange} disabled={true} />
           
           <label className={styles.label}>Travel Destination</label>
-          <input type="text" name="destination" className={styles.input} value={formData.destination} onChange={handleChange} />
+          <input type="text" name="destination" className={styles.input} value={formData.destination} onChange={handleChange} disabled={true} />
           
           <label className={styles.label}>Mode</label>
-          <input type="text" name="mode" className={styles.input} value={formData.mode} onChange={handleChange} />
+          <input type="text" name="mode" className={styles.input} value={formData.mode} onChange={handleChange} disabled={true} />
           
           <label className={styles.label}>Days You’re Travelling</label>
-          <input type="number" name="days" className={styles.input} value={formData.days} onChange={handleChange} />
+          <input type="number" name="days" className={styles.input} value={formData.days} onChange={handleChange} disabled={true} />
           <Button 
-            type="solid" color="primary" size='medium' text="Submit" />
+            type="solid" color="primary" size='medium' text="Submit" disabled={true} />
           
         </form>
       </div>
