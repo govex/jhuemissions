@@ -16,7 +16,6 @@
 
 .para {
     color: #FFF;
-    font-family: "Montserrat";
     font-size: 24px;
     font-style: normal;
     font-weight: 600;
@@ -108,4 +107,9 @@
     gap: 10px;
     justify-content: flex-end;
     width: 100%;
+}
+.lineChart {
+    g.MuiChartsAxis-label {
+        transform: translateX(-10px) !important;
+    }
 }

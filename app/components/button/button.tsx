@@ -18,7 +18,7 @@ const Button = ({
 
     const innerContent = () => (
         <button
-            className={cx(styles[type], styles[color], styles[size])}
+            className={cx(styles.base, styles[type], styles[color], styles[size])}
             onClick={onClick || undefined}
         >
             {text &&

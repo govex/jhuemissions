@@ -1,5 +1,6 @@
 
 import styles from "./homepage.module.scss";
+import cx from "classnames";
 import { useState, useEffect, useRef } from "react";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import Button from "~/components/button/button";
@@ -14,7 +15,7 @@ import type { Route } from "./+types/homepage";
 import BarChartVariants from "~/components/barChart/barChart";
 import { ConnectionMap } from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
-import {toTitleCase} from "~/utils/titleCase";
+import {toTitleCase, studentCorrection} from "~/utils/titleCase";
 import {filterInternMap} from "~/utils/mapFilter";
 import Timeline from "~/components/timeline/timeline";
 
@@ -126,7 +127,7 @@ function Homepage() {
       return {
         fiscalyear: d.fiscalyear,
         school: toTitleCase(d.school),
-        traveler_type: d.traveler_type,
+        traveler_type: studentCorrection(d.traveler_type),
         total_emissions: +d.total_emissions,
         total_trips: +d.total_trips,
         // percent_total_emissions: +d.percent_total_emissions,
@@ -345,15 +346,7 @@ function Homepage() {
       </div>
       <div className={styles.time}>
           <Card title="When are people travelling?">
-            <div className={styles.toggleBox}>
-              <span>Month</span>
-              <Toggle 
-                checked={timeToggleState === "quarter" ? true : false} 
-                onChange={handleTimeToggleChange} 
-              />
-              <span>Quarter</span>
-            </div>
-            <div className={styles.chartContainer} ref={timeRef}>
+            <div className={cx( styles.chartContainer, styles.lineChart )} ref={timeRef}>
               {!!timelineData && timeRef?.current &&
                 <Timeline 
                   data={filterInternMap(timelineData, yearFilterCallback)}

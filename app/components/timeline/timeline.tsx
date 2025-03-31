@@ -1,3 +1,4 @@
+import styles from "./timeline.module.scss";
 import { useState, useEffect } from "react";
 import { LineChart } from "@mui/x-charts"; 
 import type { InternMap } from "d3";
@@ -40,9 +41,21 @@ export default function Timeline({
                 scaleType: "point",
                 data: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"]
             }]}
+            yAxis={[{
+                label: "# of trips",
+            }]}
             series={seriesData}
             width={parentRect.width}
             height={parentRect.height}
+            margin={{left:80}}
+            sx={{
+                "& .MuiChartsAxis-directionY": {
+                    "& .MuiChartsAxis-label": {
+                        transform: "translateX(-30px) !important"
+                      }    
+                }
+            
+            }}
         />
     )
 }

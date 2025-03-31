@@ -140,7 +140,6 @@ export default function BarChartVariants({
                 }
             }}
             // slots={{barLabel: newBarLabel}}
-            barLabel="value"
             slotProps={{
                 legend: {
                     labelStyle: {
