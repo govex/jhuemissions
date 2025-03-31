@@ -319,7 +319,7 @@ function Homepage() {
           <Card
             title="What school/division is traveling the most?"
           >
-            <div className={styles.toggleBox}><span>Per Capita</span>
+            <div className={styles.toggleBox}><span>Per 1,000 People</span>
             <Toggle 
               checked={toggleState === "total_trips" ? true : false} 
               onChange={handleToggleChange} 

@@ -85,7 +85,7 @@ export default function BarChartVariants({
                 let series = {
                     label: roll.year,
                     color: colorScale(roll.year),
-                    data: roll.rollup.map(d => d[1])
+                    data: roll.rollup.map(d => valueField === "percapita_trips" || valueField === "percapita_emissions" ? (d[1]*1000).toFixed(2) : d[1])
                 }
                 serieses.push(series)
             }
