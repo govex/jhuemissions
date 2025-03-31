@@ -13,13 +13,15 @@ const Button = ({
     color="primary", 
     size="small", 
     onClick=null,
-    href=undefined
+    href=undefined,
+    disabled=false
 }) => {
 
     const innerContent = () => (
         <button
-            className={cx(styles.base, styles[type], styles[color], styles[size])}
+            className={cx(styles.base, styles[type], styles[color], styles[size], disabled ? styles.disabled : "")}
             onClick={onClick || undefined}
+            disabled={disabled}
         >
             {text &&
                 <label className={cx(styles.label, icon ? styles.icon : "")}>{text}</label>

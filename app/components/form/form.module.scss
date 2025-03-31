@@ -10,21 +10,18 @@
     justify-content:space-evenly;
     padding: 20px;
   }
-  
-  .heading {
-    color: #000;
-    text-align: center;
-    font-size: 40px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-    margin-bottom: 20px;
+
+  .formBody {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 20px 0;
   }
-  
   .label {
     color: #000;
     text-align: center;
-    font-size: 26px;
+    font-size: 20px;
     font-style: normal;
     font-weight: 600;
     line-height: normal;
@@ -33,12 +30,15 @@
   
   .input {
     background: #ECECEC;
-    width: 293px;
+    width: 100%;
+    margin: auto;
     height: 61px;
-    flex-shrink: 0;
     border: none;
     border-radius: 10px;
     padding: 10px;
     font-size: 18px;
     margin-bottom: 20px;
   }
+.checkbox {
+  margin: 20px;
+}

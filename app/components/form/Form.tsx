@@ -20,22 +20,24 @@ const EmissionCalculator = () => {
   
     return (
       <div className={styles.formcontainer}>
-        <form onSubmit={handleSubmit}>
-          <label className={styles.label}>Origin of Travel</label>
-          <input type="text" name="origin" className={styles.input} value={formData.origin} onChange={handleChange} disabled={true} />
-          
-          <label className={styles.label}>Travel Destination</label>
-          <input type="text" name="destination" className={styles.input} value={formData.destination} onChange={handleChange} disabled={true} />
-          
-          <label className={styles.label}>Mode</label>
-          <input type="text" name="mode" className={styles.input} value={formData.mode} onChange={handleChange} disabled={true} />
-          
-          <label className={styles.label}>Days You’re Travelling</label>
-          <input type="number" name="days" className={styles.input} value={formData.days} onChange={handleChange} disabled={true} />
-          <Button 
-            type="solid" color="primary" size='medium' text="Submit" disabled={true} />
-          
+        Coming Soon
+        <form className={styles.formBody} onSubmit={handleSubmit}>
+            <label className={styles.label}>From - Airport Code
+            <input type="text" name="origin" className={styles.input} value={formData.origin} onChange={handleChange} disabled={true} />
+            </label>          
+            <label className={styles.label}>To - Airport Code
+            <input type="text" name="destination" className={styles.input} value={formData.destination} onChange={handleChange} disabled={true} />
+            </label>          
+            <label className={styles.label}>Departure Date
+            <input type="text" name="mode" className={styles.input} value={formData.mode} onChange={handleChange} disabled={true} />
+            </label>          
+            <label className={styles.label}>Arrival Date
+            <input type="number" name="days" className={styles.input} value={formData.days} onChange={handleChange} disabled={true} />
+            </label>
+            <label className={styles.label}>Round Trip <input className={styles.checkbox} type='checkbox' checked disabled /></label>
         </form>
+        <Button 
+              type="solid" color="primary" size='medium' text="Submit" disabled={true} />
       </div>
     );
   };
