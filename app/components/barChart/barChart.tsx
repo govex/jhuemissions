@@ -50,7 +50,7 @@ export default function BarChartVariants({
                 })
             }
             setMarginLeft(maxLength * 10);
-            setGroupLabels(Array.from(labels));
+            setGroupLabels(Array.from(labels).sort());
         }
     }, [data, labelField])
     const [maxVal, setMaxVal] = useState(0)

@@ -28,7 +28,7 @@ export default function Timeline({
             let series = {
                 label: y,
                 color: colorScale(y),
-                data: g.map(d => d.total_emissions_epa)
+                data: g.map(d => d.total_emissions_concur)
             }
             serieses.push(series)
         }

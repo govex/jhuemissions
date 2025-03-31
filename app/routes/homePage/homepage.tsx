@@ -27,23 +27,21 @@ export function meta({ }: Route.MetaArgs) {
 export type DataPoint = {
   fiscalyear: string;
   school: string;
-  total_emissions: number;
-  total_trips: number;
-  percent_total_emissions: number;
-  percent_total_trips: number;
-  total_miles: number;
-  average_miles: number;
-  percapita_trips: number;
-}
-export type DataPoint2 = {
-  fiscalyear: string;
   traveler_type: string;
   total_emissions: number;
   total_trips: number;
-  percent_total_emissions: number;
-  percent_total_trips: number;
-  total_miles: number;
-  average_miles: number;
+  // percent_total_emissions: number;
+  // percent_total_trips: number;
+  // total_miles: number;
+  // average_miles: number;
+  percapita_trips: number;
+  percapita_emissions: number;
+}
+export type DataPoint2 = {
+  fiscalyear: string;
+  school: string;
+  total_trips: number;
+  total_cost: number;
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 
@@ -124,17 +122,19 @@ function Homepage() {
   }
   const [schoolOptions, setSchoolOptions] = useState<string[] | undefined>(undefined)
   useEffect(() => {
-    d3.csv("./data/FYDraft.csv", (d)=>{
+    d3.csv("./data/bookings_summary.csv", (d)=>{
       return {
         fiscalyear: d.fiscalyear,
         school: toTitleCase(d.school),
+        traveler_type: d.traveler_type,
         total_emissions: +d.total_emissions,
         total_trips: +d.total_trips,
-        percent_total_emissions: +d.percent_total_emissions,
-        percent_total_trips: +d.percent_total_trips,
-        total_miles: +d.total_miles,
-        average_miles: +d.average_miles,
-        percapita_trips: +d.percapita_trips
+        // percent_total_emissions: +d.percent_total_emissions,
+        // percent_total_trips: +d.percent_total_trips,
+        // total_miles: +d.total_miles,
+        // average_miles: +d.average_miles,
+        percapita_trips: +d.percapita_trips,
+        percapita_emissions: +d.percapita_emissions
       } as DataPoint;
     }).then((d) => {
       let schools = Array.from(new Set(d.map(r => r.school))).sort()
@@ -143,16 +143,12 @@ function Homepage() {
       setData(grouped);
       setLoading(false);
     }).catch((error) => console.error("Error loading CSV:", error));
-    d3.csv("./data/chart_data_traveler.csv", (d)=>{
+    d3.csv("./data/expenses_summary.csv", (d)=>{
       return {
         fiscalyear: d.fiscalyear,
-        traveler_type: d.traveler_type,
-        total_emissions: +d.total_emissions,
+        school: toTitleCase(d.school),
         total_trips: +d.total_trips,
-        percent_total_emissions: +d.percent_total_emissions,
-        percent_total_trips: +d.percent_total_trips,
-        total_miles: +d.total_miles,
-        average_miles: +d.average_miles
+        total_cost: +d.total_cost
       } as DataPoint2;
     }).then((d) => {
       let grouped = d3.group(d, d => d.fiscalyear)
@@ -174,14 +170,14 @@ function Homepage() {
     }).catch((error) => console.error("Error loading CSV:", error));
   }, []);
   const fiscalYearOptions = [
-    {label: "FY24-25", value: "FY24-25,FY2425,FY2024-25"},
-    {label: "FY23-24", value: "FY23-24,FY2324,FY2023-24"},
-    {label: "FY22-23", value: "FY22-23,FY2223,FY2022-23"},
-    {label: "FY21-22", value: "FY21-22,FY2122,FY2021-22"},
-    {label: "FY20-21", value: "FY20-21,FY2021,FY2020-21"},
-    {label: "FY19-20", value: "FY19-20,FY1920,FY2019-20"},
-    {label: "FY18-19", value: "FY18-19,FY1819,FY2018-19"},
-    {label: "FY17-18", value: "FY17-18,FY1718,FY2017-18"}
+    {label: "FY24-25", value: "FY24-25"},
+    {label: "FY23-24", value: "FY23-24"},
+    {label: "FY22-23", value: "FY22-23"},
+    {label: "FY21-22", value: "FY21-22"},
+    {label: "FY20-21", value: "FY20-21"},
+    {label: "FY19-20", value: "FY19-20"},
+    {label: "FY18-19", value: "FY18-19"},
+    {label: "FY17-18", value: "FY17-18"}
   ]
   return (
     <>
@@ -306,13 +302,13 @@ function Homepage() {
             <div className={styles.chartContainer} ref={bar1ref}>
               {!loading2 && bar1ref?.current && !!data2 &&
                 <BarChartVariants 
-                  data={filterInternMap(data2, yearFilterCallback)}
+                  data={filterInternMap(data, yearFilterCallback)}
                   orientation="horizontal"
                   xScale="linear"
                   yScale="band"
                   parentRect={bar1ref.current.getBoundingClientRect()}
-                  labelField={"traveler_type" as keyof DataPoint2["traveler_type"]}
-                  valueField={"total_trips" as keyof DataPoint2["total_trips"]}
+                  labelField={"traveler_type" as keyof DataPoint["traveler_type"]}
+                  valueField={"total_trips" as keyof DataPoint["total_trips"]}
                   school={filters.school}
                 />
               }
@@ -348,7 +344,7 @@ function Homepage() {
           </Card>
       </div>
       <div className={styles.time}>
-          <Card title="How does total emissions change over the course of a year?">
+          <Card title="When are people travelling?">
             <div className={styles.toggleBox}>
               <span>Month</span>
               <Toggle 
