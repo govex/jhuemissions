@@ -31,18 +31,8 @@ export type DataPoint = {
   traveler_type: string;
   total_emissions: number;
   total_trips: number;
-  // percent_total_emissions: number;
-  // percent_total_trips: number;
-  // total_miles: number;
-  // average_miles: number;
   percapita_trips: number;
   percapita_emissions: number;
-}
-export type DataPoint2 = {
-  fiscalyear: string;
-  school: string;
-  total_trips: number;
-  total_cost: number;
 }
 export type Connection = {
     from_full: string;
@@ -84,13 +74,10 @@ function Homepage() {
   ]
   const colorScale = d3.scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"]);
   const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
-  const [data2, setData2] = useState<InternMap<string,DataPoint2[]> | undefined>(undefined);
   const [timelineData, setTimelineData] = useState<InternMap<string, any[]> | undefined>(undefined);
   const [mapData, setMapData] = useState<ConnectionData | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
-  const [loading2, setLoading2] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
-  // const [toggleStatePercapita, setToggleStatePercapita] = useState<"percapita" | "total">("total");
   const [toggleStateTraveler, setToggleStateTraveler] = useState<"total_emissions" | "total_trips">("total_trips");
   const [toggleStateSchool, setToggleStateSchool] = useState<"total_emissions" | "total_trips">("total_trips");
   const top1ref = useRef<HTMLDivElement | null>(null);
@@ -109,14 +96,6 @@ function Homepage() {
   const handleFilterClose = () => {
     setFilterAnchorEl(null);
   };
-
-  // const handleToggleChangePercapita = (event:ChangeEvent<HTMLInputElement>) => {
-  //   if (event.target.checked) {
-  //     setToggleStatePercapita("total")
-  //   } else {
-  //     setToggleStatePercapita("percapita")
-  //   }
-  // }  
   const handleToggleChangeTraveler = (event:ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       setToggleStateTraveler("total_emissions")
@@ -191,21 +170,10 @@ function Homepage() {
         percapita_emissions: +d.percapita_emissions
       } as DataPoint;
     }).then((d) => {
+      console.log(d);
       let grouped = d3.group(d, d => d.fiscalyear)
       setData(grouped);
       setLoading(false);
-    }).catch((error) => console.error("Error loading CSV:", error));
-    d3.csv("./data/expenses_summary.csv", (d)=>{
-      return {
-        fiscalyear: d.fiscalyear,
-        school: toTitleCase(d.school),
-        total_trips: +d.total_trips,
-        total_cost: +d.total_cost
-      } as DataPoint2;
-    }).then((d) => {
-      let grouped = d3.group(d, d => d.fiscalyear)
-      setData2(grouped);
-      setLoading2(false);
     }).catch((error) => console.error("Error loading CSV:", error));
     d3.csv("./data/monthly_emissions_per_year.csv", (d) => {
       let date = Date.UTC(d.year, d.month);
@@ -240,7 +208,7 @@ function Homepage() {
   }, []);
   const [topLine, setTopLine] = useState<TopLineStats | undefined>(undefined);
   useEffect(()=>{
-    if (data !== undefined && mapData !== undefined) {
+    if (data !== undefined) {
       let topline = {
         emissions: fiscalYearOptions.map(({label,value}) => {
           return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_emissions)}
@@ -415,7 +383,7 @@ function Homepage() {
             <span>Emissions</span>
             </div>
             <div className={styles.chartContainer} ref={bar1ref}>
-              {!loading2 && bar1ref?.current && !!data2 &&
+              {bar1ref?.current && !loading && !!data &&
                 <BarChartVariants 
                   data={filterInternMap(data, yearFilterCallback)}
                   orientation="horizontal"
