@@ -187,10 +187,6 @@ function Homepage() {
         traveler_type: studentCorrection(d.traveler_type),
         total_emissions: +d.total_emissions,
         total_trips: +d.total_trips,
-        // percent_total_emissions: +d.percent_total_emissions,
-        // percent_total_trips: +d.percent_total_trips,
-        // total_miles: +d.total_miles,
-        // average_miles: +d.average_miles,
         percapita_trips: +d.percapita_trips,
         percapita_emissions: +d.percapita_emissions
       } as DataPoint;
