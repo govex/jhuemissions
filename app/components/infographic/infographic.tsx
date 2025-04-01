@@ -8,15 +8,23 @@ type infoData = {
     value: number
 }[]
 
-function Infographic({data, years, unit}:{data: infoData, years: any, unit?:string}) {
-    const innercontent = ({
-        value, changeText
-    }:{
-        value: number[],
-        changeText: {value: string, priorYear: string} | undefined,
-    }) => {
+function Infographic({data, years, parentRect, unit}:{
+    data: infoData, 
+    years: any, 
+    parentRect: {
+        bottom: number,
+        height: number,
+        left: number,
+        right: number,
+        top: number,
+        width: number,
+        x: number,
+        y: number
+    },
+    unit?:string
+}) {
+    const innercontent = () => {
         if (value?.length === 1 && !!changeText) {
-
             return (
                 <>
                 <h2 className={styles.stat}>{format(",")(parseInt(value[0]))}</h2>
@@ -26,12 +34,12 @@ function Infographic({data, years, unit}:{data: infoData, years: any, unit?:stri
             )
         } else if (value?.length > 1) {
             const sparkData = years.map(m => parseInt(data.find(f => f.year === m)?.value))
-
+            
             return (
                 <SparkLineChart 
                     data={sparkData}
-                    height={200}
-                    width={300}
+                    height={dims.height}
+                    width={dims.width}
                     showHighlight
                     showTooltip
                     xAxis={{
@@ -65,12 +73,29 @@ function Infographic({data, years, unit}:{data: infoData, years: any, unit?:stri
             }
         }    
     },[data, years, value])
-
-
+    const [dims, setDims] = useState<{width: number, height:number} | undefined>(undefined)
+    useEffect(() => {
+        if (parentRect) {
+            setDims({width: parentRect.width, height:parentRect.height})
+        }
+    }, [parentRect.width, parentRect.height])
+    const [render, setRender] = useState(false);
+    useEffect(() => {
+        if (
+            data.length > 0 &&
+            years.length > 0 &&
+            !!dims &&
+            !!value
+        ) {
+            setRender(true)
+        } else {
+            setRender(false)
+        }
+    }, [data, years, dims, value])
     return (
         <div>
-            {data.length > 0 && years.length > 0 &&
-                innercontent({value, changeText})
+            {render &&
+                innercontent()
             }
         </div>
     )

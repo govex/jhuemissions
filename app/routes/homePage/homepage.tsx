@@ -67,7 +67,7 @@ type TopLineStats = {
     year: string;
     value: number | undefined;
   }[],
-  miles: {
+  distance: {
     year: string;
     value: number | undefined;
   }[]
@@ -82,7 +82,7 @@ function Homepage() {
     {label: "FY18-19", value: "FY18-19", order: 2},
     {label: "FY17-18", value: "FY17-18", order: 1}
   ]
-
+  const colorScale = d3.scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"]);
   const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
   const [data2, setData2] = useState<InternMap<string,DataPoint2[]> | undefined>(undefined);
   const [timelineData, setTimelineData] = useState<InternMap<string, any[]> | undefined>(undefined);
@@ -90,9 +90,12 @@ function Homepage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [loading2, setLoading2] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [toggleStatePercapita, setToggleStatePercapita] = useState<"percapita" | "total">("total");
+  // const [toggleStatePercapita, setToggleStatePercapita] = useState<"percapita" | "total">("total");
   const [toggleStateTraveler, setToggleStateTraveler] = useState<"total_emissions" | "total_trips">("total_trips");
-  const [toggleStateSchool, setToggleStateSchool] = useState<"emissions" | "trips">("trips");
+  const [toggleStateSchool, setToggleStateSchool] = useState<"total_emissions" | "total_trips">("total_trips");
+  const top1ref = useRef<HTMLDivElement | null>(null);
+  const top2ref = useRef<HTMLDivElement | null>(null);
+  const top3ref = useRef<HTMLDivElement | null>(null);
   const bar1ref = useRef<HTMLDivElement | null>(null);
   const bar2ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -107,13 +110,13 @@ function Homepage() {
     setFilterAnchorEl(null);
   };
 
-  const handleToggleChangePercapita = (event:ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setToggleStatePercapita("total")
-    } else {
-      setToggleStatePercapita("percapita")
-    }
-  }  
+  // const handleToggleChangePercapita = (event:ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.checked) {
+  //     setToggleStatePercapita("total")
+  //   } else {
+  //     setToggleStatePercapita("percapita")
+  //   }
+  // }  
   const handleToggleChangeTraveler = (event:ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       setToggleStateTraveler("total_emissions")
@@ -123,9 +126,9 @@ function Homepage() {
   }  
   const handleToggleChangeSchool = (event:ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      setToggleStateSchool("emissions")
+      setToggleStateSchool("total_emissions")
     } else {
-      setToggleStateSchool("trips")
+      setToggleStateSchool("total_trips")
     }
   }  
   function yearFilterCallback(k,v) {
@@ -245,27 +248,19 @@ function Homepage() {
   useEffect(()=>{
     if (data !== undefined && mapData !== undefined) {
       let topline = {
-        emissions: fiscalYearOptions.map(({label,value}) => {
+        emissions: fiscalYearOptions.map(({label}) => {
           return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_emissions)}
         }),
-        trips: fiscalYearOptions.map(({label,value}) => {
+        trips: fiscalYearOptions.map(({label}) => {
           return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_trips)}
         }),
-        travelled: fiscalYearOptions.map(({label,value}) => {
-          let trips = mapData?.get(label)
-          if (trips !== undefined) {
-            let rollup = d3.rollup(trips, v => d3.sum(v, d => d.total_trips), d => d.to_full)
-            let asArray = Array.from(rollup.entries()) 
-            let sorted = asArray.sort((a,b)=>b[1] - a[1]).slice(0,5)
-            return {year: label, value: sorted}
-          } else {
-            return {year: label, value: undefined}
-          }
+        distance: fiscalYearOptions.map(({label}) => {
+          return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_trips)}
         })
       }
       setTopLine(topline as TopLineStats)
     }
-  },[data, mapData, filters.years])
+  },[data, filters.years])
 
   return (
     <>
@@ -338,39 +333,48 @@ function Homepage() {
           <Card
             title="Total GHG Emissions"
           >
-            {!!topLine &&
+            <div className={styles.chartContainer} ref={top1ref}>
+            {!!topLine && top1ref?.current &&
             <Infographic
               data={topLine.emissions}
               years={filters.years}
               unit={<span>metric tonnes of CO<sub>2</sub>e</span>}
+              parentRect={top1ref.current.getBoundingClientRect()}
             />
             }
+            </div>
           </Card>
         </div>
         <div className={styles.kpi2}>
           <Card
             title="Total Trips"
           >
-            {!!topLine &&
+            <div className={styles.chartContainer} ref={top2ref}>
+            {!!topLine && top2ref?.current &&
             <Infographic
               data={topLine.trips}
               years={filters.years}
               unit="trips taken"
+              parentRect={top2ref.current.getBoundingClientRect()}
             />
             }
+            </div>
           </Card>
         </div>
         <div className={styles.kpi3}>
           <Card
             title="Total Distance"
           >
-            {!!topLine &&
+            <div className={styles.chartContainer} ref={top3ref}>
+            {!!topLine && top3ref?.current &&
             <Infographic
               data={[{year:"FY23-24", value:-999}]}
               years={filters.years}
               unit="miles"
+              parentRect={top3ref.current.getBoundingClientRect()}
             />
             }
+            </div>
           </Card>
         </div>
         <div className={styles.donut}>
@@ -427,6 +431,7 @@ function Homepage() {
                   labelField={"traveler_type" as keyof DataPoint["traveler_type"]}
                   valueField={toggleStateTraveler as keyof DataPoint["total_trips" | "total_emissions"]}
                   school={filters.school}
+                  colorScale={colorScale.domain(filters.years)}
                 />
               }
             </div>
@@ -438,17 +443,10 @@ function Homepage() {
           >
             <div className={styles.toggleBox}><span>Trips</span>
             <Toggle 
-              checked={toggleStateSchool === "emissions" ? true : false} 
+              checked={toggleStateSchool === "total_emissions" ? true : false} 
               onChange={handleToggleChangeSchool} 
             />
             <span>Emissions</span>
-            </div>
-            <div className={styles.toggleBox}><span>Per 100 People</span>
-            <Toggle 
-              checked={toggleStatePercapita === "total" ? true : false} 
-              onChange={handleToggleChangePercapita} 
-            />
-            <span>Total</span>
             </div>
             <div className={styles.chartContainer} ref={bar2ref}>
               {!loading && bar2ref?.current && !!data &&
@@ -459,8 +457,9 @@ function Homepage() {
                   yScale="band"
                   parentRect={bar2ref.current.getBoundingClientRect()}
                   labelField={"school" as keyof DataPoint["school"]}
-                  valueField={`${toggleStatePercapita}_${toggleStateSchool}` as keyof DataPoint["percapita_trips" | "total_trips" | "percapita_emissions" | "total_emissions"]}
+                  valueField={toggleStateSchool as keyof DataPoint["total_trips" | "total_emissions"]}
                   school={filters.school}
+                  colorScale={colorScale.domain(filters.years)}
                 />
               }
             </div>
@@ -473,6 +472,7 @@ function Homepage() {
                 <Timeline 
                   data={filterInternMap(timelineData, yearFilterCallback)}
                   parentRect={timeRef.current.getBoundingClientRect()}
+                  colorScale={colorScale.domain(filters.years)}
                 />
               }
             </div>
