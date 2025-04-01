@@ -82,8 +82,8 @@ function Infographic({data, years, parentRect, unit}:{
     const [render, setRender] = useState(false);
     useEffect(() => {
         if (
-            data.length > 0 &&
-            years.length > 0 &&
+            data?.length > 0 &&
+            years?.length > 0 &&
             !!dims &&
             !!value
         ) {

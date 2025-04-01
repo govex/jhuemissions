@@ -251,13 +251,13 @@ function Homepage() {
   useEffect(()=>{
     if (data !== undefined && mapData !== undefined) {
       let topline = {
-        emissions: fiscalYearOptions.map(({label}) => {
+        emissions: fiscalYearOptions.map(({label,value}) => {
           return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_emissions)}
         }),
-        trips: fiscalYearOptions.map(({label}) => {
+        trips: fiscalYearOptions.map(({label,value}) => {
           return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_trips)}
         }),
-        distance: fiscalYearOptions.map(({label}) => {
+        distance: fiscalYearOptions.map(({label,value}) => {
           return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_trips)}
         })
       }
