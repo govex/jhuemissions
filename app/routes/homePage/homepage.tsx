@@ -317,27 +317,28 @@ function Homepage() {
         </div>
         <div className={styles.kpi1}>
           <Card
-            title="Total GHC Emissions"
+            title="Total GHG Emissions"
           >
             {!!topLine &&
             <Infographic
               data={topLine.emissions}
               years={filters.years}
               display="formatted"
-              unit="some units"
+              unit="metric tonnes of CO<sub>2</sub>"
             />
             }
           </Card>
         </div>
         <div className={styles.kpi2}>
           <Card
-            title="Total Trips Taken"
+            title="Total Trips"
           >
             {!!topLine &&
             <Infographic
               data={topLine.trips}
               years={filters.years}
               display="formatted"
+              unit="trips taken"
             />
             }
           </Card>

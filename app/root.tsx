@@ -9,7 +9,7 @@ import {
   
   import type { Route } from "./+types/root";
   import stylesheet from "./app.css?url";
-  
+
   export const links: Route.LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet }
   ];
@@ -20,6 +20,8 @@ import {
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  {/* gtag('config', 'G-LT2JGEXERV'); */}
           <Meta />
           <Links />
         </head>

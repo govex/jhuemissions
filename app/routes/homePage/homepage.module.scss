@@ -1,9 +1,9 @@
 .hero {
     width: 100%;
-    min-height: 436px;
+    min-height: 365px;
     background-color: #0E2D72;
     color: #FFF;
-    padding: 70px;
+    padding: 50px 70px;
     margin-bottom: 30px;
 }
 .info {
@@ -16,9 +16,9 @@
 
 .para {
     color: #FFF;
-    font-size: 24px;
+    font-size: 20px;
     font-style: normal;
-    font-weight: 600;
+    font-weight: 400;
     line-height: normal;
 }
 
@@ -27,15 +27,15 @@
     grid-template-areas: 
         "filter . . . . . tool tool"
         "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
-        "donut donut donut method method method tool tool"
+        "time time time time time time tool tool"
         "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" 
-        "time time time time time time time time"
-        "map map map map map map map map";
+        "map map map map map map map map"
+        "donut donut donut donut method method method method";
     width: 90vw;
     width: 100vw;
-    padding: 20px;
+    padding: 20px 70px;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 50px 300px 436px 90vh 442px 80vh;
+    grid-template-rows: 50px 300px 436px 90vh 442px 40vh;
     gap: 40px;
     margin-bottom: 30px;
 }
@@ -92,7 +92,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 40px;
+    gap: 30px;
     a {
         text-decoration: underline;
     }

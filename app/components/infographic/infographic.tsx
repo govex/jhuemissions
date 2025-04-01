@@ -40,7 +40,7 @@ function Infographic({data, years, display, unit}:{data: infoData, years: any, d
                             const change = data[i].value - previousRow.value
                             const perCh = (change / previousRow.value)
                             if (!!perCh) {
-                                changeText = format(".2p")(perCh)
+                                changeText = format("+.2p")(perCh)
                             }
                         }
                     }
