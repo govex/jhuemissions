@@ -195,8 +195,11 @@ function Homepage() {
         percapita_emissions: +d.percapita_emissions
       } as DataPoint;
     }).then((d) => {
-      let schools = Array.from(new Set(d.map(r => r.school))).sort()
-      setSchoolOptions(["All", ...schools]);
+      let schoolSet = new Set(d.map(r => r.school));
+      let schoolArray = Array.from(schoolSet);
+      let schoolSort = schoolArray.sort();
+      // let schools = Array.from(new Set(d.map(r => r.school))).sort()
+      setSchoolOptions(["All", ...schoolSort]);
       let grouped = d3.group(d, d => d.fiscalyear)
       setData(grouped);
       setLoading(false);
