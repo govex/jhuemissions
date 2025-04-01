@@ -24,9 +24,6 @@ const TopBar = () => {
                         <Link className='link' to="/methodology"> Methodology <ChevronDown/></Link>
                     </li>
                     <li className="topListItem">
-                        <Link className='link' to="https://form.asana.com/?k=4W32Fdf5p7zPNIV-3gKh5A&d=1108016200678557"> Contact <ChevronDown/></Link>
-                    </li>
-                    <li className="topListItem">
                         <Button 
                             text="GovEx"
                             color='primary'
