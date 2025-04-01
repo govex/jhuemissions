@@ -44,17 +44,53 @@ export type DataPoint2 = {
   total_trips: number;
   total_cost: number;
 }
+export type Connection = {
+    from_full: string;
+    to_full: string;
+    from_lat: number;
+    from_lng: number;
+    to_lat: number;
+    to_lng: number;
+    total_trips: number;
+    total_emissions: number;
+    fiscalyear: string;
+    school: string;
+}
+type ConnectionData = Map<string, Connection[]>
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-
+type TopLineStats = {
+  emissions: {
+    year: string;
+    value: number | undefined;
+  }[],
+  trips: {
+    year: string;
+    value: number | undefined;
+  }[],
+  travelled: {
+    year: string;
+    value: any[] | undefined;
+  }[]
+}
 function Homepage() {
+  const fiscalYearOptions = [
+    {label: "FY23-24", value: "FY23-24", order: 7},
+    {label: "FY22-23", value: "FY22-23", order: 6},
+    {label: "FY21-22", value: "FY21-22", order: 5},
+    {label: "FY20-21", value: "FY20-21", order: 4},
+    {label: "FY19-20", value: "FY19-20", order: 3},
+    {label: "FY18-19", value: "FY18-19", order: 2},
+    {label: "FY17-18", value: "FY17-18", order: 1}
+  ]
+
   const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
   const [data2, setData2] = useState<InternMap<string,DataPoint2[]> | undefined>(undefined);
   const [timelineData, setTimelineData] = useState<InternMap<string, any[]> | undefined>(undefined);
+  const [mapData, setMapData] = useState<ConnectionData | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [loading2, setLoading2] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [toggleState, setToggleState] = useState<"percapita_trips" | "total_trips">("total_trips");
-  const [timeToggleState, setTimeToggleState] = useState<"month" | "quarter">("month");
   const bar1ref = useRef<HTMLDivElement | null>(null);
   const bar2ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -76,13 +112,6 @@ function Homepage() {
       setToggleState("percapita_trips")
     }
   }  
-  const handleTimeToggleChange = (event:ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setTimeToggleState("quarter")
-    } else {
-      setTimeToggleState("month")
-    }
-  }
   function yearFilterCallback(k,v) {
     let selected = filters.years.flatMap(y => y.split(","));
     return selected.includes(k);
@@ -94,7 +123,6 @@ function Homepage() {
   const handleFilters = (event: ChangeEvent<HTMLInputElement> | {event: SyntheticEvent, value: string, reason: AutocompleteChangeReason}) => {
     if (event.target.checked === false) {
       let checked = Array.from(filters.years);
-      console.log(checked);
       if (checked.length === 1) {
         setFilterError(filterErrorNotEnough as errorText);
       } else if (checked.length <= 5) {
@@ -105,7 +133,12 @@ function Homepage() {
             checked.splice(checked.indexOf(event.target.value),1)
           }
           setFilterError(undefined)
-          setFilters({...filters, years: checked})
+          let sorted = checked.sort((a,b)=>{
+            let orderA = fiscalYearOptions.find(f => f.label === a)?.order
+            let orderB = fiscalYearOptions.find(f => f.label === b)?.order
+            return !!orderA && !!orderB ? orderA - orderB : 0
+          })
+          setFilters({...filters, years: sorted})
         }      
       }
     } else if (event.target.checked) {
@@ -115,8 +148,13 @@ function Homepage() {
       } else {
         setFilterError(undefined)
         checked.push(event.target.value);
-        setFilters({...filters, years: checked})  
-      }
+        let sorted = checked.sort((a,b)=>{
+          let orderA = fiscalYearOptions.find(f => f.label === a)?.order
+          let orderB = fiscalYearOptions.find(f => f.label === b)?.order
+          return !!orderA && !!orderB ? orderA - orderB : 0
+        })
+        setFilters({...filters, years: sorted})
+    }
     } else {
       setFilters({...filters, school: event.currentTarget.innerText !== '' ? event.currentTarget.innerText : 'All'})
     }
@@ -169,17 +207,50 @@ function Homepage() {
       let grouped = d3.group(d, d => d.fiscalyear);
       setTimelineData(grouped);
     }).catch((error) => console.error("Error loading CSV:", error));
+    d3.csv("./data/trips_between_locations_by_school.csv", (d) => {
+      return {
+          from_full: d.from_full,
+          to_full: d.to_full,
+          from_lat: +d.from_lat,
+          from_lng: +d.from_lng,
+          to_lat: +d.to_lat,
+          to_lng: +d.to_lng,
+          total_trips: +d.total_trips,
+          total_emissions: +d.total_emissions,
+          fiscalyear: d.fiscalyear.replace("FY20", "FY"),
+          school: d.school            
+      } as Connection
+    }).then((d) => {
+        let grouped = d3.group(d, d=>d.fiscalyear)
+        setMapData(grouped);
+    })
   }, []);
-  const fiscalYearOptions = [
-    {label: "FY24-25", value: "FY24-25"},
-    {label: "FY23-24", value: "FY23-24"},
-    {label: "FY22-23", value: "FY22-23"},
-    {label: "FY21-22", value: "FY21-22"},
-    {label: "FY20-21", value: "FY20-21"},
-    {label: "FY19-20", value: "FY19-20"},
-    {label: "FY18-19", value: "FY18-19"},
-    {label: "FY17-18", value: "FY17-18"}
-  ]
+  const [topLine, setTopLine] = useState<TopLineStats | undefined>(undefined);
+  useEffect(()=>{
+    if (data !== undefined && mapData !== undefined) {
+      let topline = {
+        emissions: fiscalYearOptions.map(({label,value}) => {
+          return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_emissions)}
+        }),
+        trips: fiscalYearOptions.map(({label,value}) => {
+          return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_trips)}
+        }),
+        travelled: fiscalYearOptions.map(({label,value}) => {
+          let trips = mapData?.get(label)
+          if (trips !== undefined) {
+            let rollup = d3.rollup(trips, v => d3.sum(v, d => d.total_trips), d => d.to_full)
+            let asArray = Array.from(rollup.entries()) 
+            let sorted = asArray.sort((a,b)=>b[1] - a[1]).slice(0,5)
+            return {year: label, value: sorted}
+          } else {
+            return {year: label, value: undefined}
+          }
+        })
+      }
+      setTopLine(topline as TopLineStats)
+    }
+  },[data, mapData, filters.years])
+
   return (
     <>
       <section className={styles.hero}>
@@ -248,27 +319,40 @@ function Homepage() {
           <Card
             title="Total GHC Emissions"
           >
+            {!!topLine &&
             <Infographic
-              data={[{ year: 2024, value: 40506, change: -0.03 }]}
+              data={topLine.emissions}
+              years={filters.years}
+              display="formatted"
+              unit="some units"
             />
+            }
           </Card>
         </div>
         <div className={styles.kpi2}>
           <Card
             title="Total Trips Taken"
           >
+            {!!topLine &&
             <Infographic
-              data={[{ year: 2024, value: 40506, change: -0.03 }]}
+              data={topLine.trips}
+              years={filters.years}
+              display="formatted"
             />
+            }
           </Card>
         </div>
         <div className={styles.kpi3}>
           <Card
-            title="Total Miles Travelled"
+            title="Most Travelled To"
           >
+            {!!topLine &&
             <Infographic
-              data={[{ year: 2024, value: 40506, change: -0.03 }]}
+              data={topLine.travelled}
+              years={filters.years}
+              display="travelled"
             />
+            }
           </Card>
         </div>
         <div className={styles.donut}>
@@ -366,10 +450,10 @@ function Homepage() {
       <div className={styles.map}>
         <Card title="Where are people travelling?">
           <div className={styles.chartContainer} ref={mapRef}>
-            {mapRef?.current &&
+            {mapRef?.current && !!mapData &&
               <ConnectionMap
                 parentRect={mapRef.current.getBoundingClientRect()} 
-                year={["FY202425"]}
+                data={filterInternMap(mapData, yearFilterCallback)}
                 />
             }
           </div>

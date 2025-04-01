@@ -13,24 +13,10 @@ type MapProps = {
     x: number,
     y: number
   };  
-  year: string[];
+  data: any;
 };
 
-type ConnectionData = Map<string, Connection[]>
-type Connection = {
-    from_full: string;
-    to_full: string;
-    from_lat: number;
-    from_lng: number;
-    to_lat: number;
-    to_lng: number;
-    total_trips: number;
-    total_emissions: number;
-    fiscalyear: string;
-    school: string;
-}
-
-export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => {
+export const ConnectionMap = ({ parentRect, data }: MapProps) => {
     const [world, setWorld] = useState<ExtendedFeatureCollection>({
         "type": "FeatureCollection",
         "features": [
@@ -69,7 +55,6 @@ export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => 
     });
     const [loading, setLoading] = useState(true);
     const [countryPaths, setCountryPaths] = useState<any[] | undefined>(undefined);
-    const [mapData, setMapData] = useState<ConnectionData | undefined>(undefined);
     const [connections, setConnections] = useState<any[] | undefined>(undefined);
     useEffect(() => {
       d3.json<ExtendedFeatureCollection>("./data/ne_world_countries.json").then((d) => {
@@ -80,31 +65,11 @@ export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => 
       });
     }, []);
     useEffect(()=>{
-        d3.csv("./data/trips_between_locations_by_school.csv", (d) => {
-            return {
-                from_full: d.from_full,
-                to_full: d.to_full,
-                from_lat: +d.from_lat,
-                from_lng: +d.from_lng,
-                to_lat: +d.to_lat,
-                to_lng: +d.to_lng,
-                total_trips: +d.total_trips,
-                total_emissions: +d.total_emissions,
-                fiscalyear: d.fiscalyear.replace("-", ""),
-                school: d.school            
-            } as Connection
-        }).then((d) => {
-            let grouped = d3.group(d, d=>d.fiscalyear)
-            setMapData(grouped);
-        })
-    },[])
-    useEffect(()=>{
         if (!loading) {
             projection.fitSize([parentRect.width, parentRect.height], world); 
             geoPathGenerator.projection(projection);    
-            if (mapData) {
-                if (year.length === 1) {
-                let lines = mapData.get(year[0])?.map((connection, i) => {
+            if (data) {
+                let lines = data.get("FY23-24")?.map((connection, i) => {
                     const path = geoPathGenerator({
                         type: 'LineString',
                         coordinates: [
@@ -128,9 +93,8 @@ export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => 
                 setConnections(lines);
             }
             }
-        }
         
-    },[mapData, parentRect.width, parentRect.height, world, loading])
+    },[data, parentRect.width, parentRect.height, world, loading])
     const projection = d3
         .geoNaturalEarth1()
         .fitSize([parentRect.width, parentRect.height], world)
@@ -161,7 +125,7 @@ export const ConnectionMap = ({ parentRect, year = ["FY202425"] }: MapProps) => 
         <div>
         <svg width={parentRect.width} height={parentRect.height}>
             {!loading && countryPaths}
-            {!loading && !!mapData && connections}
+            {!loading && !!data && connections}
         </svg>
         </div>
     );

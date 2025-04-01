@@ -51,8 +51,6 @@ function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
   error?: string,
   filters: {years: string[], school: string}
 }) {
-  console.log(filters)
-  console.log(error)
   return (
         <div className={styles.modalContainer}>
           <div className={styles.header}>

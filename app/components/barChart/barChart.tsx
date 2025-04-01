@@ -1,9 +1,11 @@
 import { BarChart } from "@mui/x-charts/node/BarChart";
 import styles from "./barChart.module.scss";
+import cx from "classnames";
 import { useEffect, useState } from "react";
 import type { DataPoint, DataPoint2 } from "~/routes/homePage/homepage";
 import { InternMap } from "d3";
 import { scaleOrdinal, rollups, sum } from "d3";
+import type classNames from "classnames";
 
 type SeriesRolls = {
     year: string;
@@ -53,6 +55,7 @@ export default function BarChartVariants({
         setRolled(seriesRolls as SeriesRolls);
     },[data, labelField, valueField])
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
+    const [overflowScroll, setOverflowScroll] = useState<Boolean>(false);
     const [marginLeft, setMarginLeft] = useState(0);
     const [maxVal, setMaxVal] = useState(0)
     useEffect(() => {
@@ -72,10 +75,20 @@ export default function BarChartVariants({
                 })
             }
             setMaxVal(maxVal)
-            setMarginLeft(maxLength * 10);
+            setMarginLeft(maxLength * 7);
             setGroupLabels(Array.from(labels));
         }
     }, [rolled])
+    const [realHeight, setRealHeight] = useState(parentRect.height)
+    useEffect(()=>{
+        if (groupLabels?.length > 15) {
+            setRealHeight(groupLabels.length * 42)            
+            setOverflowScroll(true)
+        } else {
+            setRealHeight(parentRect.height)
+            setOverflowScroll(false)
+        }
+    },[groupLabels, parentRect.height])
     const [seriesData, setSeriesData] = useState<{label: string, color: string, data: number[]}[]>([])
     useEffect(()=>{
         if (rolled !== undefined) {
@@ -97,11 +110,12 @@ export default function BarChartVariants({
             marginLeft > 0 &&
             seriesData.length > 0 &&
             maxVal > 0 &&
-            groupLabels.length > 0
+            groupLabels.length > 0 &&
+            !!realHeight
         ) {
             setRender(true);
         }
-    },[marginLeft, seriesData, maxVal, groupLabels])
+    },[marginLeft, seriesData, maxVal, groupLabels, realHeight])
     // const barClasses = getBarLabelUtilityClass("barLabel")
     // console.log(barClasses);
     // const BarLabelComponent = (x:BarLabelProps) => {
@@ -112,6 +126,7 @@ export default function BarChartVariants({
     // const newBarLabel:ReactNode<BarLabelProps> = BarLabelComponent;
     if (render) {
         return (
+            <div className={cx(styles.base, overflowScroll ? styles.overflowscroll : "")}>
             <BarChart className={styles.bar11}
             margin={{left: marginLeft, right: 70}}
             layout={orientation}
@@ -120,6 +135,7 @@ export default function BarChartVariants({
                 data: groupLabels      
             }]}
             xAxis={[{ scaleType: xScale, 
+                position: "top",
                 disableTicks: true,
                 label: valueField === "percapita_trips" || valueField === "percapita_emissions" 
                     ? "trips per 1,000 people"
@@ -127,7 +143,7 @@ export default function BarChartVariants({
             }]}
             series={seriesData}
             width={parentRect?.width}
-            height={parentRect?.height}
+            height={realHeight}
             sx={{
                 // Customize x-axis line (grey, thick)
                 // "& .MuiChartsAxis-left .MuiChartsAxis-line": {
@@ -143,13 +159,14 @@ export default function BarChartVariants({
             slotProps={{
                 legend: {
                     labelStyle: {
-                        fontFamily: "Montserrat",
+                        fontFamily: "gentona",
                         fontWeight: 600,
                         fontSize: 20
                     }
                 }
             }}
             />
+            </div>
         )    
     } else {
         return null
