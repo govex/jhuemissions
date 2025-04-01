@@ -40,10 +40,6 @@ function Infographic({data, years, unit}:{data: infoData, years: any, unit?:stri
                     }}
                 />
             )
-        } else {
-            return (
-                <p>There was a problem with this stat.</p>
-            )
         }
     }
     const [value, setValue] = useState<any | undefined>(undefined);

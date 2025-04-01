@@ -67,9 +67,9 @@ type TopLineStats = {
     year: string;
     value: number | undefined;
   }[],
-  travelled: {
+  miles: {
     year: string;
-    value: any[] | undefined;
+    value: number | undefined;
   }[]
 }
 function Homepage() {
@@ -90,7 +90,9 @@ function Homepage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [loading2, setLoading2] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [toggleState, setToggleState] = useState<"percapita_trips" | "total_trips">("total_trips");
+  const [toggleStatePercapita, setToggleStatePercapita] = useState<"percapita" | "total">("total");
+  const [toggleStateTraveler, setToggleStateTraveler] = useState<"total_emissions" | "total_trips">("total_trips");
+  const [toggleStateSchool, setToggleStateSchool] = useState<"emissions" | "trips">("trips");
   const bar1ref = useRef<HTMLDivElement | null>(null);
   const bar2ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -105,11 +107,25 @@ function Homepage() {
     setFilterAnchorEl(null);
   };
 
-  const handleToggleChange = (event:ChangeEvent<HTMLInputElement>) => {
+  const handleToggleChangePercapita = (event:ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      setToggleState("total_trips")
+      setToggleStatePercapita("total")
     } else {
-      setToggleState("percapita_trips")
+      setToggleStatePercapita("percapita")
+    }
+  }  
+  const handleToggleChangeTraveler = (event:ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setToggleStateTraveler("total_emissions")
+    } else {
+      setToggleStateTraveler("total_trips")
+    }
+  }  
+  const handleToggleChangeSchool = (event:ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setToggleStateSchool("emissions")
+    } else {
+      setToggleStateSchool("trips")
     }
   }  
   function yearFilterCallback(k,v) {
@@ -350,7 +366,7 @@ function Homepage() {
           >
             {!!topLine &&
             <Infographic
-              data={topLine.trips}
+              data={[{year:"FY23-24", value:-999}]}
               years={filters.years}
               unit="miles"
             />
@@ -393,6 +409,13 @@ function Homepage() {
           <Card
             title="What traveler type is traveling the most?"
           >
+            <div className={styles.toggleBox}><span>Trips</span>
+            <Toggle 
+              checked={toggleStateTraveler === "total_emissions" ? true : false} 
+              onChange={handleToggleChangeTraveler} 
+            />
+            <span>Emissions</span>
+            </div>
             <div className={styles.chartContainer} ref={bar1ref}>
               {!loading2 && bar1ref?.current && !!data2 &&
                 <BarChartVariants 
@@ -402,7 +425,7 @@ function Homepage() {
                   yScale="band"
                   parentRect={bar1ref.current.getBoundingClientRect()}
                   labelField={"traveler_type" as keyof DataPoint["traveler_type"]}
-                  valueField={"total_trips" as keyof DataPoint["total_trips"]}
+                  valueField={toggleStateTraveler as keyof DataPoint["total_trips" | "total_emissions"]}
                   school={filters.school}
                 />
               }
@@ -413,10 +436,17 @@ function Homepage() {
           <Card
             title="What school/division is traveling the most?"
           >
-            <div className={styles.toggleBox}><span>Per 1,000 People</span>
+            <div className={styles.toggleBox}><span>Trips</span>
             <Toggle 
-              checked={toggleState === "total_trips" ? true : false} 
-              onChange={handleToggleChange} 
+              checked={toggleStateSchool === "emissions" ? true : false} 
+              onChange={handleToggleChangeSchool} 
+            />
+            <span>Emissions</span>
+            </div>
+            <div className={styles.toggleBox}><span>Per 100 People</span>
+            <Toggle 
+              checked={toggleStatePercapita === "total" ? true : false} 
+              onChange={handleToggleChangePercapita} 
             />
             <span>Total</span>
             </div>
@@ -429,8 +459,7 @@ function Homepage() {
                   yScale="band"
                   parentRect={bar2ref.current.getBoundingClientRect()}
                   labelField={"school" as keyof DataPoint["school"]}
-                  valueField={toggleState as keyof DataPoint["percapita_trips" | "total_trips"]
-                  }
+                  valueField={`${toggleStatePercapita}_${toggleStateSchool}` as keyof DataPoint["percapita_trips" | "total_trips" | "percapita_emissions" | "total_emissions"]}
                   school={filters.school}
                 />
               }

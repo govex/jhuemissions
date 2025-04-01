@@ -3,8 +3,9 @@ import Card from "~/components/card/card";
 
 function Methodology() {
   return (
+    <>
+    <h1 className={styles.internal}>Methodology</h1>
     <div className={styles.methodology}>
-      <h2>Methodology</h2>
       <p>
         The emissions were computed using the methodology presented in Category 6: Business Travel of the <a href="https://ghgprotocol.org/sites/default/files/standards/Scope3_Calculation_Guidance_0.pdf">GHG Protocol Technical Guidance for Calculating Scope 3 Emissions</a> document. The distance-based method was used, since distance data is available in the data files used.
       </p>
@@ -27,6 +28,7 @@ function Methodology() {
         Before computing emissions, each flight was classified into short, medium, or long haul based on the flight distance specified. The distances were then multiplied by the appropriate emissions factor. CO<sub>2</sub>, CH<sub>4</sub>, and N<sub>2</sub>O emissions were calculated for each flight segment. The CH4 and N2O emissions were multiplied by global warming potentials (28 and 265 respectively) to give a result in MTCO<sub>2</sub>e (metric tons CO<sub>2</sub> equivalent).
       </p>
     </div>
+    </>
   )
 }
 

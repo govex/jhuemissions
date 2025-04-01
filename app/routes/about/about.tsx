@@ -2,6 +2,8 @@ import styles from "./about.module.scss";
 
 function About() {
   return (
+    <>
+    <h1 className={styles.internal}>About</h1>
     <div className={styles.about}>
       <h2>
         What are carbon emissions and how are they created?   
@@ -34,6 +36,7 @@ function About() {
         Air itineraries can have enormous variations in emissions. The most important factors are the number of stops, aircraft class, and carrier choice. <a href="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ftheicct.org%2Fsites%2Fdefault%2Ffiles%2Fpublications%2Fvariation-aviation-emissions-itinerary-jul2021-1.pdf&data=05%7C02%7Csbertran%40jhu.edu%7Ca810d4516e1e4abe15a108dd667e49fd%7C9fa4f438b1e6473b803f86f8aedf0dec%7C0%7C0%7C638779414838678766%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=8xYJ7LLr54DFxLDUNP%2B%2FGZ9JpnBuKpLZYYGvXLtzUvE%3D&reserved=0">Read more here.</a>
       </p>
     </div>
+    </>
   )
 }
 
