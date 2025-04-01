@@ -41,9 +41,6 @@ importers:
       d3-geo:
         specifier: ^3.1.1
         version: 3.1.1
-      ga-gtag:
-        specifier: ^1.2.0
-        version: 1.2.0
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -56,6 +53,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
+      react-gtm-module:
+        specifier: ^2.0.11
+        version: 2.0.11
       react-router:
         specifier: ^7.4.0
         version: 7.4.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -1591,9 +1591,6 @@ packages:
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
-  ga-gtag@1.2.0:
-    resolution: {integrity: sha512-j9gxutMdpGMdwaX1SzOG31Ddm+IGFjeNf+N3Z5g+BBpS8FSXOALlrM+ORIGc/QKszGJEDlw+6PfIsJZICsqsGQ==}
-
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
@@ -2043,6 +2040,9 @@ packages:
     resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
     peerDependencies:
       react: ^19.0.0
+
+  react-gtm-module@2.0.11:
+    resolution: {integrity: sha512-8gyj4TTxeP7eEyc2QKawEuQoAZdjKvMY4pgWfycGmqGByhs17fR+zEBs0JUDq4US/l+vbTl+6zvUIx27iDo/Vw==}
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -4013,8 +4013,6 @@ snapshots:
 
   function-bind@1.1.2: {}
 
-  ga-gtag@1.2.0: {}
-
   gensync@1.0.0-beta.2: {}
 
   geojson@0.5.0: {}
@@ -4404,6 +4402,8 @@ snapshots:
     dependencies:
       react: 19.0.0
       scheduler: 0.25.0
+
+  react-gtm-module@2.0.11: {}
 
   react-is@16.13.1: {}
 

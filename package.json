@@ -20,11 +20,11 @@
     "classnames": "^2.5.1",
     "d3": "^7.9.0",
     "d3-geo": "^3.1.1",
-    "ga-gtag": "^1.2.0",
     "geojson": "^0.5.0",
     "isbot": "^5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-gtm-module": "^2.0.11",
     "react-router": "^7.4.0",
     "sass": "^1.86.0"
   },

@@ -6,7 +6,8 @@ import {
     Scripts,
     ScrollRestoration,
   } from "react-router";
-  
+  import TagManager from 'react-gtm-module';
+  import { useEffect } from 'react';
   import type { Route } from "./+types/root";
   import stylesheet from "./app.css?url";
 
@@ -21,7 +22,6 @@ import {
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  {/* gtag('config', 'G-LT2JGEXERV'); */}
           <Meta />
           <Links />
         </head>
@@ -35,12 +35,18 @@ import {
   }
   
   export default function App() {
+    useEffect(()=>{
+      if (typeof window !== 'undefined') {
+        const tagManagerArgs = {gtmId: 'G-LT2JGEXERV'};
+        TagManager.initialize(tagManagerArgs);
+      }
+    },[])
     return <Outlet />;
   }
   
   export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     let message = "Oops!";
-    let details = "An unexpected error occurred.";
+    let details = "An unexpected error occurred. Please refresh your browser.";
     let stack: string | undefined;
   
     if (isRouteErrorResponse(error)) {
