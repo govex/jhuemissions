@@ -1,91 +1,32 @@
+import {useState, useEffect} from 'react';
 import { format } from "d3";
 import { SparkLineChart } from "@mui/x-charts";
 import styles from "./infographic.module.scss";
 
 type infoData = {
     year: string,
-    value: any | any[]
+    value: number
 }[]
 
-function Infographic({data, years, display, unit}:{data: infoData, years: any, display: string, unit?:string}) {
-    const innercontent = () => {
-    // if there's only one year in the filtered years list
-    if (years.length === 1) {
-        // and the display type is travelled
-        let value = data.find(f => f.year === years[0])?.value
-        if (!!value) {
-            if (display === "travelled") {
-            // display cities and values as numbered list
-                return (
-                    <ol className={styles.travellist}>
-                        {value.map(([city, trips]) => {
-                            return (
-                                <li>{city}: {trips} trips</li>
-                            )
-                        })
-                        }
-                    </ol>
-                    )    
-            } else {
-            // and the display type is not travelled
-            // and if there is a prior year of data in the data list
-            // display a large formatted number
-            // calculate and display the % change from the prior year
+function Infographic({data, years, unit}:{data: infoData, years: any, unit?:string}) {
+    const innercontent = ({
+        value, changeText
+    }:{
+        value: number[],
+        changeText: {value: string, priorYear: string} | undefined,
+    }) => {
+        if (value?.length === 1 && !!changeText) {
 
-            let changeText = "";
-                for (let i = 0; i < data.length; i++) {
-                    const previousRow = data[i-1];
-                    if (previousRow?.value) {
-                        if (previousRow.value > 0) {
-                            const change = data[i].value - previousRow.value
-                            const perCh = (change / previousRow.value)
-                            if (!!perCh) {
-                                changeText = format("+.2p")(perCh)
-                            }
-                        }
-                    }
-                }
-                return (
-                    <>
-                    <h2 className={styles.stat}>{format(",")(parseInt(value))}</h2>
-                    {unit && <p className={styles.unit}>{unit}</p>}
-                    {changeText.length > 0 &&
-                        <p className={styles.change}>{changeText} change from prior year</p>
-                    }
-                    </>
-                )
-            }
-        } else {
             return (
-                <p>There was an error with this stat.</p>
+                <>
+                <h2 className={styles.stat}>{format(",")(parseInt(value[0]))}</h2>
+                {!!unit && <p className={styles.unit}>{unit}</p>}
+                <p className={styles.change}>{changeText.value} change from {changeText.priorYear} </p>
+                </>
             )
-        }
-    } else {
-    // if there's more than one year in the filtered years list
-        // and the display type is travelled
-        if (display === "travelled") {
-            // aggregate the trips per city 
-            // and display the top five cities and values as a numbered list
-            // and add a note with years included
-            let value = data.find(f => f.value)?.value
-            if (!!value) {
-                // display cities and values as numbered list
-                return (
-                    <ol className={styles.travellist}>
-                        {value.map(([city, trips]) => {
-                            return (
-                                <li>{city}: {trips} trips</li>
-                            )
-                        })
-                        }
-                    </ol>
-                    )    
-                }
-        } else {
-        // and the display type is not travelled
+        } else if (value?.length > 1) {
             const sparkData = years.map(m => parseInt(data.find(f => f.year === m)?.value))
-            // display a sparkline and the most recent year's value
-            // and add a note with years included
+
             return (
                 <SparkLineChart 
                     data={sparkData}
@@ -99,13 +40,42 @@ function Infographic({data, years, display, unit}:{data: infoData, years: any, d
                     }}
                 />
             )
+        } else {
+            return (
+                <p>There was a problem with this stat.</p>
+            )
         }
     }
+    const [value, setValue] = useState<any | undefined>(undefined);
+    useEffect(()=>{
+        let val = data.filter(f => years.includes(f.year));
+        if (val.length === 1) {
+            setValue([val[0].value])
+        } else if (val.length > 1) {
+            setValue(val.map(m => m.value))
+        }
+    },[data,years])
+    const [changeText, setChangeText] = useState<{value: string, priorYear: string} | undefined>(undefined);
+    useEffect(()=>{
+        if (value?.length === 1) {
+            let dataI = data.findIndex(d => d.year == years[0])
+            let previousRow = data[dataI+1]
+            if (previousRow?.value > 0 && data[dataI].year == years[0]) {
+                const change = data[dataI].value - previousRow.value
+                const perCh = (change / previousRow.value)
+                if (!!perCh) {
+                    setChangeText({value: format("+.2p")(perCh), priorYear: previousRow.year})
+                }
+            }
+        }    
+    },[data, years, value])
 
-    }
+
     return (
         <div>
-            {innercontent()}
+            {data.length > 0 && years.length > 0 &&
+                innercontent({value, changeText})
+            }
         </div>
     )
 }

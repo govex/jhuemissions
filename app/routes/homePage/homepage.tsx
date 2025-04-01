@@ -315,6 +315,9 @@ function Homepage() {
           </>
           }
         </div>
+        <div className={styles.legend}>
+          <div></div>
+        </div>
         <div className={styles.kpi1}>
           <Card
             title="Total GHG Emissions"
@@ -323,8 +326,7 @@ function Homepage() {
             <Infographic
               data={topLine.emissions}
               years={filters.years}
-              display="formatted"
-              unit="metric tonnes of CO<sub>2</sub>"
+              unit={<span>metric tonnes of CO<sub>2</sub>e</span>}
             />
             }
           </Card>
@@ -337,7 +339,6 @@ function Homepage() {
             <Infographic
               data={topLine.trips}
               years={filters.years}
-              display="formatted"
               unit="trips taken"
             />
             }
@@ -345,13 +346,13 @@ function Homepage() {
         </div>
         <div className={styles.kpi3}>
           <Card
-            title="Most Travelled To"
+            title="Total Distance"
           >
             {!!topLine &&
             <Infographic
-              data={topLine.travelled}
+              data={topLine.trips}
               years={filters.years}
-              display="travelled"
+              unit="miles"
             />
             }
           </Card>
@@ -461,6 +462,14 @@ function Homepage() {
         </Card>
       </div>
     </section>
+    <div className={styles.feedback}>
+      <Button 
+        color="primary"
+        text="Feedback"
+        size="feedback"
+        href="https://form.asana.com/?k=4W32Fdf5p7zPNIV-3gKh5A&d=1108016200678557"
+      />
+    </div>
     </>
   )
 }

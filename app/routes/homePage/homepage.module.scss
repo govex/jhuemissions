@@ -25,7 +25,7 @@
 .grid {
     display: grid;
     grid-template-areas: 
-        "filter . . . . . tool tool"
+        "filter . legend legend legend . tool tool"
         "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
         "time time time time time time tool tool"
         "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" 
@@ -35,12 +35,15 @@
     width: 100vw;
     padding: 20px 70px;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 50px 300px 436px 90vh 442px 40vh;
+    grid-template-rows: 50px 300px 436px 70vh 60vh 1fr;
     gap: 40px;
     margin-bottom: 30px;
 }
 .filter {
     grid-area: filter;
+}
+.legend {
+    grid-area: legend;
 }
 .tool {
     grid-area: tool;
@@ -118,4 +121,12 @@
         line-height: 1.35em;
         margin: 10px auto 30px;
     }
+}
+.feedback {
+    position: fixed;
+    transform: rotate(-90deg);
+    z-index: 1000;
+    top: 65vh;
+    transform-origin: left;
+    left: calc(100vw - 20px);
 }
