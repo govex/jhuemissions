@@ -159,7 +159,7 @@ function Homepage() {
         setFilters({...filters, years: sorted})
     }
     } else {
-      setFilters({...filters, school: event.currentTarget.innerText !== '' ? event.currentTarget.innerText : 'All'})
+      setFilters({...filters, school: event.currentTarget.innerText !== '' ? event.currentTarget.innerText : 'All JHU'})
     }
   }
   const [schoolOptions, setSchoolOptions] = useState<{value:number,label:string}[] | []>([])
@@ -170,7 +170,7 @@ function Homepage() {
         label: toTitleCase(d.school)
       }
     }).then(data => {
-      let sorted = data.sort((a,b)=>a.label.compareLocale);
+      let sorted = data.sort((a,b)=>a.label.localeCompare(b.label));
       let dataPlusAll = [{value:-99, label:"All JHU"}, ...sorted]
       setSchoolOptions(dataPlusAll)})
     d3.csv("./data/bookings_summary.csv", (d)=>{
@@ -327,6 +327,7 @@ function Homepage() {
           {!!colorScale &&
             <Legend 
                 colorScale={colorScale.domain(filters.years)} 
+                school={filters.school}
             />
           }
         </div>
@@ -373,6 +374,7 @@ function Homepage() {
               years={filters.years}
               unit="miles"
               parentRect={top3ref.current.getBoundingClientRect()}
+              formatString=".4s"
             />
             }
             </div>
@@ -412,7 +414,7 @@ function Homepage() {
         </div>
         <div className={styles.bar1}>
           <Card
-            title="What traveler type is traveling the most?"
+            title={`What ${filters.school !== "All JHU" ? `${filters.school} ` : ""}traveler type is traveling the most?`}
           >
             <div className={styles.toggleBox}><span>Trips</span>
             <Toggle 
@@ -469,7 +471,7 @@ function Homepage() {
           </Card>
       </div>
       <div className={styles.time}>
-          <Card title="When are people travelling?">
+          <Card title={`When are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people travelling?`}>
             <div className={cx( styles.chartContainer, styles.lineChart )} ref={timeRef}>
               {!!timelineData && timeRef?.current && !!colorScale &&
                 <Timeline 

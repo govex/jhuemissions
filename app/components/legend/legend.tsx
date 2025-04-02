@@ -4,8 +4,9 @@ import type { ScaleOrdinal } from "d3";
 
 type ColorScale = ScaleOrdinal<string, string>;
 
-export default function Legend<FC>( {colorScale} : {
+export default function Legend<FC>( {colorScale, school} : {
     colorScale: ColorScale,
+    school: string
 } ) {
     const [colors, setColors] = useState(colorScale.range());
     const [years, setYears] = useState(colorScale.domain());
@@ -15,6 +16,7 @@ export default function Legend<FC>( {colorScale} : {
     },[colorScale])
     return (
         <div className={styles.legend}>
+        <div className={styles.swatches}>
             {years.map((d,i) => {
                 return (
                     <div className={styles.colorgroup} key={d}>
@@ -23,6 +25,8 @@ export default function Legend<FC>( {colorScale} : {
                     </div>
                 )
             })}
+        </div>
+        <div className={styles.school}>School/Division: {school}</div>
         </div>
     )
 }
