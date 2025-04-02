@@ -1,0 +1,29 @@
+.legend {
+    display: flex;
+    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: #ECECEC;
+    width: fit-content;
+    margin: auto;
+}
+.colorgroup {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    h4 {
+        font-size: 18px;
+        font-weight: 400;    
+    }
+}
+.colorsquare {
+    height: 25px;
+    width: 25px;
+    display: inline-block;
+    margin-right: 5px;
+    border-radius: 4px;
+}

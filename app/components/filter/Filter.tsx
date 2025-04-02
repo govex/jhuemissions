@@ -1,5 +1,4 @@
 import type { ChangeEvent, MouseEvent } from 'react';
-import Button from "~/components/button/button";
 import { styled, 
   Accordion,
   AccordionSummary,
@@ -47,7 +46,7 @@ function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
   close: (event:MouseEvent) => void,
   change: (event:ChangeEvent) => void, 
   yearOptions: {label:string, value: string[]}[],
-  schoolOptions: string[],
+  schoolOptions: {label:string, value:number}[],
   error?: string,
   filters: {years: string[], school: string}
 }) {
@@ -82,7 +81,7 @@ function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
                 <Autocomplete 
                   onChange={change}
                   value={filters.school}
-                  options={schoolOptions}
+                  options={schoolOptions.map(m => m.label)}
                   renderInput={(params) => <TextField {...params} />}
                   sx={{
                     backgroundColor: "transparent",

@@ -25,7 +25,7 @@
 .grid {
     display: grid;
     grid-template-areas: 
-        "filter . legend legend legend . tool tool"
+        "filter legend legend legend legend legend tool tool"
         "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3 tool tool"
         "time time time time time time tool tool"
         "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" 

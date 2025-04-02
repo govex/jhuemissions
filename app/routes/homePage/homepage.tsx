@@ -18,6 +18,7 @@ import Toggle from "~/components/toggle/toggle";
 import {toTitleCase, studentCorrection} from "~/utils/titleCase";
 import {filterInternMap} from "~/utils/mapFilter";
 import Timeline from "~/components/timeline/timeline";
+import Legend from "~/components/legend/legend";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -31,6 +32,10 @@ export type DataPoint = {
   traveler_type: string;
   total_emissions: number;
   total_trips: number;
+  total_distance_miles: number;
+  total_distance_km: number;
+  median_distance_miles: number;
+  median_distance_km: number;
   percapita_trips: number;
   percapita_emissions: number;
 }
@@ -157,17 +162,30 @@ function Homepage() {
       setFilters({...filters, school: event.currentTarget.innerText !== '' ? event.currentTarget.innerText : 'All'})
     }
   }
-  const [schoolOptions, setSchoolOptions] = useState<string[]>(["All"])
+  const [schoolOptions, setSchoolOptions] = useState<{value:number,label:string}[] | []>([])
   useEffect(() => {
+    d3.csv("./data/business_areas_with_headcount.csv", (d)=>{
+      return {
+        value: +d.code,
+        label: toTitleCase(d.school)
+      }
+    }).then(data => {
+      let sorted = data.sort((a,b)=>a.label.compareLocale);
+      let dataPlusAll = [{value:-99, label:"All"}, ...sorted]
+      setSchoolOptions(dataPlusAll)})
     d3.csv("./data/bookings_summary.csv", (d)=>{
       return {
         fiscalyear: d.fiscalyear,
         school: toTitleCase(d.school),
-        traveler_type: studentCorrection(d.traveler_type),
+        traveler_type: d.traveler_type,
         total_emissions: +d.total_emissions,
         total_trips: +d.total_trips,
         percapita_trips: +d.percapita_trips,
-        percapita_emissions: +d.percapita_emissions
+        percapita_emissions: +d.percapita_emissions,
+        total_distance_km: +d.total_distance_km,
+        total_distance_miles: +d.total_distance_miles,
+        median_distance_km: +d.median_distance_km,
+        median_distance_miles: +d.median_distance_km
       } as DataPoint;
     }).then((d) => {
       console.log(d);
@@ -175,14 +193,14 @@ function Homepage() {
       setData(grouped);
       setLoading(false);
     }).catch((error) => console.error("Error loading CSV:", error));
-    d3.csv("./data/monthly_emissions_per_year.csv", (d) => {
-      let date = Date.UTC(d.year, d.month);
+    d3.csv("./data/monthly_emissions_by_business_area.csv", (d) => {
+      let date = new Date(+d.year, +d.month);
       return {
-        month: date.toLocaleString(undefined, {month: "short"}),
-        total_emissions_concur: +d.total_emissions_concur,
-        total_emissions_epa: +d.total_emissions_epa,
+        month: date.toLocaleString(undefined, {month: "short", timeZone: "GMT"}),
         fiscalyear: d.fiscalyear,
-        total_trips: +d.total_trips
+        school: toTitleCase(d.school),
+        total_trips: +d.total_trips,
+        total_emissions: +d.total_emissions_epa
       }
     }).then(d => {
       let grouped = d3.group(d, d => d.fiscalyear);
@@ -217,7 +235,7 @@ function Homepage() {
           return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_trips)}
         }),
         distance: fiscalYearOptions.map(({label,value}) => {
-          return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_trips)}
+          return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_distance_miles)}
         })
       }
       setTopLine(topline as TopLineStats)
@@ -257,7 +275,7 @@ function Homepage() {
             size="medium"
             onClick={handleFilterClick}
           />
-          {schoolOptions?.length && schoolOptions.length > 0 &&
+          {schoolOptions?.length > 0 &&
           <>
           <Popover
             id={filterId}
@@ -289,7 +307,11 @@ function Homepage() {
           }
         </div>
         <div className={styles.legend}>
-          <div></div>
+          {!!colorScale &&
+            <Legend 
+                colorScale={colorScale.domain(filters.years)} 
+            />
+          }
         </div>
         <div className={styles.kpi1}>
           <Card
@@ -330,7 +352,7 @@ function Homepage() {
             <div className={styles.chartContainer} ref={top3ref}>
             {!!topLine && top3ref?.current &&
             <Infographic
-              data={[{year:"FY23-24", value:-999}]}
+              data={topLine.distance}
               years={filters.years}
               unit="miles"
               parentRect={top3ref.current.getBoundingClientRect()}
@@ -430,11 +452,13 @@ function Homepage() {
       <div className={styles.time}>
           <Card title="When are people travelling?">
             <div className={cx( styles.chartContainer, styles.lineChart )} ref={timeRef}>
-              {!!timelineData && timeRef?.current &&
+              {!!timelineData && timeRef?.current && !!colorScale &&
                 <Timeline 
                   data={filterInternMap(timelineData, yearFilterCallback)}
                   parentRect={timeRef.current.getBoundingClientRect()}
                   colorScale={colorScale.domain(filters.years)}
+                  valueField="total_trips"
+                  school={filters.school}
                 />
               }
             </div>
