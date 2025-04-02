@@ -159,7 +159,7 @@ function Homepage() {
         setFilters({...filters, years: sorted})
     }
     } else {
-      setFilters({...filters, school: event.currentTarget.innerText !== '' ? event.currentTarget.innerText : 'All'})
+      setFilters({...filters, school: event.currentTarget.innerText !== '' ? event.currentTarget.innerText : 'All JHU'})
     }
   }
   const [schoolOptions, setSchoolOptions] = useState<{value:number,label:string}[] | []>([])
