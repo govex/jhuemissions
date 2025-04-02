@@ -8,7 +8,7 @@ type infoData = {
     value: number
 }[]
 
-function Infographic({data, years, parentRect, unit}:{
+function Infographic({data, years, parentRect, unit, formatString}:{
     data: infoData, 
     years: any, 
     parentRect: {
@@ -22,14 +22,19 @@ function Infographic({data, years, parentRect, unit}:{
         y: number
     },
     unit?:string
+    formatString?:string
 }) {
     const innercontent = () => {
-        if (value?.length === 1 && !!changeText) {
+        if (value?.length === 1) {
             return (
                 <>
-                <h2 className={styles.stat}>{format(",")(parseInt(value[0]))}</h2>
+                <h2 className={styles.stat}>{format(!!formatString ? formatString : ",")(parseInt(value[0]))}</h2>
                 {!!unit && <p className={styles.unit}>{unit}</p>}
-                <p className={styles.change}>{changeText.value} change from {changeText.priorYear} </p>
+                {changeText ?
+                    (<p className={styles.change}>{changeText.value} change from {changeText.priorYear} </p>)
+                    : 
+                    (<p className={styles.change}>prior year unavailable</p>)
+                }
                 </>
             )
         } else if (value?.length > 1) {
@@ -69,8 +74,12 @@ function Infographic({data, years, parentRect, unit}:{
                 const perCh = (change / previousRow.value)
                 if (!!perCh) {
                     setChangeText({value: format("+.2p")(perCh), priorYear: previousRow.year})
+                } else {
+                    setChangeText(undefined)
                 }
             }
+        } else {
+            setChangeText(undefined)
         }    
     },[data, years, value])
     const [dims, setDims] = useState<{width: number, height:number} | undefined>(undefined)

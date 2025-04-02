@@ -61,9 +61,7 @@ export default function BarChartVariants<FC>({
                 let sorted = rolled.sort((a,b)=>b[1]-a[1])
                 let schoolIdx = sorted.findIndex(f => f[0] === school);
                 let spliced = sorted.splice(schoolIdx, 1);
-                console.log(spliced)
                 let reordered = [spliced[0], ...sorted];
-                console.log(reordered)
 
                 seriesRolls.push({
                     year: y,
@@ -78,7 +76,7 @@ export default function BarChartVariants<FC>({
             }
         }
         setRolled(seriesRolls as SeriesRolls);
-    },[data, labelField, valueField])
+    },[data, labelField, valueField, school])
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [overflowScroll, setOverflowScroll] = useState<Boolean>(false);
     const [marginLeft, setMarginLeft] = useState(0);
