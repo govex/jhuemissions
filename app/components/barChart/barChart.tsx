@@ -1,18 +1,19 @@
 import { BarChart } from "@mui/x-charts/node/BarChart";
 import styles from "./barChart.module.scss";
 import cx from "classnames";
-import { useEffect, useState } from "react";
-import type { DataPoint, DataPoint2 } from "~/routes/homePage/homepage";
-import { InternMap } from "d3";
-import { scaleOrdinal, rollups, sum } from "d3";
-import type classNames from "classnames";
+import { type FC, useState, useEffect } from "react";
+import type { DataPoint } from "~/routes/homePage/homepage";
+import type { InternMap, ScaleOrdinal } from "d3";
+import { rollups, sum } from "d3";
+
+type ColorScale = ScaleOrdinal<string, string>;
 
 type SeriesRolls = {
     year: string;
-    rollup: InternMap<string, any[]>
+    rollup: [string, number][]
 }[];
 
-export default function BarChartVariants({
+export default function BarChartVariants<FC>({
     data,
     orientation,
     xScale,
@@ -20,9 +21,11 @@ export default function BarChartVariants({
     parentRect,
     labelField,
     valueField,
-    school
+    school,
+    schoolFilter,
+    colorScale
 }:{
-    data: InternMap<string, DataPoint[] | DataPoint2[]>,
+    data: InternMap<string, DataPoint[]>,
     orientation: "horizontal" | "vertical" | undefined,
     xScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
     yScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
@@ -36,21 +39,43 @@ export default function BarChartVariants({
         x: number,
         y: number
     },
-    labelField: keyof DataPoint | keyof DataPoint2,
-    valueField: keyof DataPoint | keyof DataPoint2,
+    labelField: keyof DataPoint,
+    valueField: keyof DataPoint,
     school: string,
+    schoolFilter: Boolean,
+    colorScale: ColorScale,
 }) {
-    const colorScale = scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"])
-        .domain(Array.from(data.keys()))
     const [rolled, setRolled] = useState<SeriesRolls | undefined>(undefined);
     useEffect(() => {
         let seriesRolls = []
         for (const [y,g] of data.entries()) {
-            let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
-            seriesRolls.push({
-                year: y,
-                rollup: rolled.sort((a,b)=>b[1]-a[1])
-            })
+            if (school !== "All JHU" && schoolFilter) {
+                let filtered = g.filter(f => f.school === school)
+                let rolled = rollups(filtered, v => sum(v, d => d[valueField]), d => d[labelField]);
+                seriesRolls.push({
+                    year: y,
+                    rollup: rolled.sort((a,b)=>b[1]-a[1])
+                })
+            } else if (school !== "All JHU") {    
+                let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
+                let sorted = rolled.sort((a,b)=>b[1]-a[1])
+                let schoolIdx = sorted.findIndex(f => f[0] === school);
+                let spliced = sorted.splice(schoolIdx, 1);
+                console.log(spliced)
+                let reordered = [spliced[0], ...sorted];
+                console.log(reordered)
+
+                seriesRolls.push({
+                    year: y,
+                    rollup: reordered
+                })    
+            } else {
+                let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
+                seriesRolls.push({
+                    year: y,
+                    rollup: rolled.sort((a,b)=>b[1]-a[1])
+                })    
+            }
         }
         setRolled(seriesRolls as SeriesRolls);
     },[data, labelField, valueField])
@@ -62,7 +87,7 @@ export default function BarChartVariants({
         if (rolled !== undefined) {
             let maxLength = 0;
             let maxVal = 0;
-            let labels = new Set();
+            let labels = new Set<string>();
             for (const g of rolled.values()) {
                 g.rollup.forEach(i => {
                     if (i[0].length > maxLength) {
@@ -137,9 +162,9 @@ export default function BarChartVariants({
             xAxis={[{ scaleType: xScale, 
                 position: "top",
                 disableTicks: true,
-                label: valueField === "percapita_trips" || valueField === "percapita_emissions" 
-                    ? "trips per 1,000 people"
-                    : "# of trips"
+                label: valueField === "total_trips"
+                    ? "# of trips"
+                    : "MTCO2e"
             }]}
             series={seriesData}
             width={parentRect?.width}

@@ -121,7 +121,7 @@ function Homepage() {
   }
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popover' : undefined;
-  const [filters, setFilters] = useState<{years: string[], school: string}>({years: ["FY23-24"], school: "All"});
+  const [filters, setFilters] = useState<{years: string[], school: string}>({years: ["FY23-24"], school: "All JHU"});
   const [filterError, setFilterError] = useState<errorText>(undefined); 
   const handleFilters = (event: ChangeEvent<HTMLInputElement> | {event: SyntheticEvent, value: string, reason: AutocompleteChangeReason}) => {
     if (event.target.checked === false) {
@@ -171,7 +171,7 @@ function Homepage() {
       }
     }).then(data => {
       let sorted = data.sort((a,b)=>a.label.compareLocale);
-      let dataPlusAll = [{value:-99, label:"All"}, ...sorted]
+      let dataPlusAll = [{value:-99, label:"All JHU"}, ...sorted]
       setSchoolOptions(dataPlusAll)})
     d3.csv("./data/bookings_summary.csv", (d)=>{
       return {
@@ -188,7 +188,6 @@ function Homepage() {
         median_distance_miles: +d.median_distance_km
       } as DataPoint;
     }).then((d) => {
-      console.log(d);
       let grouped = d3.group(d, d => d.fiscalyear)
       setData(grouped);
       setLoading(false);
@@ -229,18 +228,36 @@ function Homepage() {
     if (data !== undefined) {
       let topline = {
         emissions: fiscalYearOptions.map(({label,value}) => {
-          return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_emissions)}
+          let yearData = data.get(label)
+          if (filters.school === "All JHU") {
+            return {year: label, value: d3.sum(yearData, d => d.total_emissions)}
+          } else {
+            let filtered = yearData.filter(f => f.school === filters.school)
+            return {year: label, value: d3.sum(filtered, d => d.total_emissions)}
+          }
         }),
         trips: fiscalYearOptions.map(({label,value}) => {
-          return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_trips)}
+          let yearData = data.get(label)
+          if (filters.school === "All JHU") {
+            return {year: label, value: d3.sum(yearData, d => d.total_trips)}
+          } else {
+            let filtered = yearData.filter(f => f.school === filters.school)
+            return {year: label, value: d3.sum(filtered, d => d.total_trips)}
+          }
         }),
         distance: fiscalYearOptions.map(({label,value}) => {
-          return {year: label, value: d3.sum(data.get(label)?.values(), d => d.total_distance_miles)}
+          let yearData = data.get(label)
+          if (filters.school === "All JHU") {
+            return {year: label, value: d3.sum(yearData, d => d.total_distance_miles)}
+          } else {
+            let filtered = yearData.filter(f => f.school === filters.school)
+            return {year: label, value: d3.sum(filtered, d => d.total_distance_miles)}
+          }
         })
       }
       setTopLine(topline as TopLineStats)
     }
-  },[data, filters.years])
+  },[data, filters])
 
   return (
     <>
@@ -415,6 +432,7 @@ function Homepage() {
                   labelField={"traveler_type" as keyof DataPoint["traveler_type"]}
                   valueField={toggleStateTraveler as keyof DataPoint["total_trips" | "total_emissions"]}
                   school={filters.school}
+                  schoolFilter={true}
                   colorScale={colorScale.domain(filters.years)}
                 />
               }
@@ -443,6 +461,7 @@ function Homepage() {
                   labelField={"school" as keyof DataPoint["school"]}
                   valueField={toggleStateSchool as keyof DataPoint["total_trips" | "total_emissions"]}
                   school={filters.school}
+                  schoolFilter={false}
                   colorScale={colorScale.domain(filters.years)}
                 />
               }

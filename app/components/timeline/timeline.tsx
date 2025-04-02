@@ -33,12 +33,20 @@ export default function Timeline<FC>({
     useEffect(()=>{
         let serieses = [];
         for (const [y,g] of data.entries()) {
-            if (!school || school === "All") {
+            if (!school || school === "All JHU") {
                 let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d.month);
                 let series = {
                     label: y,
                     color: colorScale(y),
                     data: rolled.sort((a,b)=>months.indexOf(a[0])-months.indexOf(b[0])).map(d => d[1])
+                }
+                serieses.push(series)
+            } else {
+                let filtered = g.filter(d => d.school === school)
+                let series = {
+                    label: y,
+                    color: colorScale(y),
+                    data: filtered.sort((a,b)=>months.indexOf(a.month)-months.indexOf(b.month)).map(d => d[valueField])
                 }
                 serieses.push(series)
             }
