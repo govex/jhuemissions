@@ -61,16 +61,16 @@ export default function Timeline<FC>({
                     data: months
                 }]}
                 yAxis={[{
-                    label: "# of trips",
+                    label: valueField === "total_trips" ? "# of trips" : "emissions",
                 }]}
                 series={seriesData}
                 width={parentRect.width}
                 height={parentRect.height}
-                margin={{left:80}}
+                margin={{left:100}}
                 sx={{
                     "& .MuiChartsAxis-directionY": {
                         "& .MuiChartsAxis-label": {
-                            transform: "translateX(-30px) !important"
+                            transform: "translateX(-50px) !important"
                           }    
                     }
                 

@@ -85,6 +85,7 @@ function Homepage() {
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [toggleStateTraveler, setToggleStateTraveler] = useState<"total_emissions" | "total_trips">("total_trips");
   const [toggleStateSchool, setToggleStateSchool] = useState<"total_emissions" | "total_trips">("total_trips");
+  const [toggleStateTimeline, setToggleStateTimeline] = useState<"total_emissions" | "total_trips">("total_trips");
   const top1ref = useRef<HTMLDivElement | null>(null);
   const top2ref = useRef<HTMLDivElement | null>(null);
   const top3ref = useRef<HTMLDivElement | null>(null);
@@ -113,6 +114,13 @@ function Homepage() {
       setToggleStateSchool("total_emissions")
     } else {
       setToggleStateSchool("total_trips")
+    }
+  }  
+  const handleToggleChangeTimeline = (event:ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setToggleStateTimeline("total_emissions")
+    } else {
+      setToggleStateTimeline("total_trips")
     }
   }  
   function yearFilterCallback(k,v) {
@@ -472,13 +480,20 @@ function Homepage() {
       </div>
       <div className={styles.time}>
           <Card title={`When are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people travelling?`}>
+          <div className={styles.toggleBox}><span>Trips</span>
+            <Toggle 
+              checked={toggleStateTimeline === "total_emissions" ? true : false} 
+              onChange={handleToggleChangeTimeline} 
+            />
+            <span>Emissions</span>
+            </div>
             <div className={cx( styles.chartContainer, styles.lineChart )} ref={timeRef}>
               {!!timelineData && timeRef?.current && !!colorScale &&
                 <Timeline 
                   data={filterInternMap(timelineData, yearFilterCallback)}
                   parentRect={timeRef.current.getBoundingClientRect()}
                   colorScale={colorScale.domain(filters.years)}
-                  valueField="total_trips"
+                  valueField={toggleStateTimeline}
                   school={filters.school}
                 />
               }
