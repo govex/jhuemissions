@@ -45,6 +45,9 @@ export default function BarChartVariants<FC>({
     schoolFilter: Boolean,
     colorScale: ColorScale,
 }) {
+    // To Do: figure out stacked variant 
+    // https://mui.com/x/react-charts/stacking/
+    
     const [rolled, setRolled] = useState<SeriesRolls | undefined>(undefined);
     useEffect(() => {
         let seriesRolls = []
