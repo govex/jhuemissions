@@ -6,8 +6,6 @@ import {
     Scripts,
     ScrollRestoration,
   } from "react-router";
-  import TagManager from 'react-gtm-module';
-  import { useEffect } from 'react';
   import type { Route } from "./+types/root";
   import stylesheet from "./app.css?url";
 
@@ -21,7 +19,13 @@ import {
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-LT2JGEXERV" />
+          <script dangerouslySetInnerHTML={{__html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-LT2JGEXERV');
+          `}}/> 
           <Meta />
           <Links />
         </head>
@@ -35,12 +39,6 @@ import {
   }
   
   export default function App() {
-    useEffect(()=>{
-      if (typeof window !== 'undefined') {
-        const tagManagerArgs = {gtmId: 'G-LT2JGEXERV'};
-        TagManager.initialize(tagManagerArgs);
-      }
-    },[])
     return <Outlet />;
   }
   
