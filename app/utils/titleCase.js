@@ -12,3 +12,12 @@ export const toTitleCase = (str) => {
     const regex = new RegExp('\\b' + wordToReplace + '\\b', 'g');
     return text.replace(regex, replacement);
   }
+
+export const formatPlaces = (place) => {
+  let splits = place.split(', ')
+  if (splits[1].length > 2) {
+    return `${splits[0]}, ${toTitleCase(splits[1])}`
+  } else {
+    return splits.slice(0,2).join(", ")
+  }
+}
