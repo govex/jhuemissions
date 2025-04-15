@@ -13,9 +13,9 @@ import * as d3 from "d3";
 import type { InternMap } from "d3";
 import type { Route } from "./+types/homepage";
 import BarChartVariants from "~/components/barChart/barChart";
-import { ConnectionMap } from "~/components/connectionMap/connectionMap";
+import ConnectionMap from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
-import {toTitleCase, studentCorrection} from "~/utils/titleCase";
+import {toTitleCase, formatPlaces} from "~/utils/titleCase";
 import {filterInternMap} from "~/utils/mapFilter";
 import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
@@ -42,16 +42,18 @@ export type DataPoint = {
 export type Connection = {
     from_full: string;
     to_full: string;
-    from_lat: number;
-    from_lng: number;
-    to_lat: number;
-    to_lng: number;
     total_trips: number;
     total_emissions: number;
     fiscalyear: string;
     school: string;
 }
 type ConnectionData = Map<string, Connection[]>
+type HeadCount = {
+  code: number;
+  school: string;
+  personnelarea: string;
+  personnelareatotal: number;
+}
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 type TopLineStats = {
   emissions: {
@@ -81,6 +83,7 @@ function Homepage() {
   const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
   const [timelineData, setTimelineData] = useState<InternMap<string, any[]> | undefined>(undefined);
   const [mapData, setMapData] = useState<ConnectionData | undefined>(undefined);
+  const [headcount, setHeadcount] = useState<HeadCount[] | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [toggleStateTraveler, setToggleStateTraveler] = useState<"total_emissions" | "total_trips">("total_trips");
@@ -123,47 +126,73 @@ function Homepage() {
   const filterId = filterOpen ? 'simple-popover' : undefined;
   const [filters, setFilters] = useState<{years: string[], school: string}>({years: ["FY23-24"], school: "All JHU"});
   const [filterError, setFilterError] = useState<errorText>(undefined); 
-  const handleFilters = (event: ChangeEvent<HTMLInputElement> | {event: SyntheticEvent, value: string, reason: AutocompleteChangeReason}) => {
-    if (event.target.checked === false) {
-      let checked = Array.from(filters.years);
-      if (checked.length === 1) {
-        setFilterError(filterErrorNotEnough as errorText);
-      } else if (checked.length <= 5) {
-        if (checked.indexOf(event.target.value) != -1) {
-          if (checked.indexOf(event.target.value) == 0) {
-            checked.shift();
-          } else {
-            checked.splice(checked.indexOf(event.target.value),1)
-          }
+  const handleFilters = (event: SyntheticEvent, value: string, reason: AutocompleteChangeReason) => {
+    if (event.type === "change") {
+      if (event.target.checked === false) {
+        let checked = Array.from(filters.years);
+        if (checked.length === 1) {
+          setFilterError(filterErrorNotEnough as errorText);
+        } else if (checked.length <= 5) {
+          if (checked.indexOf(event.target.value) != -1) {
+            if (checked.indexOf(value) == 0) {
+              checked.shift();
+            } else {
+              checked.splice(checked.indexOf(event.target.value),1)
+            }
+            setFilterError(undefined)
+            let sorted = checked.sort((a,b)=>{
+              let orderA = fiscalYearOptions.find(f => f.label === a)?.order
+              let orderB = fiscalYearOptions.find(f => f.label === b)?.order
+              return !!orderA && !!orderB ? orderA - orderB : 0
+            })
+            setFilters({...filters, years: sorted})
+          }      
+        }
+      } else if (event.target.checked) {
+        let checked = Array.from(filters.years);
+        if (checked.length >= 5) {
+          setFilterError(filterErrorTooMany as errorText)
+        } else {
           setFilterError(undefined)
+          checked.push(event.target.value);
           let sorted = checked.sort((a,b)=>{
             let orderA = fiscalYearOptions.find(f => f.label === a)?.order
             let orderB = fiscalYearOptions.find(f => f.label === b)?.order
             return !!orderA && !!orderB ? orderA - orderB : 0
           })
           setFilters({...filters, years: sorted})
-        }      
-      }
-    } else if (event.target.checked) {
-      let checked = Array.from(filters.years);
-      if (checked.length >= 5) {
-        setFilterError(filterErrorTooMany as errorText)
-      } else {
-        setFilterError(undefined)
-        checked.push(event.target.value);
-        let sorted = checked.sort((a,b)=>{
-          let orderA = fiscalYearOptions.find(f => f.label === a)?.order
-          let orderB = fiscalYearOptions.find(f => f.label === b)?.order
-          return !!orderA && !!orderB ? orderA - orderB : 0
-        })
-        setFilters({...filters, years: sorted})
-    }
+        }
+      } 
     } else {
-      setFilters({...filters, school: event.currentTarget.innerText !== '' ? event.currentTarget.innerText : 'All JHU'})
+      console.log(event.type, value, reason)
+      setFilters({...filters, school: !!value ? value : 'All JHU'})
     }
   }
   const [schoolOptions, setSchoolOptions] = useState<{value:number,label:string}[] | []>([])
   useEffect(() => {
+    d3.csv("./data/business_areas_with_headcount.csv", (d) => {
+      return {
+        code: +d.code,
+        school: d.school,
+        personnelarea: d.personnelarea,
+        personnelareatotal: +d.personnelareatotal
+      } as HeadCount
+    }).then(data => {
+      setHeadcount(data);
+    }).catch((error) => console.error("Error loading CSV:", error));
+    d3.csv("./data/trips_between_locations_by_school.csv", (d) => {
+      return {
+          from_full: formatPlaces(d.from_full),
+          to_full: formatPlaces(d.to_full),
+          total_trips: +d.total_trips,
+          total_emissions: +d.total_emissions,
+          fiscalyear: d.fiscalyear,
+          school: d.school            
+      } as Connection
+    }).then((d) => {
+        let grouped = d3.group(d, d=>d.fiscalyear)
+        setMapData(grouped);
+    }).catch((error) => console.error("Error loading CSV:", error));
     d3.csv("./data/business_areas_with_headcount.csv", (d)=>{
       return {
         value: +d.code,
@@ -172,7 +201,8 @@ function Homepage() {
     }).then(data => {
       let sorted = data.sort((a,b)=>a.label.localeCompare(b.label));
       let dataPlusAll = [{value:-99, label:"All JHU"}, ...sorted]
-      setSchoolOptions(dataPlusAll)})
+      setSchoolOptions(dataPlusAll)
+    }).catch((error) => console.error("Error loading CSV:", error));
     d3.csv("./data/bookings_summary.csv", (d)=>{
       return {
         fiscalyear: d.fiscalyear,
@@ -205,23 +235,6 @@ function Homepage() {
       let grouped = d3.group(d, d => d.fiscalyear);
       setTimelineData(grouped);
     }).catch((error) => console.error("Error loading CSV:", error));
-    d3.csv("./data/trips_between_locations_by_school.csv", (d) => {
-      return {
-          from_full: d.from_full,
-          to_full: d.to_full,
-          from_lat: +d.from_lat,
-          from_lng: +d.from_lng,
-          to_lat: +d.to_lat,
-          to_lng: +d.to_lng,
-          total_trips: +d.total_trips,
-          total_emissions: +d.total_emissions,
-          fiscalyear: d.fiscalyear.replace("FY20", "FY"),
-          school: d.school            
-      } as Connection
-    }).then((d) => {
-        let grouped = d3.group(d, d=>d.fiscalyear)
-        setMapData(grouped);
-    })
   }, []);
   const [topLine, setTopLine] = useState<TopLineStats | undefined>(undefined);
   useEffect(()=>{
@@ -486,13 +499,16 @@ function Homepage() {
           </Card>
       </div>
       <div className={styles.map}>
-        <Card title="Where are people travelling?">
+        <Card title={`Where are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people travelling?`}>
           <div className={styles.chartContainer} ref={mapRef}>
-            {mapRef?.current && !!mapData &&
+            {mapRef?.current && !!mapData && !!headcount &&
               <ConnectionMap
                 parentRect={mapRef.current.getBoundingClientRect()} 
                 data={filterInternMap(mapData, yearFilterCallback)}
-                />
+                school={filters.school}
+                schoolCode={headcount.find(f => f.school === filters.school)?.code}
+                colorScale={colorScale.domain(filters.years)}
+              />
             }
           </div>
         </Card>

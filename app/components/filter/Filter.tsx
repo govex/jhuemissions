@@ -119,7 +119,7 @@ function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
                     {yearOptions?.length > 0 && yearOptions.map((chk) => {
                       return (
                         <FormControlLabel
-                        sx={{fontFamily: "Montserrat", color: "#000000"}}
+                        sx={{color: "#000000"}}
                         control={
                           <Checkbox
                             onChange={change}

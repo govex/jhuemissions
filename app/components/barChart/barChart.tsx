@@ -1,4 +1,4 @@
-import { BarChart } from "@mui/x-charts/node/BarChart";
+import { BarChart } from "@mui/x-charts";
 import styles from "./barChart.module.scss";
 import cx from "classnames";
 import { type FC, useState, useEffect } from "react";
