@@ -53,20 +53,16 @@ export type Connection = {
 }
 type ConnectionData = Map<string, Connection[]>
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
+type TopLineData = {
+  all: number | undefined;
+  school: number | undefined;
+};
 type TopLineStats = {
-  emissions: {
-    year: string;
-    value: number | undefined;
-  }[],
-  trips: {
-    year: string;
-    value: number | undefined;
-  }[],
-  distance: {
-    year: string;
-    value: number | undefined;
-  }[]
-}
+  year: string,
+  emissions: TopLineData,
+  trips: TopLineData,
+  distance: TopLineData
+}[]
 function Homepage() {
   const fiscalYearOptions = [
     {label: "FY23-24", value: "FY23-24", order: 7},
@@ -79,6 +75,7 @@ function Homepage() {
   ]
   const colorScale = d3.scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"]);
   const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
+  const [percentData, setPercentData] = useState<any>(undefined);
   const [timelineData, setTimelineData] = useState<InternMap<string, any[]> | undefined>(undefined);
   const [mapData, setMapData] = useState<ConnectionData | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
@@ -92,6 +89,7 @@ function Homepage() {
   const bar2ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const timeRef = useRef<HTMLDivElement | null>(null);
+  const percentRef = useRef<HTMLDivElement | null>(null);
   const filterErrorTooMany = "Only five years may be displayed at once.";
   const filterErrorNotEnough = "At least one year must be selected.";
   const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
@@ -189,7 +187,14 @@ function Homepage() {
       } as DataPoint;
     }).then((d) => {
       let grouped = d3.group(d, d => d.fiscalyear)
+      let schooled = d3.rollup(d, v => {
+        return {
+          total_trips: d3.sum(v, d => d.total_trips), 
+          total_emissions: d3.sum(v, d => d.total_emissions)
+        }
+      }, d => d.school, d => d.fiscalyear);
       setData(grouped);
+      setPercentData(schooled);
       setLoading(false);
     }).catch((error) => console.error("Error loading CSV:", error));
     d3.csv("./data/monthly_emissions_by_business_area.csv", (d) => {
@@ -226,35 +231,25 @@ function Homepage() {
   const [topLine, setTopLine] = useState<TopLineStats | undefined>(undefined);
   useEffect(()=>{
     if (data !== undefined) {
-      let topline = {
-        emissions: fiscalYearOptions.map(({label,value}) => {
-          let yearData = data.get(label)
-          if (filters.school === "All JHU") {
-            return {year: label, value: d3.sum(yearData, d => d.total_emissions)}
-          } else {
-            let filtered = yearData.filter(f => f.school === filters.school)
-            return {year: label, value: d3.sum(filtered, d => d.total_emissions)}
+      let topline = fiscalYearOptions.map(({label,value}) => { 
+        let yearData = data.get(label)
+        let filtered = yearData?.filter(f => f.school === filters.school)
+        return {
+          year: label, 
+          emissions: {
+            all: yearData ? d3.sum(yearData, d => d.total_emissions) : undefined, 
+            school: filtered ? d3.sum(filtered, d => d.total_emissions) : undefined
+          },
+          trips: {
+            all: yearData ? d3.sum(yearData, d => d.total_trips) : undefined, 
+            school: filtered ? d3.sum(filtered, d => d.total_trips) : undefined
+          },
+          distance: {
+            all: yearData ? d3.sum(yearData, d => d.total_distance_miles) : undefined, 
+            school: filtered ? d3.sum(filtered, d => d.total_distance_miles) : undefined
           }
-        }),
-        trips: fiscalYearOptions.map(({label,value}) => {
-          let yearData = data.get(label)
-          if (filters.school === "All JHU") {
-            return {year: label, value: d3.sum(yearData, d => d.total_trips)}
-          } else {
-            let filtered = yearData.filter(f => f.school === filters.school)
-            return {year: label, value: d3.sum(filtered, d => d.total_trips)}
-          }
-        }),
-        distance: fiscalYearOptions.map(({label,value}) => {
-          let yearData = data.get(label)
-          if (filters.school === "All JHU") {
-            return {year: label, value: d3.sum(yearData, d => d.total_distance_miles)}
-          } else {
-            let filtered = yearData.filter(f => f.school === filters.school)
-            return {year: label, value: d3.sum(filtered, d => d.total_distance_miles)}
-          }
-        })
-      }
+        }
+      })
       setTopLine(topline as TopLineStats)
     }
   },[data, filters])
@@ -338,7 +333,11 @@ function Homepage() {
             <div className={styles.chartContainer} ref={top1ref}>
             {!!topLine && top1ref?.current &&
             <Infographic
-              data={topLine.emissions}
+              data={topLine.map(m => {
+                return {
+                  year: m.year, 
+                  value: filters.school === "All JHU" ? m.emissions.all : m.emissions.school}
+              })}
               years={filters.years}
               unit={<span>metric tonnes of CO<sub>2</sub>e</span>}
               parentRect={top1ref.current.getBoundingClientRect()}
@@ -354,8 +353,12 @@ function Homepage() {
             <div className={styles.chartContainer} ref={top2ref}>
             {!!topLine && top2ref?.current &&
             <Infographic
-              data={topLine.trips}
-              years={filters.years}
+            data={topLine.map(m => {
+              return {
+                year: m.year, 
+                value: filters.school === "All JHU" ? m.trips.all : m.trips.school}
+            })}
+            years={filters.years}
               unit="trips taken"
               parentRect={top2ref.current.getBoundingClientRect()}
             />
@@ -370,7 +373,11 @@ function Homepage() {
             <div className={styles.chartContainer} ref={top3ref}>
             {!!topLine && top3ref?.current &&
             <Infographic
-              data={topLine.distance}
+              data={topLine.map(m => {
+                return {
+                  year: m.year, 
+                  value: filters.school === "All JHU" ? m.distance.all : m.distance.school}
+              })}
               years={filters.years}
               unit="miles"
               parentRect={top3ref.current.getBoundingClientRect()}
@@ -495,6 +502,29 @@ function Homepage() {
                 />
             }
           </div>
+        </Card>
+      </div>
+      <div className={styles.percent}>
+        <Card title="How is travel distributed throughout JHU?">
+            <div className={styles.chartContainer} ref={percentRef}>
+              {percentRef?.current && !!percentData &&
+                <BarChartVariants 
+                data={percentData}
+                orientation="horizontal"
+                xScale="linear"
+                yScale="band"
+                parentRect={percentRef.current.getBoundingClientRect()}
+                labelField={"school" as keyof DataPoint["school"]}
+                valueField={toggleStateSchool as keyof DataPoint["total_trips" | "total_emissions"]}
+                school={filters.school}
+                schoolFilter={false}
+                colorScale={colorScale.domain(filters.years)}
+                stack={true}
+                topLine={topLine}
+                years={filters.years}
+              />
+            }
+            </div>
         </Card>
       </div>
     </section>
