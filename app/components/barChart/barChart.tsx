@@ -4,7 +4,7 @@ import cx from "classnames";
 import { type FC, useState, useEffect } from "react";
 import type { DataPoint } from "~/routes/homePage/homepage";
 import type { InternMap, ScaleOrdinal } from "d3";
-import { rollups, sum } from "d3";
+import { rollups, sum, format, max } from "d3";
 
 type ColorScale = ScaleOrdinal<string, string>;
 
@@ -12,6 +12,8 @@ type SeriesRolls = {
     year: string;
     rollup: [string, number][]
 }[];
+
+type Stacked = InternMap<string, InternMap<string, {total_trips: number, total_emissions: number}>>
 
 export default function BarChartVariants<FC>({
     data,
@@ -23,9 +25,12 @@ export default function BarChartVariants<FC>({
     valueField,
     school,
     schoolFilter,
-    colorScale
+    colorScale,
+    stack = false,
+    topLine,
+    years
 }:{
-    data: InternMap<string, DataPoint[]>,
+    data: InternMap<string, DataPoint[] | InternMap<string, {total_trips: number, total_emissions: number}>>,
     orientation: "horizontal" | "vertical" | undefined,
     xScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
     yScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
@@ -44,48 +49,52 @@ export default function BarChartVariants<FC>({
     school: string,
     schoolFilter: Boolean,
     colorScale: ColorScale,
+    stack?: Boolean,
+    topLine?: any[]
+    years?: any
 }) {
-    // To Do: figure out stacked variant 
-    // https://mui.com/x/react-charts/stacking/
-    
-    const [rolled, setRolled] = useState<SeriesRolls | undefined>(undefined);
+    const [rolled, setRolled] = useState<SeriesRolls | Stacked | undefined>(undefined);
     useEffect(() => {
-        let seriesRolls = []
-        for (const [y,g] of data.entries()) {
-            if (school !== "All JHU" && schoolFilter) {
-                let filtered = g.filter(f => f.school === school)
-                let rolled = rollups(filtered, v => sum(v, d => d[valueField]), d => d[labelField]);
-                seriesRolls.push({
-                    year: y,
-                    rollup: rolled.sort((a,b)=>b[1]-a[1])
-                })
-            } else if (school !== "All JHU") {    
-                let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
-                let sorted = rolled.sort((a,b)=>b[1]-a[1])
-                let schoolIdx = sorted.findIndex(f => f[0] === school);
-                let spliced = sorted.splice(schoolIdx, 1);
-                let reordered = [spliced[0], ...sorted];
-
-                seriesRolls.push({
-                    year: y,
-                    rollup: reordered
-                })    
-            } else {
-                let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
-                seriesRolls.push({
-                    year: y,
-                    rollup: rolled.sort((a,b)=>b[1]-a[1])
-                })    
-            }
+        if (stack && years) {
+            setRolled(data)
+        } else {
+            let seriesRolls = []
+            for (const [y,g] of data.entries()) {
+                if (school !== "All JHU" && schoolFilter) {
+                    let filtered = g.filter(f => f.school === school)
+                    let rolled = rollups(filtered, v => sum(v, d => d[valueField]), d => d[labelField]);
+                    seriesRolls.push({
+                        year: y,
+                        rollup: rolled.sort((a,b)=>b[1]-a[1])
+                    })
+                } else if (school !== "All JHU") {    
+                    let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
+                    let sorted = rolled.sort((a,b)=>b[1]-a[1])
+                    let schoolIdx = sorted.findIndex(f => f[0] === school);
+                    let spliced = sorted.splice(schoolIdx, 1);
+                    let reordered = [spliced[0], ...sorted];
+    
+                    seriesRolls.push({
+                        year: y,
+                        rollup: reordered
+                    })    
+                } else {
+                    let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
+                    seriesRolls.push({
+                        year: y,
+                        rollup: rolled.sort((a,b)=>b[1]-a[1])
+                    })    
+                }
+            }    
+            setRolled(seriesRolls as SeriesRolls);
         }
-        setRolled(seriesRolls as SeriesRolls);
     },[data, labelField, valueField, school])
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [overflowScroll, setOverflowScroll] = useState<Boolean>(false);
     const [marginLeft, setMarginLeft] = useState(0);
     const [maxVal, setMaxVal] = useState(0)
     useEffect(() => {
-        if (rolled !== undefined) {
+        if (rolled !== undefined && !stack) {
             let maxLength = 0;
             let maxVal = 0;
             let labels = new Set<string>();
@@ -101,13 +110,13 @@ export default function BarChartVariants<FC>({
                 })
             }
             setMaxVal(maxVal)
-            setMarginLeft(maxLength * 7);
+            setMarginLeft(stack ? 70 : maxLength * 7);
             setGroupLabels(Array.from(labels));
         }
-    }, [rolled])
+    }, [rolled, stack])
     const [realHeight, setRealHeight] = useState(parentRect.height)
     useEffect(()=>{
-        if (groupLabels?.length > 15) {
+        if (groupLabels?.length > 15 && !stack) {
             setRealHeight(groupLabels.length * 42)            
             setOverflowScroll(true)
         } else {
@@ -115,24 +124,65 @@ export default function BarChartVariants<FC>({
             setOverflowScroll(false)
         }
     },[groupLabels, parentRect.height])
-    const [seriesData, setSeriesData] = useState<{label: string, color: string, data: number[]}[]>([])
+    const [seriesData, setSeriesData] = useState<{
+        label: string, 
+        color?: string, 
+        stack?: string, 
+        valueFormatter?: (v: number, { dataIndex }: { dataIndex: any; }) => string, 
+        data: number[]
+    }[]>([])
     useEffect(()=>{
         if (rolled !== undefined) {
-            let serieses = [];
-            for (const roll of rolled) {
-                let series = {
-                    label: roll.year,
-                    color: colorScale(roll.year),
-                    data: roll.rollup.map(d => valueField === "percapita_trips" || valueField === "percapita_emissions" ? (d[1]).toFixed(5) : d[1])
+            if (stack && topLine && years) {
+                let serieses = [];
+                for (const [group, yearMap] of rolled.entries()) {
+                    let series = {
+                        label: group,
+                        stack: "total",
+                        data: years.map(year => {
+                            let yearData = yearMap.get(year)
+                            return yearData ? yearData[valueField] : 0
+                        }),
+                        highlightScope: {
+                            highlight: 'series',
+                            fade: "global"
+                        },
+                        valueFormatter: (v:number, { dataIndex }: { dataIndex: any; }) => {
+                            let yearValues = topLine.find(f => f.year === years[dataIndex])
+                            let yearAll = valueField === "total_trips" ? yearValues.trips.all : yearValues.emissions.all
+                            return format(".3%")(v / yearAll)
+                        }
+                    }
+                    serieses.push(series)
                 }
-                serieses.push(series)
+                const maxStackedValue = max(serieses.flatMap(f => f.data.map(m => m)))
+                setMaxVal(maxStackedValue)
+                const modifiedSeries = [{ ...serieses[0], stackOffset: "expand", stackOrder: "ascending" }, ...serieses.slice(1)];
+                setSeriesData(modifiedSeries)
+            } else {
+                let serieses = [];
+                for (const roll of rolled) {
+                    let series = {
+                        label: roll.year,
+                        color: colorScale(roll.year),
+                        data: roll.rollup.map(d => valueField === "percapita_trips" || valueField === "percapita_emissions" ? (d[1]).toFixed(5) : d[1])
+                    }
+                    serieses.push(series)    
+                }
+                setSeriesData(serieses);
             }
-            setSeriesData(serieses);
         }
-    },[rolled])
+    },[rolled, stack, topLine, years])
     const [render, setRender] = useState(false);
     useEffect(()=>{
-        if (
+        if (seriesData.length > 0 &&
+            !!realHeight &&
+            maxVal > 0 &&
+            stack &&
+            years
+        ) {
+            setRender(true);
+        } else if (
             marginLeft > 0 &&
             seriesData.length > 0 &&
             maxVal > 0 &&
@@ -140,50 +190,49 @@ export default function BarChartVariants<FC>({
             !!realHeight
         ) {
             setRender(true);
+        } else {
+            setRender(false);
         }
     },[marginLeft, seriesData, maxVal, groupLabels, realHeight])
-    // const barClasses = getBarLabelUtilityClass("barLabel")
-    // console.log(barClasses);
-    // const BarLabelComponent = (x:BarLabelProps) => {
-    //     return (
-    //         <BarLabel {...x}></BarLabel>
-    //     )
-    // }
-    // const newBarLabel:ReactNode<BarLabelProps> = BarLabelComponent;
     if (render) {
         return (
             <div className={cx(styles.base, overflowScroll ? styles.overflowscroll : "")}>
             <BarChart className={styles.bar11}
-            margin={{left: marginLeft, right: 70}}
+            margin={{left: stack ? 70 : marginLeft, right: 50}}
             layout={orientation}
             yAxis={[{ 
                 scaleType: yScale,
-                data: groupLabels      
+                data: stack ? years : groupLabels      
             }]}
-            xAxis={[{ scaleType: xScale, 
-                position: "top",
+            xAxis={[{ id: "mainX", 
+                scaleType: xScale, 
                 disableTicks: true,
                 label: valueField === "total_trips"
-                    ? "# of trips"
-                    : "MTCO2e"
+                    ? `${stack ? "%" : "#"} of trips`
+                    : `${stack ? "% " : ""}MTCO2e`,
+                colorMap: stack ? {
+                    type: "continuous",
+                    min: 0,
+                    max: maxVal,
+                    color: ["#ECECEC","#A15B96"]
+                } : undefined,
             }]}
+            axisHighlight={{y: "none"}}
+            bottomAxis={stack ? null : {}}
+            topAxis={stack || !overflowScroll ? undefined : "mainX"}
+            leftAxis={{disableLine: stack, disableTicks: stack}}
+            tooltip={{trigger: stack ? "item" : "axis"}}
             series={seriesData}
             width={parentRect?.width}
             height={realHeight}
             sx={{
-                // Customize x-axis line (grey, thick)
-                // "& .MuiChartsAxis-left .MuiChartsAxis-line": {
-                //     stroke: "#CCC",
-                //     strokeWidth: 4,
-                //     color: "#000",
-                // },
                 "& .MuiBarLabel-root": {
                     textAnchor: "start"
                 }
             }}
-            // slots={{barLabel: newBarLabel}}
             slotProps={{
                 legend: {
+                    hidden: stack,
                     labelStyle: {
                         fontFamily: "gentona",
                         fontWeight: 600,
