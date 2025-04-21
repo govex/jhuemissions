@@ -58,7 +58,6 @@ export async function loader({}: Route.LoaderArgs) {
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Homepage({ loaderData }: Route.ComponentProps) {
-  console.log(loaderData);
   const colorScale = d3.scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"]);
   const [schoolData, setSchoolData] = useState<any>(loaderData.bookings.school);
   const [travelerData, setTravelerData] = useState<any>(loaderData.bookings.traveler_jhu);
@@ -112,12 +111,10 @@ function Homepage({ loaderData }: Route.ComponentProps) {
   const [filters, setFilters] = useState<any>(loaderData.filters);
   const [filterError, setFilterError] = useState<errorText>(undefined); 
   const handleFilters = (event: SyntheticEvent, value: string, reason: AutocompleteChangeReason) => {
-    console.log(event, value, reason)
     if (reason) {
       setFilters({...filters, school: value ? value : 'All JHU'})
     } else if (event.target.checked === false) {
       let checked = Array.from(filters.years);
-      console.log(checked, event.target.value)
       if (checked.length === 1) {
         setFilterError(filterErrorNotEnough as errorText);
       } else if (checked.length <= 5) {
@@ -128,7 +125,6 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             checked.splice(checked.indexOf(event.target.value),1)
           }
           setFilterError(undefined)
-          // checked.push(event.target.value);
           let sorted = checked.sort((a,b)=>{
             let orderA = fiscalYearOptions.find(f => f.label === a)?.order
             let orderB = fiscalYearOptions.find(f => f.label === b)?.order
@@ -187,7 +183,6 @@ function Homepage({ loaderData }: Route.ComponentProps) {
       setSchoolOptions(schools.sort((a,b)=>a.label.localeCompare(b.label)))
     }
   },[loaderData.schools, schoolData])
-console.log(filters)
   return (
     <>
       <section className={styles.hero}>

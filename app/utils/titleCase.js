@@ -6,12 +6,12 @@ export const toTitleCase = (str) => {
         }
       return word.charAt(0).toUpperCase() + word.slice(1);
     }).join(' ');
-  };
+};
 
-  export const studentCorrection = (text, wordToReplace="Stud", replacement="Students") => {
-    const regex = new RegExp('\\b' + wordToReplace + '\\b', 'g');
-    return text.replace(regex, replacement);
-  }
+export const studentCorrection = (text, wordToReplace="Stud", replacement="Students") => {
+  const regex = new RegExp('\\b' + wordToReplace + '\\b', 'g');
+  return text.replace(regex, replacement);
+}
 
 export const formatPlaces = (place) => {
   let splits = place.split(', ')
