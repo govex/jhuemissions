@@ -10,13 +10,12 @@ import Filter from "~/components/filter/Filter";
 import Form from "~/components/form/Form";
 import Infographic from "~/components/infographic/infographic";
 import * as d3 from "d3";
-import type { InternMap } from "d3";
 import type { Route } from "./+types/homepage";
 import BarChartVariants from "~/components/barChart/barChart";
 import { ConnectionMap } from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
-import {toTitleCase, studentCorrection} from "~/utils/titleCase";
-import {filterInternMap} from "~/utils/mapFilter";
+import supabase from "~/utils/supabase";
+import {toTitleCase} from "~/utils/titleCase";
 import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
 
@@ -26,48 +25,13 @@ export function meta({ }: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
-export type DataPoint = {
-  fiscalyear: string;
-  school: string;
-  traveler_type: string;
-  total_emissions: number;
-  total_trips: number;
-  total_distance_miles: number;
-  total_distance_km: number;
-  median_distance_miles: number;
-  median_distance_km: number;
-  percapita_trips: number;
-  percapita_emissions: number;
-}
-export type Connection = {
-    from_full: string;
-    to_full: string;
-    from_lat: number;
-    from_lng: number;
-    to_lat: number;
-    to_lng: number;
-    total_trips: number;
-    total_emissions: number;
-    fiscalyear: string;
-    school: string;
-}
-type ConnectionData = Map<string, Connection[]>
-type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-type TopLineStats = {
-  emissions: {
-    year: string;
-    value: number | undefined;
-  }[],
-  trips: {
-    year: string;
-    value: number | undefined;
-  }[],
-  distance: {
-    year: string;
-    value: number | undefined;
-  }[]
-}
-function Homepage() {
+export async function loader({}: Route.LoaderArgs) {
+  let places = await supabase.from('places').select();
+  let schools = await supabase.from('business_area').select();
+  let map = await supabase.from('map').select();
+  let bookings = await supabase.from('bookings').select();
+  let timeline = await supabase.from('timeline').select();
+  let filters = {school: "All JHU", years:["FY23-24"]};
   const fiscalYearOptions = [
     {label: "FY23-24", value: "FY23-24", order: 7},
     {label: "FY22-23", value: "FY22-23", order: 6},
@@ -77,15 +41,34 @@ function Homepage() {
     {label: "FY18-19", value: "FY18-19", order: 2},
     {label: "FY17-18", value: "FY17-18", order: 1}
   ]
+  let topline_jhu = await supabase.from('alljhutopline').select();
+  let topline_school = await supabase.from('school_topline').select();
+  let traveler_jhu = await supabase.from('traveler_topline').select();
+  let map_jhu = await supabase.from('map_alljhu').select();
+  let timeline_jhu = await supabase.from('timeline_alljhu').select();
+  return {
+    places: places.data,
+    schools: schools.data,
+    map: {school: map.data, jhu: map_jhu.data},
+    timeline: {school: timeline.data, jhu: timeline_jhu.data},
+    bookings: {school: topline_school.data, traveler_jhu: traveler_jhu.data, traveler_school: bookings.data, topline: topline_jhu.data }, 
+    filters,
+    fiscalYearOptions
+  }
+}
+type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
+function Homepage({ loaderData }: Route.ComponentProps) {
+  console.log(loaderData);
   const colorScale = d3.scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"]);
-  const [data, setData] = useState<InternMap<string,DataPoint[]> | undefined>(undefined);
-  const [timelineData, setTimelineData] = useState<InternMap<string, any[]> | undefined>(undefined);
-  const [mapData, setMapData] = useState<ConnectionData | undefined>(undefined);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [schoolData, setSchoolData] = useState<any>(loaderData.bookings.school);
+  const [travelerData, setTravelerData] = useState<any>(loaderData.bookings.traveler_jhu);
+  const [timelineData, setTimelineData] = useState<any>(loaderData.timeline.jhu);
+  const [mapData, setMapData] = useState<any>(loaderData.map.jhu);
+  const [topLineData, setTopLineData] = useState<any>(loaderData.bookings.topline);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [toggleStateTraveler, setToggleStateTraveler] = useState<"total_emissions" | "total_trips">("total_trips");
-  const [toggleStateSchool, setToggleStateSchool] = useState<"total_emissions" | "total_trips">("total_trips");
-  const [toggleStateTimeline, setToggleStateTimeline] = useState<"total_emissions" | "total_trips">("total_trips");
+  const [toggleStateTimeline, setToggleStateTimeline] = useState<"emissions" | "trips">("trips");
+  const [toggleStateTraveler, setToggleStateTraveler] = useState<"emissions" | "trips" >("trips");
+  const [toggleStateSchool, setToggleStateSchool] = useState<"emissions" | "trips">("trips");
   const top1ref = useRef<HTMLDivElement | null>(null);
   const top2ref = useRef<HTMLDivElement | null>(null);
   const top3ref = useRef<HTMLDivElement | null>(null);
@@ -104,34 +87,31 @@ function Homepage() {
   };
   const handleToggleChangeTraveler = (event:ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      setToggleStateTraveler("total_emissions")
+      setToggleStateTraveler("emissions")
     } else {
-      setToggleStateTraveler("total_trips")
+      setToggleStateTraveler("trips")
     }
   }  
   const handleToggleChangeSchool = (event:ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      setToggleStateSchool("total_emissions")
+      setToggleStateSchool("emissions")
     } else {
-      setToggleStateSchool("total_trips")
+      setToggleStateSchool("trips")
     }
   }  
   const handleToggleChangeTimeline = (event:ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      setToggleStateTimeline("total_emissions")
+      setToggleStateTimeline("emissions")
     } else {
-      setToggleStateTimeline("total_trips")
+      setToggleStateTimeline("trips")
     }
   }  
-  function yearFilterCallback(k,v) {
-    let selected = filters.years.flatMap(y => y.split(","));
-    return selected.includes(k);
-  }
+  const [fiscalYearOptions, setFiscalYearOptions] = useState<any>(loaderData.fiscalYearOptions)
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popover' : undefined;
-  const [filters, setFilters] = useState<{years: string[], school: string}>({years: ["FY23-24"], school: "All JHU"});
+  const [filters, setFilters] = useState<any>(loaderData.filters);
   const [filterError, setFilterError] = useState<errorText>(undefined); 
-  const handleFilters = (event: ChangeEvent<HTMLInputElement> | {event: SyntheticEvent, value: string, reason: AutocompleteChangeReason}) => {
+  const handleFilters = (event: SyntheticEvent, value: string, reason: AutocompleteChangeReason) => {
     if (event.target.checked === false) {
       let checked = Array.from(filters.years);
       if (checked.length === 1) {
@@ -167,106 +147,44 @@ function Homepage() {
         setFilters({...filters, years: sorted})
     }
     } else {
-      setFilters({...filters, school: event.currentTarget.innerText !== '' ? event.currentTarget.innerText : 'All JHU'})
+      setFilters({...filters, school: value ? value : 'All JHU'})
     }
   }
-  const [schoolOptions, setSchoolOptions] = useState<{value:number,label:string}[] | []>([])
   useEffect(() => {
-    d3.csv("./data/business_areas_with_headcount.csv", (d)=>{
-      return {
-        value: +d.code,
-        label: toTitleCase(d.school)
-      }
-    }).then(data => {
-      let sorted = data.sort((a,b)=>a.label.localeCompare(b.label));
-      let dataPlusAll = [{value:-99, label:"All JHU"}, ...sorted]
-      setSchoolOptions(dataPlusAll)})
-    d3.csv("./data/bookings_summary.csv", (d)=>{
-      return {
-        fiscalyear: d.fiscalyear,
-        school: toTitleCase(d.school),
-        traveler_type: d.traveler_type,
-        total_emissions: +d.total_emissions,
-        total_trips: +d.total_trips,
-        percapita_trips: +d.percapita_trips,
-        percapita_emissions: +d.percapita_emissions,
-        total_distance_km: +d.total_distance_km,
-        total_distance_miles: +d.total_distance_miles,
-        median_distance_km: +d.median_distance_km,
-        median_distance_miles: +d.median_distance_km
-      } as DataPoint;
-    }).then((d) => {
-      let grouped = d3.group(d, d => d.fiscalyear)
-      setData(grouped);
-      setLoading(false);
-    }).catch((error) => console.error("Error loading CSV:", error));
-    d3.csv("./data/monthly_emissions_by_business_area.csv", (d) => {
-      let date = new Date(+d.year, +d.month);
-      return {
-        month: date.toLocaleString(undefined, {month: "short", timeZone: "GMT"}),
-        fiscalyear: d.fiscalyear,
-        school: toTitleCase(d.school),
-        total_trips: +d.total_trips,
-        total_emissions: +d.total_emissions_epa
-      }
-    }).then(d => {
-      let grouped = d3.group(d, d => d.fiscalyear);
-      setTimelineData(grouped);
-    }).catch((error) => console.error("Error loading CSV:", error));
-    d3.csv("./data/trips_between_locations_by_school.csv", (d) => {
-      return {
-          from_full: d.from_full,
-          to_full: d.to_full,
-          from_lat: +d.from_lat,
-          from_lng: +d.from_lng,
-          to_lat: +d.to_lat,
-          to_lng: +d.to_lng,
-          total_trips: +d.total_trips,
-          total_emissions: +d.total_emissions,
-          fiscalyear: d.fiscalyear.replace("FY20", "FY"),
-          school: d.school            
-      } as Connection
-    }).then((d) => {
-        let grouped = d3.group(d, d=>d.fiscalyear)
-        setMapData(grouped);
-    })
-  }, []);
-  const [topLine, setTopLine] = useState<TopLineStats | undefined>(undefined);
-  useEffect(()=>{
-    if (data !== undefined) {
-      let topline = {
-        emissions: fiscalYearOptions.map(({label,value}) => {
-          let yearData = data.get(label)
-          if (filters.school === "All JHU") {
-            return {year: label, value: d3.sum(yearData, d => d.total_emissions)}
-          } else {
-            let filtered = yearData.filter(f => f.school === filters.school)
-            return {year: label, value: d3.sum(filtered, d => d.total_emissions)}
-          }
-        }),
-        trips: fiscalYearOptions.map(({label,value}) => {
-          let yearData = data.get(label)
-          if (filters.school === "All JHU") {
-            return {year: label, value: d3.sum(yearData, d => d.total_trips)}
-          } else {
-            let filtered = yearData.filter(f => f.school === filters.school)
-            return {year: label, value: d3.sum(filtered, d => d.total_trips)}
-          }
-        }),
-        distance: fiscalYearOptions.map(({label,value}) => {
-          let yearData = data.get(label)
-          if (filters.school === "All JHU") {
-            return {year: label, value: d3.sum(yearData, d => d.total_distance_miles)}
-          } else {
-            let filtered = yearData.filter(f => f.school === filters.school)
-            return {year: label, value: d3.sum(filtered, d => d.total_distance_miles)}
-          }
-        })
-      }
-      setTopLine(topline as TopLineStats)
+    if (filters.school === "All JHU") {
+      setTopLineData(loaderData.bookings.topline)
+      setTravelerData(loaderData.bookings.traveler_jhu)
+      setMapData(loaderData.map.jhu)
+      setTimelineData(loaderData.timeline.jhu)
+    } else {
+      let schoolBookings = loaderData.bookings.school?.filter(f => toTitleCase(f.school) === filters.school);
+      setTopLineData(schoolBookings ? schoolBookings : []);
+      // let schoolTravelers = loaderData.bookings.traveler_school?.filter(f => toTitleCase(f.school) === filters.school);
+      setTravelerData(loaderData.bookings.traveler_school ? loaderData.bookings.traveler_school : []);
+      let schoolCode = loaderData.schools?.find(f => toTitleCase(f.employeeGroupName) === filters.school);
+      let schoolMap = loaderData.map.school?.filter(f => f.school === schoolCode.code);
+      setMapData(schoolMap ? schoolMap : []);
+      let schoolTimeline = loaderData.timeline.school?.filter(f => toTitleCase(f.school) === filters.school);
+      setTimelineData(schoolTimeline ? schoolTimeline : [])
     }
-  },[data, filters])
-
+  }, [filters.school, loaderData.bookings, loaderData.map, loaderData.timeline])
+  const [schoolOptions, setSchoolOptions] = useState<{label: string, value: string, code: number}[] | undefined>(undefined)
+  useEffect(()=>{
+    if (loaderData.schools && schoolData.length > 0) {
+      let bookingsSchools = schoolData.map(m => m.school)
+      let schools = loaderData.schools.filter(f => {
+        return bookingsSchools.includes(f.employeeGroupName)
+      }).map(m => {
+        return {
+          label: toTitleCase(m.employeeGroupName),
+          value: m.employeeGroupName,
+          code: m.code
+        }
+      })
+      setSchoolOptions(schools.sort((a,b)=>a.label.localeCompare(b.label)))
+    }
+  },[loaderData.schools, schoolData])
+console.log(filters)
   return (
     <>
       <section className={styles.hero}>
@@ -300,10 +218,11 @@ function Homepage() {
             size="medium"
             onClick={handleFilterClick}
           />
-          {schoolOptions?.length > 0 &&
+          {schoolOptions &&
           <>
           <Popover
             id={filterId}
+            disableScrollLock
             open={filterOpen}
             anchorEl={filterAnchorEl}
             onClose={handleFilterClose}
@@ -344,9 +263,10 @@ function Homepage() {
             title="Total GHG Emissions"
           >
             <div className={styles.chartContainer} ref={top1ref}>
-            {!!topLine && top1ref?.current &&
+            {!!topLineData && top1ref?.current &&
             <Infographic
-              data={topLine.emissions}
+              valueField="emissions"
+              data={topLineData}
               years={filters.years}
               unit={<span>metric tonnes of CO<sub>2</sub>e</span>}
               parentRect={top1ref.current.getBoundingClientRect()}
@@ -360,9 +280,10 @@ function Homepage() {
             title="Total Trips"
           >
             <div className={styles.chartContainer} ref={top2ref}>
-            {!!topLine && top2ref?.current &&
+            {!!topLineData && top2ref?.current &&
             <Infographic
-              data={topLine.trips}
+              valueField="trips"
+              data={topLineData}
               years={filters.years}
               unit="trips taken"
               parentRect={top2ref.current.getBoundingClientRect()}
@@ -376,9 +297,10 @@ function Homepage() {
             title="Total Distance"
           >
             <div className={styles.chartContainer} ref={top3ref}>
-            {!!topLine && top3ref?.current &&
+            {!!topLineData && top3ref?.current &&
             <Infographic
-              data={topLine.distance}
+              valueField="distance"
+              data={topLineData}
               years={filters.years}
               unit="miles"
               parentRect={top3ref.current.getBoundingClientRect()}
@@ -426,24 +348,25 @@ function Homepage() {
           >
             <div className={styles.toggleBox}><span>Trips</span>
             <Toggle 
-              checked={toggleStateTraveler === "total_emissions" ? true : false} 
+              checked={toggleStateTraveler === "emissions"} 
               onChange={handleToggleChangeTraveler} 
             />
             <span>Emissions</span>
             </div>
             <div className={styles.chartContainer} ref={bar1ref}>
-              {bar1ref?.current && !loading && !!data &&
+              {bar1ref?.current && !!travelerData &&
                 <BarChartVariants 
-                  data={filterInternMap(data, yearFilterCallback)}
+                  data={travelerData}
                   orientation="horizontal"
                   xScale="linear"
                   yScale="band"
                   parentRect={bar1ref.current.getBoundingClientRect()}
-                  labelField={"traveler_type" as keyof DataPoint["traveler_type"]}
-                  valueField={toggleStateTraveler as keyof DataPoint["total_trips" | "total_emissions"]}
+                  labelField={"traveler_type"}
+                  valueField={toggleStateTraveler}
                   school={filters.school}
-                  schoolFilter={true}
+                  schoolOptions={schoolOptions}
                   colorScale={colorScale.domain(filters.years)}
+                  years={filters.years}
                 />
               }
             </div>
@@ -455,24 +378,26 @@ function Homepage() {
           >
             <div className={styles.toggleBox}><span>Trips</span>
             <Toggle 
-              checked={toggleStateSchool === "total_emissions" ? true : false} 
+              checked={toggleStateSchool === "emissions"} 
               onChange={handleToggleChangeSchool} 
             />
             <span>Emissions</span>
             </div>
             <div className={styles.chartContainer} ref={bar2ref}>
-              {!loading && bar2ref?.current && !!data &&
+              {bar2ref?.current && !!schoolData && !!schoolOptions &&
                 <BarChartVariants 
-                  data={filterInternMap(data, yearFilterCallback)}
+                  data={schoolData}
                   orientation="horizontal"
                   xScale="linear"
                   yScale="band"
                   parentRect={bar2ref.current.getBoundingClientRect()}
-                  labelField={"school" as keyof DataPoint["school"]}
-                  valueField={toggleStateSchool as keyof DataPoint["total_trips" | "total_emissions"]}
+                  labelField={"school"}
+                  valueField={toggleStateSchool}
                   school={filters.school}
-                  schoolFilter={false}
+                  schoolOptions={schoolOptions}
                   colorScale={colorScale.domain(filters.years)}
+                  years={filters.years}
+                  schoolFilter={false}
                 />
               }
             </div>
@@ -482,7 +407,7 @@ function Homepage() {
           <Card title={`When are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people travelling?`}>
           <div className={styles.toggleBox}><span>Trips</span>
             <Toggle 
-              checked={toggleStateTimeline === "total_emissions" ? true : false} 
+              checked={toggleStateTimeline === "emissions" ? true : false} 
               onChange={handleToggleChangeTimeline} 
             />
             <span>Emissions</span>
@@ -490,11 +415,11 @@ function Homepage() {
             <div className={cx( styles.chartContainer, styles.lineChart )} ref={timeRef}>
               {!!timelineData && timeRef?.current && !!colorScale &&
                 <Timeline 
-                  data={filterInternMap(timelineData, yearFilterCallback)}
+                  data={timelineData.filter(f => filters.years.includes(f.fiscalyear))}
                   parentRect={timeRef.current.getBoundingClientRect()}
                   colorScale={colorScale.domain(filters.years)}
                   valueField={toggleStateTimeline}
-                  school={filters.school}
+                  years={filters.years}
                 />
               }
             </div>
@@ -503,10 +428,11 @@ function Homepage() {
       <div className={styles.map}>
         <Card title="Where are people travelling?">
           <div className={styles.chartContainer} ref={mapRef}>
-            {mapRef?.current && !!mapData &&
+            {mapRef?.current && !!mapData && !!loaderData.places && 
               <ConnectionMap
                 parentRect={mapRef.current.getBoundingClientRect()} 
-                data={filterInternMap(mapData, yearFilterCallback)}
+                data={mapData.filter(f => filters.years.includes(f.fiscalyear))}
+                places={loaderData.places}
                 />
             }
           </div>

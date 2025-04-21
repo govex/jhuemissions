@@ -13,10 +13,11 @@ type MapProps = {
     x: number,
     y: number
   };  
-  data: any;
+  data: any[];
+  places: any[];
 };
 
-export const ConnectionMap = ({ parentRect, data }: MapProps) => {
+export const ConnectionMap = ({ parentRect, data, places }: MapProps) => {
     const [world, setWorld] = useState<ExtendedFeatureCollection>({
         "type": "FeatureCollection",
         "features": [
@@ -69,12 +70,14 @@ export const ConnectionMap = ({ parentRect, data }: MapProps) => {
             projection.fitSize([parentRect.width, parentRect.height], world); 
             geoPathGenerator.projection(projection);    
             if (data) {
-                let lines = data.get("FY23-24")?.map((connection, i) => {
+                let lines = data.map((connection, i) => {
+                    let fromPlace = places.find(f => f.place === connection.from_full)
+                    let toPlace = places.find(f => f.place === connection.to_full)
                     const path = geoPathGenerator({
                         type: 'LineString',
                         coordinates: [
-                            [connection.from_lng, connection.from_lat],
-                            [connection.to_lng, connection.to_lat]
+                            [fromPlace.lng, fromPlace.lat],
+                            [toPlace.lng, toPlace.lat]
                         ]
                     })
                     const keyId = connection.from_full.slice(0,2) + "_" + connection.to_full.slice(0,2) + i
