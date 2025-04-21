@@ -1,17 +1,11 @@
-import { BarChart } from "@mui/x-charts/node/BarChart";
+import { BarChart, type BarSeriesType } from "@mui/x-charts";
 import styles from "./barChart.module.scss";
 import cx from "classnames";
 import { type FC, useState, useEffect } from "react";
-import type { DataPoint } from "~/routes/homePage/homepage";
-import type { InternMap, ScaleOrdinal } from "d3";
-import { rollups, sum } from "d3";
+import type { ScaleOrdinal } from "d3";
+import { max } from "d3";
 
 type ColorScale = ScaleOrdinal<string, string>;
-
-type SeriesRolls = {
-    year: string;
-    rollup: [string, number][]
-}[];
 
 export default function BarChartVariants<FC>({
     data,
@@ -22,10 +16,12 @@ export default function BarChartVariants<FC>({
     labelField,
     valueField,
     school,
-    schoolFilter,
-    colorScale
+    schoolOptions,
+    colorScale,
+    years,
+    schoolFilter = true
 }:{
-    data: InternMap<string, DataPoint[]>,
+    data: any[],
     orientation: "horizontal" | "vertical" | undefined,
     xScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
     yScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
@@ -39,72 +35,96 @@ export default function BarChartVariants<FC>({
         x: number,
         y: number
     },
-    labelField: keyof DataPoint,
-    valueField: keyof DataPoint,
+    labelField: string,
+    valueField: string,
     school: string,
-    schoolFilter: Boolean,
+    schoolOptions: any[],
     colorScale: ColorScale,
+    years: string[]
+    schoolFilter?: Boolean
 }) {
-    const [rolled, setRolled] = useState<SeriesRolls | undefined>(undefined);
-    useEffect(() => {
-        let seriesRolls = []
-        for (const [y,g] of data.entries()) {
-            if (school !== "All JHU" && schoolFilter) {
-                let filtered = g.filter(f => f.school === school)
-                let rolled = rollups(filtered, v => sum(v, d => d[valueField]), d => d[labelField]);
-                seriesRolls.push({
-                    year: y,
-                    rollup: rolled.sort((a,b)=>b[1]-a[1])
-                })
-            } else if (school !== "All JHU") {    
-                let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
-                let sorted = rolled.sort((a,b)=>b[1]-a[1])
-                let schoolIdx = sorted.findIndex(f => f[0] === school);
-                let spliced = sorted.splice(schoolIdx, 1);
-                let reordered = [spliced[0], ...sorted];
-
-                seriesRolls.push({
-                    year: y,
-                    rollup: reordered
-                })    
-            } else {
-                let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
-                seriesRolls.push({
-                    year: y,
-                    rollup: rolled.sort((a,b)=>b[1]-a[1])
-                })    
-            }
-        }
-        setRolled(seriesRolls as SeriesRolls);
-    },[data, labelField, valueField, school])
+    const [schoolValue, setSchoolValue] = useState<string | undefined>(undefined);
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [overflowScroll, setOverflowScroll] = useState<Boolean>(false);
     const [marginLeft, setMarginLeft] = useState(0);
-    const [maxVal, setMaxVal] = useState(0)
+    const [maxVal, setMaxVal] = useState(0);
+    const [chartData, setChartData] = useState<any[]>([]);
+    const [seriesData, setSeriesData] = useState<BarSeriesType[] | []>([])
     useEffect(() => {
-        if (rolled !== undefined) {
-            let maxLength = 0;
-            let maxVal = 0;
-            let labels = new Set<string>();
-            for (const g of rolled.values()) {
-                g.rollup.forEach(i => {
-                    if (i[0].length > maxLength) {
-                        maxLength = i[0].length
-                    }
-                    if (i[1] > maxVal) {
-                        maxVal = i[1]
-                    }    
-                    labels.add(i[0]);
+        if (schoolOptions) {
+            let opt = schoolOptions.find(s => s.label === school)
+            setSchoolValue(opt?.value)    
+        } 
+    }, [school, schoolOptions])
+    useEffect(() => {
+        if (data && data?.length > 0) {
+            if (school === "All JHU") {
+                let flatData = data.filter(f => years.includes(f.fiscalyear)).sort((a,b)=>b[valueField]-a[valueField]); 
+                let serieses = years.map((y) => {
+                    return {
+                        label: y,
+                        color: colorScale(y),
+                        data: flatData.map(m => m[valueField]),
+                        type: "bar"
+                    } as BarSeriesType
                 })
+                setSeriesData(serieses);    
+                setChartData(flatData);
+            } else if (schoolFilter && schoolValue) {
+                let flatData = data.filter(f => years.includes(f.fiscalyear) && f.school === schoolValue).sort((a,b)=>b[valueField]-a[valueField]);
+                let serieses = years.map((y) => {
+                    return {
+                        label: y,
+                        color: colorScale(y),
+                        data: flatData.filter(f => f.fiscalyear === y).map(m => m[valueField]),
+                        type: "bar"
+                    } as BarSeriesType
+                })
+                setSeriesData(serieses);    
+                setChartData(flatData);
+            } else if (schoolValue) {
+                let flatData = data.filter(f => years.includes(f.fiscalyear)).sort((a,b)=>b[valueField]-a[valueField]);
+                let serieses = years.map((y) => {
+                    let yearData = flatData.filter(f => f.fiscalyear === y);
+                    let schoolIdx = yearData.findIndex(f => f.school === schoolValue);
+                    let spliced = yearData.splice(schoolIdx, 1);
+                    let reordered = [spliced[0], ...yearData];
+                    return {
+                        label: y,
+                        color: colorScale(y),
+                        data: reordered.map(m => m[valueField]),
+                        type: "bar"
+                    } as BarSeriesType
+                })
+                setSeriesData(serieses);
+                setChartData(flatData)
             }
-            setMaxVal(maxVal)
-            setMarginLeft(maxLength * 7);
-            setGroupLabels(Array.from(labels));
-        }
-    }, [rolled])
+        } 
+    }, [data, valueField, years, school, schoolOptions, schoolValue])
+    useEffect(() => {
+        if (chartData.length > 0) {
+            let labels = Array.from(new Set<string>(chartData.map(m => m[labelField])));
+            if (schoolValue && !schoolFilter) {
+                let schoolIdx = labels.findIndex(f => f === schoolValue)
+                let spliced = labels.splice(schoolIdx, 1)
+                labels = [spliced[0], ...labels]
+            }
+            let maxLength = max(labels.map(m => m.length));
+            let maxVal = max(chartData, d => +d[valueField])
+            setMaxVal(maxVal ? maxVal : 0)
+            setMarginLeft(maxLength ? maxLength * 7 : 70);
+            setGroupLabels(!schoolFilter
+                ? labels.map(m => {
+                    let opt = schoolOptions.find(s => s.value === m)
+                    return opt.label
+                    })
+                : labels
+            );
+        } 
+    }, [chartData, labelField, valueField, schoolOptions, years, school])
     const [realHeight, setRealHeight] = useState(parentRect.height)
     useEffect(()=>{
-        if (groupLabels?.length > 15) {
+        if (groupLabels && groupLabels?.length > 15) {
             setRealHeight(groupLabels.length * 42)            
             setOverflowScroll(true)
         } else {
@@ -112,86 +132,55 @@ export default function BarChartVariants<FC>({
             setOverflowScroll(false)
         }
     },[groupLabels, parentRect.height])
-    const [seriesData, setSeriesData] = useState<{label: string, color: string, data: number[]}[]>([])
-    useEffect(()=>{
-        if (rolled !== undefined) {
-            let serieses = [];
-            for (const roll of rolled) {
-                let series = {
-                    label: roll.year,
-                    color: colorScale(roll.year),
-                    data: roll.rollup.map(d => valueField === "percapita_trips" || valueField === "percapita_emissions" ? (d[1]).toFixed(5) : d[1])
-                }
-                serieses.push(series)
-            }
-            setSeriesData(serieses);
-        }
-    },[rolled])
     const [render, setRender] = useState(false);
     useEffect(()=>{
         if (
             marginLeft > 0 &&
             seriesData.length > 0 &&
             maxVal > 0 &&
-            groupLabels.length > 0 &&
-            !!realHeight
+            groupLabels.length > 0
         ) {
             setRender(true);
+        } else {
+            setRender(false);
         }
     },[marginLeft, seriesData, maxVal, groupLabels, realHeight])
-    // const barClasses = getBarLabelUtilityClass("barLabel")
-    // console.log(barClasses);
-    // const BarLabelComponent = (x:BarLabelProps) => {
-    //     return (
-    //         <BarLabel {...x}></BarLabel>
-    //     )
-    // }
-    // const newBarLabel:ReactNode<BarLabelProps> = BarLabelComponent;
-    if (render) {
-        return (
-            <div className={cx(styles.base, overflowScroll ? styles.overflowscroll : "")}>
-            <BarChart className={styles.bar11}
-            margin={{left: marginLeft, right: 70}}
-            layout={orientation}
-            yAxis={[{ 
-                scaleType: yScale,
-                data: groupLabels      
-            }]}
-            xAxis={[{ scaleType: xScale, 
-                position: "top",
-                disableTicks: true,
-                label: valueField === "total_trips"
-                    ? "# of trips"
-                    : "MTCO2e"
-            }]}
-            series={seriesData}
-            width={parentRect?.width}
-            height={realHeight}
-            sx={{
-                // Customize x-axis line (grey, thick)
-                // "& .MuiChartsAxis-left .MuiChartsAxis-line": {
-                //     stroke: "#CCC",
-                //     strokeWidth: 4,
-                //     color: "#000",
-                // },
-                "& .MuiBarLabel-root": {
-                    textAnchor: "start"
-                }
-            }}
-            // slots={{barLabel: newBarLabel}}
-            slotProps={{
-                legend: {
-                    labelStyle: {
-                        fontFamily: "gentona",
-                        fontWeight: 600,
-                        fontSize: 20
+    return (
+        <div className={cx(styles.base, overflowScroll ? styles.overflowscroll : "")}>
+            <BarChart 
+                className={styles.bar11}
+                loading={!render}
+                margin={{left: marginLeft, right: 70}}
+                layout={orientation}
+                yAxis={[{ 
+                    scaleType: yScale,
+                    data: groupLabels, 
+                }]}
+                xAxis={[{ scaleType: xScale, 
+                    position: "top",
+                    disableTicks: true,
+                    label: valueField === "trips"
+                        ? "# of trips"
+                        : "MTCO2e"
+                }]}
+                series={seriesData}
+                width={parentRect?.width}
+                height={realHeight}
+                sx={{
+                    "& .MuiBarLabel-root": {
+                        textAnchor: "start"
                     }
-                }
-            }}
+                }}
+                slotProps={{
+                    legend: {
+                        labelStyle: {
+                            fontFamily: "gentona",
+                            fontWeight: 600,
+                            fontSize: 20
+                        }
+                    }
+                }}
             />
-            </div>
-        )    
-    } else {
-        return null
-    }
+        </div>
+    )    
 }
