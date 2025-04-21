@@ -64,7 +64,7 @@ export default function BarChartVariants<FC>({
                     return {
                         label: y,
                         color: colorScale(y),
-                        data: flatData.map(m => m[valueField]),
+                        data: flatData.filter(f => f.fiscalyear === y).map(m => m[valueField]),
                         type: "bar"
                     } as BarSeriesType
                 })
