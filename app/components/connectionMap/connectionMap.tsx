@@ -19,10 +19,10 @@ type MapProps = {
     x: number,
     y: number
   };  
-  data: InternMap<string, any[]>,
-  school: string;
-  schoolCode: number | undefined;
+  data: any[],
+  years: string[];
   colorScale: ColorScale;
+  places: any[];
 };
 const BpIcon = styled('span')(({ theme }) => ({
     marginLeft: 4,
@@ -51,7 +51,7 @@ const BpIcon = styled('span')(({ theme }) => ({
     },
   });
   
-export default function ConnectionMap<FC>({ parentRect, data, school, schoolCode, colorScale }: MapProps) {
+export default function ConnectionMap<FC>({ parentRect, data, years, colorScale, places }: MapProps) {
     const [world, setWorld] = useState<ExtendedFeatureCollection>({
         "type": "FeatureCollection",
         "features": [
@@ -90,7 +90,6 @@ export default function ConnectionMap<FC>({ parentRect, data, school, schoolCode
     });
     const lineWidthScale = d3.scaleLog().range([.25, 5]);
     const [loading, setLoading] = useState(true);
-    const [places, setPlaces] = useState<any[] | undefined>(undefined);
     const [placeHighlight, setPlaceHighlight] = useState<string | undefined>(undefined);
     const [countryPaths, setCountryPaths] = useState<any[] | undefined>(undefined);
     const [connections, setConnections] = useState<any[] | undefined>(undefined);
@@ -128,40 +127,23 @@ export default function ConnectionMap<FC>({ parentRect, data, school, schoolCode
             setLoading(false);    
         }
       });
-      d3.csv("./data/places_geocoded.csv", (d) => {
-        return {
-            place: formatPlaces(d.place),
-            lat: +d.lat,
-            lng: +d.lng
-        }
-      }).then(d => {
-        setPlaces(d)
-      })
     }, []);
     useEffect(()=>{
         if (!loading) {
             projection.fitSize([parentRect.width, parentRect.height], world); 
             geoPathGenerator.projection(projection);    
-            if (data && places) {
-                let lines = [];
-                for (const [y,g] of data.entries()) {
-                    let filtered = g;
-                    if (schoolCode) {
-                        filtered = g.filter(f => +f.school === schoolCode)
-                    }
-                    let rolled = d3.rollups(filtered, v => d3.sum(v, d => d.total_trips), d => d.from_full, d => d.to_full);
-                    let extentTrips = d3.extent(rolled.flatMap(([from, connections]) => {
-                        return connections.map(([to, trips]) => trips)
-                    }))
-                    lineWidthScale.domain(extentTrips)
-                    let yearLines = [];
-                    let highlightLines = []; 
-                    let i = 1;
-                    for (let [from, connections] of rolled) {
-                        for (let [to, trips] of connections) {
-                            let from_place = places.find(f => f.place === from);
-                            let to_place = places.find(f => f.place === to);
-                            let highlight = from_place.place === placeHighlight || to_place.place === placeHighlight;
+            if (data && places && years) {
+                let lines = years.map(y => {
+                    let yearData = data.filter(f => f.fiscalyear === y)
+                    if (yearData?.length > 0) {
+                        let extentTrips = d3.extent(yearData, d => d.trips)
+                        lineWidthScale.domain(extentTrips)
+                        let yearLines = [];
+                        let highlightLines = []; 
+                        yearData.forEach((connection, i) => {
+                            let from_place = places.find(f => f.place === connection.from_full)
+                            let to_place = places.find(f => f.place === connection.to_full)
+                            let highlight = formatPlaces(from_place.place) === placeHighlight || formatPlaces(to_place.place) === placeHighlight;
                             const path = geoPathGenerator({
                                 type: 'LineString',
                                 coordinates: [
@@ -169,15 +151,14 @@ export default function ConnectionMap<FC>({ parentRect, data, school, schoolCode
                                     [to_place.lng, to_place.lat]
                                 ]
                             })
-                            const keyId = from.slice(0,2) + "_" + to.slice(0,2) + `_${i}`
-                            i += 1;
+                            const keyId = from_place.place.slice(0,2) + "_" + to_place.place.slice(0,2) + `_${i}`
                             if (highlight) {
                                 highlightLines.push(
                                     <path
                                         key={keyId}
                                         d={path ?? undefined}
                                         stroke={"#A15B96"}
-                                        strokeWidth={lineWidthScale(trips)}
+                                        strokeWidth={lineWidthScale(connection.trips)}
                                         fill="none"
                                         opacity={.25}
                                     />
@@ -188,22 +169,36 @@ export default function ConnectionMap<FC>({ parentRect, data, school, schoolCode
                                         key={keyId}
                                         d={path ?? undefined}
                                         stroke={colorScale(y)}
-                                        strokeWidth={lineWidthScale(trips)}
+                                        strokeWidth={lineWidthScale(connection.trips)}
                                         fill="none"
                                         opacity={0.25}
                                     />
                                 )
                             }
-                        }                        
+                        })                        
+                        return {
+                            year: y, 
+                            paths: yearLines, 
+                            highlight: highlightLines, 
+                            yearData
+                        }
+                    } else {
+                        return {
+                            year: y, 
+                            paths: [], 
+                            highlight: [], 
+                            yearData: []
+                        }
                     }
-                    lines.push({year: y, paths: yearLines, highlight: highlightLines, rolled: rolled})
-                }
+                })
+            
                 setConnections(lines);
                 if (lines.length > 1) {
-                    setDisplayYear(lines[0].year)
+                    let displayableYear = lines.find(f => f.yearData.length > 0);
+                    setDisplayYear(displayableYear?.year)
                 }
         }}
-    },[data, parentRect.width, parentRect.height, world, loading, places, placeHighlight, schoolCode])
+    },[data, parentRect.width, parentRect.height, world, loading, places, placeHighlight])
 
     const projection = d3
         .geoNaturalEarth1()
@@ -247,7 +242,7 @@ export default function ConnectionMap<FC>({ parentRect, data, school, schoolCode
                                 {connections?.map(c => {
                                     return (
                                         <FormControlLabel 
-                                            disabled={c.paths.length < 1 && c.highlight.length < 1}
+                                            disabled={c.yearData.length < 1}
                                             value={c.year} 
                                             control={<Radio
                                                 checkedIcon={<BpCheckedIcon />}
@@ -264,7 +259,7 @@ export default function ConnectionMap<FC>({ parentRect, data, school, schoolCode
                         <FormLabel>Highlight Place</FormLabel>
                         <Autocomplete
                             onChange={handleChange}
-                            options={places.map(m => m.place)}
+                            options={places.map(m => formatPlaces(m.place))}
                             renderInput={(params) => <TextField {...params} />}
                             sx={{
                             backgroundColor: "transparent",
