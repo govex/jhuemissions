@@ -117,6 +117,7 @@ function Homepage({ loaderData }: Route.ComponentProps) {
       setFilters({...filters, school: value ? value : 'All JHU'})
     } else if (event.target.checked === false) {
       let checked = Array.from(filters.years);
+      console.log(checked, event.target.value)
       if (checked.length === 1) {
         setFilterError(filterErrorNotEnough as errorText);
       } else if (checked.length <= 5) {
@@ -127,7 +128,7 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             checked.splice(checked.indexOf(event.target.value),1)
           }
           setFilterError(undefined)
-          checked.push(event.target.value);
+          // checked.push(event.target.value);
           let sorted = checked.sort((a,b)=>{
             let orderA = fiscalYearOptions.find(f => f.label === a)?.order
             let orderB = fiscalYearOptions.find(f => f.label === b)?.order
