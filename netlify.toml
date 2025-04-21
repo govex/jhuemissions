@@ -1,5 +1,5 @@
 [build]
-command = "react-router build && cp build/server/index.js .netlify/functions/server/index.js"
+command = "react-router build"
 publish = "build/client"
 
 [dev]
