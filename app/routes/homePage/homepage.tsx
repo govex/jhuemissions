@@ -46,12 +46,15 @@ export async function loader({}: Route.LoaderArgs) {
   let traveler_jhu = await supabase.from('traveler_topline').select();
   let map_jhu = await supabase.from('map_alljhu').select();
   let timeline_jhu = await supabase.from('timeline_alljhu').select();
+  let school_percent = await supabase.from('school_percent').select();
+  let traveler_percent = await supabase.from('traveler_percent').select();
   return {
     places: places.data,
     schools: schools.data,
     map: {school: map.data, jhu: map_jhu.data},
     timeline: {school: timeline.data, jhu: timeline_jhu.data},
     bookings: {school: topline_school.data, traveler_jhu: traveler_jhu.data, traveler_school: bookings.data, topline: topline_jhu.data }, 
+    percent: {school: school_percent.data, traveler: traveler_percent.data},
     filters,
     fiscalYearOptions
   }
@@ -62,12 +65,15 @@ function Homepage({ loaderData }: Route.ComponentProps) {
   const [schoolData, setSchoolData] = useState<any>(loaderData.bookings.school);
   const [travelerData, setTravelerData] = useState<any>(loaderData.bookings.traveler_jhu);
   const [timelineData, setTimelineData] = useState<any>(loaderData.timeline.jhu);
+  const [percentData, setPercentData] = useState<any>(loaderData.percent.school);
   const [mapData, setMapData] = useState<any>(loaderData.map.jhu);
   const [topLineData, setTopLineData] = useState<any>(loaderData.bookings.topline);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [toggleStateTimeline, setToggleStateTimeline] = useState<"emissions" | "trips">("trips");
   const [toggleStateTraveler, setToggleStateTraveler] = useState<"emissions" | "trips" >("trips");
   const [toggleStateSchool, setToggleStateSchool] = useState<"emissions" | "trips">("trips");
+  const [toggleStatePercentField, setToggleStatePercentField] = useState<"pct_emissions" | "pct_trips">("pct_emissions");
+  const [toggleStatePercentDataset, setToggleStatePercentDataset] = useState<"school" | "traveler_type">("school");
   const top1ref = useRef<HTMLDivElement | null>(null);
   const top2ref = useRef<HTMLDivElement | null>(null);
   const top3ref = useRef<HTMLDivElement | null>(null);
@@ -75,6 +81,7 @@ function Homepage({ loaderData }: Route.ComponentProps) {
   const bar2ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const timeRef = useRef<HTMLDivElement | null>(null);
+  const percentRef = useRef<HTMLDivElement | null>(null);
   const filterErrorTooMany = "Only five years may be displayed at once.";
   const filterErrorNotEnough = "At least one year must be selected.";
   const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
@@ -103,6 +110,22 @@ function Homepage({ loaderData }: Route.ComponentProps) {
       setToggleStateTimeline("emissions")
     } else {
       setToggleStateTimeline("trips")
+    }
+  }  
+  const handleToggleChangePercentField = (event:ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setToggleStatePercentField("pct_emissions")
+    } else {
+      setToggleStatePercentField("pct_trips")
+    }
+  }  
+  const handleToggleChangePercentDataset = (event:ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setToggleStatePercentDataset("traveler_type")
+      setPercentData(loaderData.percent.traveler)
+    } else {
+      setToggleStatePercentDataset("school")
+      setPercentData(loaderData.percent.school)
     }
   }  
   const [fiscalYearOptions, setFiscalYearOptions] = useState<any>(loaderData.fiscalYearOptions)
@@ -158,7 +181,6 @@ function Homepage({ loaderData }: Route.ComponentProps) {
     } else {
       let schoolBookings = loaderData.bookings.school?.filter(f => toTitleCase(f.school) === filters.school);
       setTopLineData(schoolBookings ? schoolBookings : []);
-      // let schoolTravelers = loaderData.bookings.traveler_school?.filter(f => toTitleCase(f.school) === filters.school);
       setTravelerData(loaderData.bookings.traveler_school ? loaderData.bookings.traveler_school : []);
       let schoolCode = loaderData.schools?.find(f => toTitleCase(f.employeeGroupName) === filters.school);
       let schoolMap = schoolCode ? loaderData.map.school?.filter(f => f.school === schoolCode.code) : undefined;
@@ -266,7 +288,7 @@ function Homepage({ loaderData }: Route.ComponentProps) {
               valueField="emissions"
               data={topLineData}
               years={filters.years}
-              unit={<span>metric tonnes of CO<sub>2</sub>e</span>}
+              unit={<span>metric tons of CO<sub>2</sub>e</span>}
               parentRect={top1ref.current.getBoundingClientRect()}
             />
             }
@@ -437,6 +459,49 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             }
           </div>
         </Card>
+      </div>
+      <div className={styles.percent}>
+          <Card
+            title="How is travel distributed across all of JHU?"
+          >
+            <div className={styles.multitoggle}>
+              <div className={styles.toggleBox}>
+                <span>School</span>
+                <Toggle 
+                  checked={toggleStatePercentDataset === "traveler_type"} 
+                  onChange={handleToggleChangePercentDataset} 
+                />
+                <span>Traveler</span>
+              </div>
+              <div className={styles.toggleBox}>
+                <span>Trips</span>
+                <Toggle 
+                  checked={toggleStatePercentField === "pct_emissions"} 
+                  onChange={handleToggleChangePercentField} 
+                />
+                <span>Emissions</span>
+              </div>
+            </div>
+            <div className={styles.chartContainer} ref={percentRef}>
+              {percentRef?.current && !!percentData && !!schoolOptions &&
+                <BarChartVariants 
+                  data={percentData}
+                  orientation="horizontal"
+                  xScale="linear"
+                  yScale="band"
+                  parentRect={percentRef.current.getBoundingClientRect()}
+                  labelField={toggleStatePercentDataset}
+                  valueField={toggleStatePercentField}
+                  school={filters.school}
+                  schoolOptions={schoolOptions}
+                  colorScale={colorScale.domain(filters.years)}
+                  years={filters.years}
+                  schoolFilter={false}
+                  stack={true}
+                />
+              }
+            </div>
+          </Card>
       </div>
     </section>
     <div className={styles.feedback}>

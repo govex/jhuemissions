@@ -30,11 +30,12 @@
         "time time time time time time tool tool"
         "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" 
         "map map map map map map map map"
+        "percent percent percent percent percent percent percent percent"
         "donut donut donut donut method method method method";
     width: 100vw;
     padding: 20px 70px;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr ;
-    grid-template-rows: 50px 260px 436px 70vh 60vh 1fr;
+    grid-template-rows: 50px 260px 436px 70vh 60vh 60vh 1fr;
     gap: 40px;
     margin-bottom: 30px;
 }
@@ -80,6 +81,9 @@
 .time {
     grid-area: time;
 }
+.percent {
+    grid-area: percent;
+}
 .chartContainer {
     width: 100%;
     height: 100%;
@@ -113,6 +117,15 @@
     gap: 10px;
     justify-content: flex-end;
     width: 100%;
+}
+.multitoggle {
+    display: flex;
+    flex-direction: row;
+    gap: 70px;
+    flex-wrap: wrap;
+    .toggleBox {
+        width: fit-content;
+    }
 }
 .completenessCard {
     padding: 30px;
