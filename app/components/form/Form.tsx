@@ -19,7 +19,7 @@ const EmissionCalculator = () => {
     departure: '',
     return: ''
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const formRef = useRef(null);
   const [formRect, setFormRect] = useState<any | undefined>(undefined);
@@ -45,60 +45,59 @@ const EmissionCalculator = () => {
 
     if (!origin || !destination || !passengers) {
       setError('Please fill in all required fields.');
-      return;
-    }
-
-    const legs = [
-      {
-        departure_airport: origin,
-        destination_airport: destination,
-        cabin_class: travelClass ? travelClass.value : travelClasses[0].value
+    } else {
+      const legs = [
+        {
+          departure_airport: origin,
+          destination_airport: destination,
+          cabin_class: travelClass ? travelClass.value : travelClasses[0].value
+        }
+      ];
+  
+      if (isRoundtrip) {
+        legs.push({
+          departure_airport: destination,
+          destination_airport: origin,
+          cabin_class: travelClass ? travelClass.value : travelClasses[0].value
+        });
       }
-    ];
-
-    if (isRoundtrip) {
-      legs.push({
-        departure_airport: destination,
-        destination_airport: origin,
-        cabin_class: travelClass ? travelClass.value : travelClasses[0].value
-      });
-    }
-
-    const payload = {
-      type: 'flight',
-      passengers,
-      legs
-    };
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch('https://www.carboninterface.com/api/v1/estimates', {
-        method: 'POST',
-        headers: {
-          Authorization: 'Bearer W3ybZlNo1ESBkPsI1tw',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const result = await response.json();
-      setTotalEmissions(result.data.attributes.carbon_kg);
-      console.log('Emission Result:', result.data.attributes.carbon_kg);
-    } catch (err) {
-      console.error('Error fetching emissions data:', err);
-      setError('Failed to fetch emissions data.');
-    } finally {
-      setLoading(false);
+  
+      const payload = {
+        type: 'flight',
+        passengers,
+        legs
+      };
+  
+      try {
+        setError(null);
+  
+        const response = await fetch('https://www.carboninterface.com/api/v1/estimates', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer W3ybZlNo1ESBkPsI1tw',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+  
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+  
+        const result = await response.json();
+        setTotalEmissions(result.data.attributes.carbon_kg);
+        console.log('Emission Result:', result.data.attributes.carbon_kg);
+      } catch (err) {
+        console.error('Error fetching emissions data:', err);
+        setError('Failed to fetch emissions data.');
+      } finally {
+        setLoading(false);
+      }  
     }
   };
 
   const handleModalClose = () => {
+    setLoading(true);
     setAnchorEl(null);
   };
 
@@ -175,12 +174,11 @@ const EmissionCalculator = () => {
             type="solid"
             color="primary"
             size="medium"
-            text={loading ? 'Loading...' : 'Submit'}
-            disabled={loading}
+            text={'Submit'}
             onClick={handleSubmit}
             
           />
-          {!!formRect &&
+          {!!formRect && !loading &&
           <Popover
           id={tripID}
           anchorReference='anchorPosition'
