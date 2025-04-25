@@ -34,7 +34,7 @@ const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions 
                     </div>
                 </AccordionDetails>
             </Accordion>
-                <Accordion sx={{ backgroundColor: '#FFFFFFCC', boxShadow: 'none', borderRadius: '10px' }}></Accordion>
+            <Accordion defaultExpanded sx={{ backgroundColor: '#FFFFFFCC', boxShadow: 'none', borderRadius: '10px' }}>
                 <AccordionSummary
                     expandIcon={<ChevronDown />}
                     aria-controls="sustainability-options-content"

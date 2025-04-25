@@ -1,15 +1,12 @@
 // FlightEmissionsCalculator.js
 import styles from './form.module.scss';
-import { useState } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
 import Button from '~/components/button/button';
-import { Popover } from "@mui/material";
-import Select from 'react-select';
+import { Popover, Autocomplete, TextField } from "@mui/material";
 import TripDetails from '../tripDetails/tripDetails';
 const travelClasses = [
   { value: 'economy', label: 'Economy' },
-  { value: 'premiumeconomy', label: 'Premium Economy' },
-  { value: 'business', label: 'Business' },
-  { value: 'first', label: 'First' }
+  { value: 'premium', label: 'Premium' }
 ];
 
 const EmissionCalculator = () => {
@@ -17,14 +14,16 @@ const EmissionCalculator = () => {
     origin: '',
     destination: '',
     roundtrip: false,
-    flight_class: travelClasses[0],
+    flight_class: travelClasses[0].label,
     passengers: 1,
     departure: '',
     return: ''
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
+  const [error, setError] = useState<string | null>(null);
+  const formRef = useRef(null);
+  const [formRect, setFormRect] = useState<any | undefined>(undefined);
+  useLayoutEffect(()=>{ setFormRect(formRef?.current?.getBoundingClientRect()) },[formRef])
   //anchor for popover
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   // store only the total emissions number
@@ -41,6 +40,8 @@ const EmissionCalculator = () => {
     const destination = formData.destination;
     const passengers = parseInt(formData.passengers.toString(), 10);
     const isRoundtrip = formData.roundtrip;
+    const cabinClass = formData.flight_class;
+    const travelClass = travelClasses.find(f => f.label === cabinClass)
 
     if (!origin || !destination || !passengers) {
       setError('Please fill in all required fields.');
@@ -50,14 +51,16 @@ const EmissionCalculator = () => {
     const legs = [
       {
         departure_airport: origin,
-        destination_airport: destination
+        destination_airport: destination,
+        cabin_class: travelClass ? travelClass.value : travelClasses[0].value
       }
     ];
 
     if (isRoundtrip) {
       legs.push({
         departure_airport: destination,
-        destination_airport: origin
+        destination_airport: origin,
+        cabin_class: travelClass ? travelClass.value : travelClasses[0].value
       });
     }
 
@@ -105,7 +108,7 @@ const EmissionCalculator = () => {
 
   return (
     <>
-      <div className={styles.formcontainer}>
+      <div className={styles.formcontainer} ref={formRef}>
         <form className={styles.formBody} onSubmit={handleSubmit}>
           <label className={styles.label}>
             From
@@ -144,11 +147,19 @@ const EmissionCalculator = () => {
 
           <label className={styles.label}>
             Class
-            <Select
-              options={travelClasses}
+            <Autocomplete 
+              onChange={(e,v) => handleChange('flight_class', v)}
               value={formData.flight_class}
-              onChange={v => handleChange('flight_class', v)}
-            />
+              options={travelClasses.map(m => m.label)}
+              renderInput={(params) => <TextField {...params} />}
+              sx={{
+                backgroundColor: "transparent",
+                color: "#A15B96",
+                fontWeight: "600",
+                fontSize: "24px",
+                border: "none"
+              }}
+            />                
           </label>
 
           <label className={styles.label}>
@@ -169,26 +180,30 @@ const EmissionCalculator = () => {
             onClick={handleSubmit}
             
           />
+          {!!formRect &&
           <Popover
-            id={tripID}
-            open={popoverOpen}
-            anchorEl={anchorEl}
-            onClose={handleModalClose}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            sx={{
-              '& .MuiPopover-paper': {
-                backgroundColor: 'transparent',
-                borderRadius: '30px'
-              }
-            }}
-          >
-            <TripDetails
+          id={tripID}
+          anchorReference='anchorPosition'
+          anchorPosition={{top: formRect.top, left: formRect.left - formRect.width}}
+          open={popoverOpen}
+          anchorEl={anchorEl}
+          onClose={handleModalClose}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          sx={{
+            '& .MuiPopover-paper': {
+              backgroundColor: 'transparent',
+              borderRadius: '30px'
+            }
+          }}
+        >
+          <TripDetails
 
-              close={() => handleModalClose()}
-              title="Trip Details"
-              totalEmissions={totalEmissions}
-            />
-          </Popover>
+            close={() => handleModalClose()}
+            title="Trip Details"
+            totalEmissions={totalEmissions}
+          />
+        </Popover>
+        }
         </form>
         {error && <div className={styles.error}>{error}</div>}
       </div>
