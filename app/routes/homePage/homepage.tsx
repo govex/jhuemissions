@@ -14,7 +14,7 @@ import type { Route } from "./+types/homepage";
 import BarChartVariants from "~/components/barChart/barChart";
 import ConnectionMap from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
-import {toTitleCase, formatPlaces} from "~/utils/titleCase";
+import {toTitleCase} from "~/utils/titleCase";
 import supabase from "~/utils/supabase";
 import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
@@ -332,40 +332,6 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             </div>
           </Card>
         </div>
-        <div className={styles.donut}>
-          <Card
-            title="How complete is our data?"
-          >
-            <div className={styles.completenessCard}>
-              <p>JHU staff book air travel through multiple channels: directly via the Concur system, through third-party agencies, or independently with later reimbursement. This dashboard currently displays data from air travel booked through Concur, World Travel Inc., Safe Harbors Business Travel, and TripLink. We are actively working to assess the completeness of this dataset by cross-referencing bookings with expense reports in Concur, and we will display completeness estimates here soon.</p>
-              <p>Additionally, some air travel may not be recorded in Concur at all. According to the JHU Travel and Expense Programs (University Procurement Office), these cases include direct-billed travel agency bookings, estimated to be less than 5% of total travel, and some study abroad program travel, processed through SAP.</p>
-            </div>
-          </Card>
-        </div>
-        <div className={styles.method}>
-          <Card
-            title="How did we calculate the emissions?"
-          >
-            <div className={styles.completenessCard}>
-            <p>The data presented on this dashboard is sourced from Concur’s booking system. In addition to recorded travel details, carbon emissions for each trip have been calculated using the <a href="https://ghgprotocol.org/sites/default/files/standards/Scope3_Calculation_Guidance_0.pdf">GHG Protocol Technical Guidance for Calculating Scope 3 Emissions</a>.</p>
-            <p>We applied a distance-based method to estimate emissions, ensuring consistency with established sustainability reporting standards. For a detailed breakdown of our calculation methodology see:</p>
-            </div>
-            <Button
-              text="Our Methodology"
-              type="solid"
-              color="secondary"
-              size="medium"
-              href="/methodology"
-            />
-          </Card>
-        </div>
-        <div className={styles.tool}>
-          <Card title="Emissions Calculator">
-            {!!loaderData.airports && loaderData.airports.length > 0 &&
-              <Form airports={loaderData.airports} />
-            }
-          </Card>
-        </div>
         <div className={styles.bar1}>
           <Card
             title={`What ${filters.school !== "All JHU" ? `${filters.school} ` : ""}traveler type is traveling the most?`}
@@ -507,6 +473,40 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             </div>
           </Card>
       </div>
+      <div className={styles.tool}>
+        <Card title="Emissions Calculator">
+          {!!loaderData.airports && loaderData.airports.length > 0 &&
+            <Form airports={loaderData.airports} />
+          }
+        </Card>
+      </div>
+      <div className={styles.donut}>
+          <Card
+            title="How complete is our data?"
+          >
+            <div className={styles.completenessCard}>
+              <p>JHU staff book air travel through multiple channels: directly via the Concur system, through third-party agencies, or independently with later reimbursement. This dashboard currently displays data from air travel booked through Concur, World Travel Inc., Safe Harbors Business Travel, and TripLink. We are actively working to assess the completeness of this dataset by cross-referencing bookings with expense reports in Concur, and we will display completeness estimates here soon.</p>
+              <p>Additionally, some air travel may not be recorded in Concur at all. According to the JHU Travel and Expense Programs (University Procurement Office), these cases include direct-billed travel agency bookings, estimated to be less than 5% of total travel, and some study abroad program travel, processed through SAP.</p>
+            </div>
+          </Card>
+        </div>
+        <div className={styles.method}>
+          <Card
+            title="How did we calculate the emissions?"
+          >
+            <div className={styles.completenessCard}>
+            <p>The data presented on this dashboard is sourced from Concur’s booking system. In addition to recorded travel details, carbon emissions for each trip have been calculated using the <a href="https://ghgprotocol.org/sites/default/files/standards/Scope3_Calculation_Guidance_0.pdf">GHG Protocol Technical Guidance for Calculating Scope 3 Emissions</a>.</p>
+            <p>We applied a distance-based method to estimate emissions, ensuring consistency with established sustainability reporting standards. For a detailed breakdown of our calculation methodology see:</p>
+            </div>
+            <Button
+              text="Our Methodology"
+              type="solid"
+              color="secondary"
+              size="medium"
+              href="/methodology"
+            />
+          </Card>
+        </div>
     </section>
     <div className={styles.feedback}>
       <Button 

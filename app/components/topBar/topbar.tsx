@@ -1,29 +1,29 @@
 import Button from 'app/components/button/button';
 import { Link } from 'react-router';
 import { ReactComponent as ChevronDown } from 'app/components/icons/chevron-down';
-import './topbar.css';
+import styles from './topbar.module.scss';
 
 const TopBar = () => {
     return (
-        <div className="topBar">
+        <div className={styles.topBar}>
             {/* image */}
-            <div className="logo">
+            <div className={styles.logo}>
                 <img src="general/logoL.png" alt="Johns Hopkins University Bloomberg Center for Government Excellence" />
             </div>
 
             {/* buttons */}
-            <div className="navs">
-                <ul className="topList">
-                    <li className="topListItem">
-                        <Link className='link down-arrow' to="/"> Dashboard <ChevronDown/></Link>
+            <div className={styles.navs}>
+                <ul className={styles.topList}>
+                    <li className={styles.topListItem}>
+                        <Link className={styles.link} to="/"> Dashboard <ChevronDown/></Link>
                     </li>
-                    <li className="topListItem">
-                        <Link className='link down-arrow' to="/about"> About <ChevronDown/></Link>
+                    <li className={styles.topListItem}>
+                        <Link className={styles.link} to="/about"> About <ChevronDown/></Link>
                     </li>
-                    <li className="topListItem">
-                        <Link className='link' to="/methodology"> Methodology <ChevronDown/></Link>
+                    <li className={styles.topListItem}>
+                        <Link className={styles.link} to="/methodology"> Methodology <ChevronDown/></Link>
                     </li>
-                    <li className="topListItem">
+                    <li className={styles.topListItem}>
                         <Button 
                             text="GovEx"
                             color='primary'
