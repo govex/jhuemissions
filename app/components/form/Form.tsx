@@ -103,7 +103,6 @@ const EmissionCalculator = () => {
 
   const popoverOpen = Boolean(anchorEl);
   const tripID = popoverOpen ? 'simple-popover' : undefined;
-console.log(formRect);
 
   return (
     <>
