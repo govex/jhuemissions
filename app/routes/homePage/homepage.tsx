@@ -32,6 +32,7 @@ export async function loader({}: Route.LoaderArgs) {
   let bookings = await supabase.from('bookings').select();
   let timeline = await supabase.from('timeline').select();
   let filters = {school: "All JHU", years:["FY23-24"]};
+  let airports = await supabase.from('airports').select();
   const fiscalYearOptions = [
     {label: "FY23-24", value: "FY23-24", order: 7},
     {label: "FY22-23", value: "FY22-23", order: 6},
@@ -55,6 +56,7 @@ export async function loader({}: Route.LoaderArgs) {
     timeline: {school: timeline.data, jhu: timeline_jhu.data},
     bookings: {school: topline_school.data, traveler_jhu: traveler_jhu.data, traveler_school: bookings.data, topline: topline_jhu.data }, 
     percent: {school: school_percent.data, traveler: traveler_percent.data},
+    airports: airports.data,
     filters,
     fiscalYearOptions
   }
@@ -359,7 +361,9 @@ function Homepage({ loaderData }: Route.ComponentProps) {
         </div>
         <div className={styles.tool}>
           <Card title="Emissions Calculator">
-            <Form />
+            {!!loaderData.airports && loaderData.airports.length > 0 &&
+              <Form airports={loaderData.airports} />
+            }
           </Card>
         </div>
         <div className={styles.bar1}>
