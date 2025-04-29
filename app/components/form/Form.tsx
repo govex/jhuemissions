@@ -103,7 +103,7 @@ const EmissionCalculator = () => {
 
   const popoverOpen = Boolean(anchorEl);
   const tripID = popoverOpen ? 'simple-popover' : undefined;
-
+console.log(formRect);
 
   return (
     <>
@@ -182,11 +182,10 @@ const EmissionCalculator = () => {
           <Popover
           id={tripID}
           anchorReference='anchorPosition'
-          anchorPosition={{top: formRect.top, left: formRect.left - formRect.width}}
+          anchorPosition={{top: formRect.top - window.scrollY, left: formRect.left - 400}}
           open={popoverOpen}
           anchorEl={anchorEl}
           onClose={handleModalClose}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           sx={{
             '& .MuiPopover-paper': {
               backgroundColor: 'transparent',
@@ -199,6 +198,7 @@ const EmissionCalculator = () => {
             close={() => handleModalClose()}
             title="Trip Details"
             totalEmissions={totalEmissions}
+            formData={formData}
           />
         </Popover>
         }

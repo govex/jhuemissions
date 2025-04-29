@@ -16,7 +16,7 @@ interface TripDetailsProps {
     totalEmissions: number;
 }
 
-const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions }) => (
+const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions, formData }) => (
     <div className={styles.modalContainer}>
         <div className={styles.header}>
             <h3 className={styles.filterTitle}>{title}</h3>
@@ -26,15 +26,36 @@ const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions 
         </div>
         <div className={styles.modalBody}>
 
-            <Accordion sx={{ backgroundColor: '#FFFFFFCC', boxShadow: 'none', borderRadius: '10px' }}>
+            <Accordion sx={{
+                borderRadius: "10px",
+                boxShadow: "0px 4px 4px 0px #00000040",
+                backgroundColor: "#FFFFFFCC",
+                fontFamily: "Montserrat",
+                fontWeight: "600",
+                fontSize: "24px",
+                color: "#A15B96",
+                marginBottom: "20px",
+                "&:first-of-type": {borderRadius: "10px"}                
+              }}>
                 <AccordionDetails>
                     <div className={styles.resultRow}>
-
-                        <span>{totalEmissions.toFixed(2)} kg CO₂e</span>
+                        <span>A flight from {formData.origin} to {formData.destination} {formData.roundtrip ? " and back" : ""} would produce: </span>
+                        <br/><span>{totalEmissions.toFixed(2)} kg CO₂e</span>
                     </div>
                 </AccordionDetails>
             </Accordion>
-            <Accordion defaultExpanded sx={{ backgroundColor: '#FFFFFFCC', boxShadow: 'none', borderRadius: '10px' }}>
+            <Accordion
+                sx={{
+                    borderRadius: "10px",
+                    boxShadow: "0px 4px 4px 0px #00000040",
+                    backgroundColor: "#FFFFFFCC",
+                    fontFamily: "Montserrat",
+                    fontWeight: "600",
+                    fontSize: "24px",
+                    color: "#A15B96",
+                    "&:last-of-type": {borderRadius: "10px"}
+                }}
+            >
                 <AccordionSummary
                     expandIcon={<ChevronDown />}
                     aria-controls="sustainability-options-content"
