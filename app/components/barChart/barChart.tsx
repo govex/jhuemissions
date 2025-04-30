@@ -1,12 +1,13 @@
-import { BarChart, type BarSeriesType } from "@mui/x-charts";
+import { BarChart, type BarSeriesType, type BarElementOwnerState } from "@mui/x-charts";
+import { styled } from '@mui/material';
+import { animated } from '@react-spring/web';
 import styles from "./barChart.module.scss";
 import cx from "classnames";
 import { type FC, useState, useEffect } from "react";
 import type { ScaleOrdinal } from "d3";
-import { max, format } from "d3";
+import { max, format, scaleSequential, interpolateRgbBasis } from "d3";
 
 type ColorScale = ScaleOrdinal<string, string>;
-
 export default function BarChartVariants<FC>({
     data,
     orientation,
@@ -52,6 +53,23 @@ export default function BarChartVariants<FC>({
     const [maxVal, setMaxVal] = useState(0);
     const [chartData, setChartData] = useState<any[]>([]);
     const [seriesData, setSeriesData] = useState<BarSeriesType[] | []>([])
+    const stackedStrokeScaleDark = scaleSequential(interpolateRgbBasis(["#c091b8","#371f33"]))
+    const stackedStrokeScaleLight = scaleSequential(interpolateRgbBasis(["#f8f2f7","#ddc4d9"]))
+    const Bar = styled(animated.rect)(({ ownerState }:{ownerState: BarElementOwnerState}) => {
+        let seriesData = chartData.filter(f => f[labelField] === ownerState.id);
+        let dp = seriesData[ownerState.dataIndex] ? seriesData[ownerState.dataIndex][valueField] : undefined
+        return {
+            fill: ownerState?.color,
+            transition: 'opacity 0.2s ease-in, fill 0.2s ease-in',
+            opacity: 1,
+            strokeWidth: 2,
+            stroke:
+            ownerState?.isHighlighted && stack && maxVal !== 0
+                ? dp 
+                    ? dp < maxVal/2 ? stackedStrokeScaleDark(dp) : stackedStrokeScaleLight(dp) : 'black'
+                : 'none',
+        };
+    });
     useEffect(() => {
         if (schoolOptions) {
             let opt = schoolOptions.find(s => s.label === school)
@@ -74,10 +92,11 @@ export default function BarChartVariants<FC>({
                         }),
                         highlightScope: {
                             highlight: "series",
-                            fade: "global"
+                            fade: "none"
                         },
                         valueFormatter: (v:number) => format(".3p")(v),
-                        type: "bar"
+                        type: "bar",
+                        id: `${group}`
                     } as BarSeriesType;
                 });
                 const modifiedSeries:BarSeriesType[] = [{ ...serieses[0], stackOffset: "expand", stackOrder: "ascending" }, ...serieses.slice(1)];
@@ -139,6 +158,10 @@ export default function BarChartVariants<FC>({
             }
             let maxLength = max(labels.map(m => m.length));
             let maxVal = max(chartData, d => +d[valueField]);
+            if (maxVal) {
+                stackedStrokeScaleDark.domain([0, maxVal/2])
+                stackedStrokeScaleLight.domain([maxVal/2, maxVal])    
+            }
             setMaxVal(maxVal ? maxVal : 0);
             setMarginLeft(maxLength ? maxLength * 7 : 70);
             setGroupLabels(!schoolFilter && !stack
@@ -149,7 +172,7 @@ export default function BarChartVariants<FC>({
                 : labels
             );
         } 
-    }, [chartData, labelField, valueField, schoolOptions, years, school, stack])
+    }, [chartData, labelField, valueField, schoolOptions, years, school, stack, parentRect.width])
     const [realHeight, setRealHeight] = useState(parentRect.height)
     useEffect(()=>{
         if (!stack && groupLabels && groupLabels?.length > 15) {
@@ -194,7 +217,7 @@ export default function BarChartVariants<FC>({
                         type: "continuous",
                         min: 0,
                         max: maxVal,
-                        color: ["#ECECEC","#A15B96"]
+                        color: ["#f0e4ee","#62375a"]
                     } : undefined,
                 }]}
                 axisHighlight={{y: stack ? "none" : "band"}}
@@ -210,13 +233,14 @@ export default function BarChartVariants<FC>({
                         textAnchor: "start"
                     }
                 }}
+                slots={{
+                    bar: (props) => <Bar {...props} />
+                }}
                 slotProps={{
                     legend: {
                         hidden: stack,                        
                         labelStyle: {
                             fontFamily: "gentona",
-                            fontWeight: 600,
-                            fontSize: 20
                         }
                     }
                 }}

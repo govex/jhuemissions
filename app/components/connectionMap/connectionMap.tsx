@@ -88,7 +88,7 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
         }
         ]
     });
-    const lineWidthScale = d3.scaleLog().range([.25, 5]);
+    const lineWidthScale = d3.scaleLog().range([1,5]);
     const [loading, setLoading] = useState(true);
     const [placeHighlight, setPlaceHighlight] = useState<string | undefined>(undefined);
     const [countryPaths, setCountryPaths] = useState<any[] | undefined>(undefined);
@@ -157,7 +157,7 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                                     <path
                                         key={keyId}
                                         d={path ?? undefined}
-                                        stroke={"#A15B96"}
+                                        stroke={"#000"}
                                         strokeWidth={lineWidthScale(connection.trips)}
                                         fill="none"
                                         opacity={.25}
@@ -171,7 +171,7 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                                         stroke={colorScale(y)}
                                         strokeWidth={lineWidthScale(connection.trips)}
                                         fill="none"
-                                        opacity={0.25}
+                                        opacity={0.15}
                                     />
                                 )
                             }
@@ -196,6 +196,8 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                 if (lines.length > 1) {
                     let displayableYear = lines.find(f => f.yearData.length > 0);
                     setDisplayYear(displayableYear?.year)
+                } else {
+                    setDisplayYear(lines[0].year)
                 }
         }}
     },[data, parentRect.width, parentRect.height, world, loading, places, placeHighlight])
@@ -226,13 +228,77 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
             setCountryPaths(paths);
         }
     },[world, parentRect.width, parentRect.height, loading])
+    const annotations = () => {
+        if (placeHighlight && displayYear) {
+            let yearData = connections?.find(f => f.year === displayYear);
+            let fromTrips = yearData ? yearData.yearData.filter(f => formatPlaces(f.from_full) === placeHighlight) : [];
+            let toTrips = yearData ? yearData.yearData.filter(f => formatPlaces(f.to_full) === placeHighlight) : [];
+            let totalFrom = fromTrips.reduce((a,c) => a + parseInt(c.trips), 0);
+            let totalTo = toTrips.reduce((a,c) => a + parseInt(c.trips), 0);
+            let fromMost = fromTrips.sort((a,b)=>b.trips - a.trips).slice(0,5);
+            let toMost = toTrips.sort((a,b)=>b.trips - a.trips).slice(0,5);
+            if (fromTrips.length > 0 || toTrips.length > 0) {
+                return (
+                    <div>
+                        {!!totalFrom && <p className={styles.legendTitle}>{totalFrom} trips from {placeHighlight}</p>}
+                        {!!fromMost && <ul>
+                            {fromMost.map(m => {
+                                return (<li>{m.trips} to {formatPlaces(m.to_full)}</li>)}
+                            )}
+                        </ul>}
+                        {!!totalTo && <p className={styles.legendTitle}>{totalTo} trips to {placeHighlight}</p>}
+                        {!!toMost && <ul>
+                            {toMost.map(m => {
+                               return (<li>{m.trips} from {formatPlaces(m.from_full)}</li>)}
+                            )}
+                        </ul>}
+                    </div>
+                )
+            } else {
+                return <></>
+            }
+        } else {
+            return <></>
+        }
+    }
     const yearButtons = () => {
-        if (connections) {
+        if (connections && displayYear) {
+            let yearData = connections.find(f => f.year === displayYear);
+            let extentTrips = yearData ? d3.extent(yearData.yearData, d => d.trips) : undefined;
+            let legendScale = lineWidthScale.copy();
+            if (extentTrips) legendScale.domain(extentTrips);
+            let stops = extentTrips ? [1, 10, 100, 1000] : [];
             return (
                 <div className={styles.form}>
+                    {!!extentTrips &&
+                        <div className={styles.lineLegend}>
+                            <span className={styles.legendTitle}># Trips To & From:</span>
+                            {stops.map(m => {
+                                return (
+                                    <div className={styles.legendEntry}>
+                                        <div style={{
+                                            height: legendScale(m), 
+                                            background: "black",
+                                            width: 15,
+                                            display: "inline-block",
+                                            verticalAlign: "middle",
+                                            marginRight: 5
+                                        }}></div>
+                                        <span>{m}</span>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    }
                     {connections.length > 1 && (
                         <FormControl>
-                            <FormLabel id="radio-buttons-group-label">Fiscal Year</FormLabel>
+                            <FormLabel
+                                sx={{
+                                    "& .MuiFormLabel-root": {
+                                        fontFamily: 'gentona'
+                                    }
+                                }} 
+                                id="radio-buttons-group-label">Fiscal Year</FormLabel>
                             <RadioGroup
                                 aria-labelledby="radio-buttons-group-label"
                                 value={displayYear}
@@ -256,7 +322,13 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                         </FormControl>
                     )}
                     <FormControl>
-                        <FormLabel>Highlight Place</FormLabel>
+                    <FormLabel
+                        sx={{
+                            "& .MuiFormLabel-root": {
+                                fontFamily: 'gentona'
+                            }
+                        }} 
+                        >Highlight Place</FormLabel>
                         <Autocomplete
                             onChange={handleChange}
                             options={places.map(m => formatPlaces(m.place))}
@@ -279,12 +351,15 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
     return (
         <div className={styles.mapContainer}>
             <div className={styles.legend}>
-                {yearButtons()}
+                {!!displayYear && !!connections && yearButtons()}
             </div>
             <svg width={parentRect.width} height={parentRect.height}>
                 {!loading && countryPaths}
                 {!loading && displayPaths}
             </svg>
+            <div className={styles.annotations}>
+                {!!connections && annotations()}
+            </div>
         </div>
     );
 };

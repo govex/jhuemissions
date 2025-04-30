@@ -62,14 +62,14 @@ const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions,
                     id="sustainability-options-header"
                     sx={{ fontFamily: 'Montserrat', fontWeight: 600, fontSize: '20px', color: '#A15B96' }}
                 >
-                    <Typography>If you would like to make your trip more sustainable</Typography>
+                    <Typography>Traveling for work? Minimize climate impact by:</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <ol style={{ paddingLeft: '20px', margin: 0, fontFamily: 'Montserrat', fontSize: '16px' }}>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ol>
+                    <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '16px' }}>
+                        <li>Taking the train</li>
+                        <li>Bundling air trips</li>
+                        <li>Flying direct</li>
+                    </ul>
                 </AccordionDetails>
             </Accordion>
         </div>

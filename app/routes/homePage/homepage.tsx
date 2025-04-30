@@ -63,7 +63,7 @@ export async function loader({}: Route.LoaderArgs) {
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Homepage({ loaderData }: Route.ComponentProps) {
-  const colorScale = d3.scaleOrdinal(["#86C8BC", "#E8927C", "#F1C400", "#418FDF", "#000000"]);
+  const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(loaderData.bookings.school);
   const [travelerData, setTravelerData] = useState<any>(loaderData.bookings.traveler_jhu);
   const [timelineData, setTimelineData] = useState<any>(loaderData.timeline.jhu);

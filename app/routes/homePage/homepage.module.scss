@@ -118,6 +118,9 @@
     gap: 10px;
     justify-content: flex-end;
     width: 100%;
+    span {
+        color: rgba(0, 0, 0, 0.6);
+    }
 }
 .multitoggle {
     display: flex;
