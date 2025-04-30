@@ -16,7 +16,20 @@ interface TripDetailsProps {
     totalEmissions: number;
 }
 
-const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions, formData }) => (
+const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions, formData }) => {
+    const calculatorResults = () => {
+        let originSplit = formData.origin.split(" ");
+        let originShort = `${originSplit[2]} (${originSplit[0]})`;
+        let destSplit = formData.destination.split(" ");
+        let destShort = `${destSplit[2]} (${destSplit[0]})`;
+        let emissions = `${totalEmissions.toFixed(2)} kg CO₂e`;
+        let equivalent = totalEmissions * 5;
+        return <p>
+            A flight from <b>{originShort}</b> to <b>{destShort}</b> {formData.roundtrip ? " and back" : ""} would produce <b>{emissions}</b>. That's the equivalent of driving <b>{equivalent.toFixed(1)}</b> miles.
+        </p>
+    
+    }
+    return  (
     <div className={styles.modalContainer}>
         <div className={styles.header}>
             <h3 className={styles.filterTitle}>{title}</h3>
@@ -30,17 +43,13 @@ const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions,
                 borderRadius: "10px",
                 boxShadow: "0px 4px 4px 0px #00000040",
                 backgroundColor: "#FFFFFFCC",
-                fontFamily: "Montserrat",
-                fontWeight: "600",
-                fontSize: "24px",
                 color: "#A15B96",
                 marginBottom: "20px",
                 "&:first-of-type": {borderRadius: "10px"}                
               }}>
                 <AccordionDetails>
                     <div className={styles.resultRow}>
-                        <span>A flight from {formData.origin} to {formData.destination} {formData.roundtrip ? " and back" : ""} would produce: </span>
-                        <br/><span>{totalEmissions.toFixed(2)} kg CO₂e</span>
+                        {calculatorResults()}
                     </div>
                 </AccordionDetails>
             </Accordion>
@@ -49,9 +58,6 @@ const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions,
                     borderRadius: "10px",
                     boxShadow: "0px 4px 4px 0px #00000040",
                     backgroundColor: "#FFFFFFCC",
-                    fontFamily: "Montserrat",
-                    fontWeight: "600",
-                    fontSize: "24px",
                     color: "#A15B96",
                     "&:last-of-type": {borderRadius: "10px"}
                 }}
@@ -60,7 +66,7 @@ const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions,
                     expandIcon={<ChevronDown />}
                     aria-controls="sustainability-options-content"
                     id="sustainability-options-header"
-                    sx={{ fontFamily: 'Montserrat', fontWeight: 600, fontSize: '20px', color: '#A15B96' }}
+                    sx={{ fontWeight: 600, fontSize: '20px', color: '#A15B96' }}
                 >
                     <Typography>Traveling for work? Minimize climate impact by:</Typography>
                 </AccordionSummary>
@@ -74,6 +80,6 @@ const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions,
             </Accordion>
         </div>
     </div>
-);
+)};
 
 export default TripDetails;
