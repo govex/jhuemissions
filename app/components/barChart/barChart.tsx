@@ -1,6 +1,6 @@
 import { BarChart, type BarSeriesType, type BarElementOwnerState } from "@mui/x-charts";
 import { styled } from '@mui/material';
-import { animated } from '@react-spring/web';
+import { animated } from 'react-spring';
 import styles from "./barChart.module.scss";
 import cx from "classnames";
 import { type FC, useState, useEffect } from "react";
