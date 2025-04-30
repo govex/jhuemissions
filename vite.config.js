@@ -6,9 +6,4 @@ import tsconfigPaths from "vite-tsconfig-paths";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [reactRouter(), tsconfigPaths(), netlifyPlugin()],
-  build: {
-    rollupOptions: {
-      external: ['@react-spring/web']
-    }
-  }
 })
