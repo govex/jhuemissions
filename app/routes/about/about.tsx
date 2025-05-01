@@ -3,8 +3,18 @@ import styles from "./about.module.scss";
 function About() {
   return (
     <>
-    <h1 className={styles.internal}>About</h1>
-    <div className={styles.about}>
+    <section className={styles.hero}>
+      <h1>Travel Emissions Dashboard</h1>
+      <div className={styles.info}>
+        <p className={styles.para}>
+        This dashboard aims to communicate the climate emissions impact of business travel to faculty and administrative leaders, inform estimates of JHU air travel scope 3 emissions to allow for better decision making, and foster an enabling environment, driven by faculty priorities, for mitigation efforts that address scope 3 emissions.</p>
+        <p className={styles.para}>For additional background, please see <a href="https://sustainability.jhu.edu/news/a-climate-dashboard-on-jhu-business-travel-is-scheduled-to-take-off-in-april/">this article</a>.</p>
+      </div>
+    </section>
+    <section className={styles.carousel}>
+      
+    </section>
+    <section className={styles.about}>
       <div className={styles.odd}>
         <div className={styles.about_block}>
           <div className={styles.imgOdd}>
@@ -98,7 +108,7 @@ function About() {
       <p className={styles.footnote}>
         Infographic reviewed by <a href="https://publichealth.jhu.edu/faculty/3991/shima-hamidi">Shima Hamidi</a>, <a href="https://engineering.jhu.edu/faculty/scot-miller/">Scot Miller</a>, and <a href="https://www.dylangaeta.com/">Dylan Gaeta</a>.
       </p>
-    </div>
+    </section>
     </>
   )
 }

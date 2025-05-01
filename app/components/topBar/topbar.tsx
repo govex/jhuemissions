@@ -1,5 +1,5 @@
 import Button from 'app/components/button/button';
-import { Link } from 'react-router';
+import { NavLink } from 'react-router';
 import { ReactComponent as ChevronDown } from 'app/components/icons/chevron-down';
 import styles from './topbar.module.scss';
 
@@ -15,13 +15,13 @@ const TopBar = () => {
             <div className={styles.navs}>
                 <ul className={styles.topList}>
                     <li className={styles.topListItem}>
-                        <Link className={styles.link} to="/"> Dashboard <ChevronDown/></Link>
+                        <NavLink to="/"> About <ChevronDown/></NavLink>
                     </li>
                     <li className={styles.topListItem}>
-                        <Link className={styles.link} to="/about"> About <ChevronDown/></Link>
+                        <NavLink to="/methodology"> Methodology <ChevronDown/></NavLink>
                     </li>
                     <li className={styles.topListItem}>
-                        <Link className={styles.link} to="/methodology"> Methodology <ChevronDown/></Link>
+                        <NavLink to="/dashboard"> Dashboard <ChevronDown/></NavLink>
                     </li>
                     <li className={styles.topListItem}>
                         <Button 
@@ -32,13 +32,8 @@ const TopBar = () => {
                             size='small'
                         />
                     </li>
-                    
-                    
                 </ul>
-
-
             </div>
-
         </div>
     )
 }

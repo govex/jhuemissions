@@ -1,6 +1,6 @@
 .hero {
     width: 100%;
-    min-height: 365px;
+    height: fit-content;
     background-color: #0E2D72;
     color: #FFF;
     padding: 50px 70px;
@@ -8,18 +8,14 @@
 }
 .info {
     height: 100%;
-    display: flex;
-    align-items: start;
-    justify-content: space-evenly;
-    gap: 80px;
+    width: 100%;
 }
 
 .para {
     color: #FFF;
     font-size: 20px;
-    font-style: normal;
     font-weight: 400;
-    line-height: normal;
+    margin-bottom: 50px;
 }
 
 .grid {
@@ -93,16 +89,6 @@
 .filterPopover {
     background-color: transparent;
     border-radius: 30px;
-}
-.left, .right {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 30px;
-    a {
-        text-decoration: underline;
-    }
 }
 .bar1{
     grid-area: bar1;

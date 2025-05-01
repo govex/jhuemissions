@@ -1,7 +1,7 @@
 
-import styles from "./homepage.module.scss";
+import styles from "./dashboard.module.scss";
 import cx from "classnames";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
@@ -213,13 +213,6 @@ function Homepage({ loaderData }: Route.ComponentProps) {
       <section className={styles.hero}>
       <h1>Travel Emissions Dashboard</h1>
       <div className={styles.info}>
-        <div className={styles.left}>
-            <p className={styles.para}>
-            This dashboard aims to communicate the climate emissions impact of business travel to faculty and administrative leaders, inform estimates of JHU air travel scope 3 emissions to allow for better decision making, and foster an enabling environment, driven by faculty priorities, for mitigation efforts that address scope 3 emissions.</p>
-            <p className={styles.para}>For additional background, please see <a href="https://sustainability.jhu.edu/news/a-climate-dashboard-on-jhu-business-travel-is-scheduled-to-take-off-in-april/">this article</a>.</p>
-        </div>
-        <div className={styles.right}>
-          <p className={styles.para}>This instance of the dashboard is a live public beta.</p>
           <p className={styles.para}>Want to know more about carbon emissions and the role air travel plays on them? </p> 
           <Button
             type="border"
@@ -229,7 +222,6 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             size="large"
             href="/about"
           />
-        </div>
       </div>
       </section>
       <section className={styles.grid}>
