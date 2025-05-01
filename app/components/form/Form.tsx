@@ -99,12 +99,11 @@ const EmissionCalculator = (airports) => {
   
         const result = await response.json();
         setTotalEmissions(result.data.attributes.carbon_kg);
+        setLoading(false);
         console.log('Emission Result:', result.data.attributes.carbon_kg);
       } catch (err) {
         console.error('Error fetching emissions data:', err);
-        setError('Failed to fetch emissions data.');
-      } finally {
-        setLoading(false);
+        setError('Failed to fetch emissions data. Try a different selection.');
       }  
     }
   };

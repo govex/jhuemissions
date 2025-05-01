@@ -47,7 +47,11 @@ const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions,
                 marginBottom: "20px",
                 "&:first-of-type": {borderRadius: "10px"}                
               }}>
-                <AccordionDetails>
+                <AccordionDetails
+                    sx={{
+                        padding: "16px"
+                    }}
+                >
                     <div className={styles.resultRow}>
                         {calculatorResults()}
                     </div>
@@ -66,7 +70,14 @@ const TripDetails: React.FC<TripDetailsProps> = ({ close, title, totalEmissions,
                     expandIcon={<ChevronDown />}
                     aria-controls="sustainability-options-content"
                     id="sustainability-options-header"
-                    sx={{ fontWeight: 600, fontSize: '20px', color: '#A15B96' }}
+                    sx={{ 
+                        fontWeight: 600, 
+                        fontSize: '20px', 
+                        color: '#A15B96',
+                        "& .Mui-expanded": {
+                            marginBottom: 0
+                        }
+                     }}
                 >
                     <Typography>Traveling for work? Minimize climate impact by:</Typography>
                 </AccordionSummary>
