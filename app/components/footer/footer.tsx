@@ -1,7 +1,7 @@
 import styles from './footer.module.scss';
 import Button from 'app/components/button/button';
 import { Link } from 'react-router';
-import { ReactComponent as ArrowUpCircle } from '../icons/arrow-up-circle';
+import { ReactComponent as ArrowUpCircle } from '~/components/icons/arrow-up-circle';
 
 const Footer = () => {
     return (

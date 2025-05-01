@@ -1,7 +1,9 @@
 import styles from "./about.module.scss";
+import Button from "~/components/button/button";
 
 function About() {
-  return (
+
+    return (
     <>
     <section className={styles.hero}>
       <h1>Travel Emissions Dashboard</h1>
@@ -12,7 +14,6 @@ function About() {
       </div>
     </section>
     <section className={styles.carousel}>
-      
     </section>
     <section className={styles.about}>
       <div className={styles.odd}>
