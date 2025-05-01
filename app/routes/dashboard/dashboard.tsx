@@ -10,7 +10,7 @@ import Filter from "~/components/filter/Filter";
 import Form from "~/components/form/Form";
 import Infographic from "~/components/infographic/infographic";
 import * as d3 from "d3";
-import type { Route } from "./+types/homepage";
+import type { Route } from "./+types/dashboard";
 import BarChartVariants from "~/components/barChart/barChart";
 import ConnectionMap from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
