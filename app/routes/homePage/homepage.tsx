@@ -15,6 +15,7 @@ import BarChartVariants from "~/components/barChart/barChart";
 import ConnectionMap from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
 import {toTitleCase} from "~/utils/titleCase";
+import useResizeObserver from "~/utils/useResizeObserver";
 import supabase from "~/utils/supabase";
 import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
@@ -76,14 +77,14 @@ function Homepage({ loaderData }: Route.ComponentProps) {
   const [toggleStateSchool, setToggleStateSchool] = useState<"emissions" | "trips">("trips");
   const [toggleStatePercentField, setToggleStatePercentField] = useState<"pct_emissions" | "pct_trips">("pct_emissions");
   const [toggleStatePercentDataset, setToggleStatePercentDataset] = useState<"school" | "traveler_type">("school");
-  const top1ref = useRef<HTMLDivElement | null>(null);
-  const top2ref = useRef<HTMLDivElement | null>(null);
-  const top3ref = useRef<HTMLDivElement | null>(null);
-  const bar1ref = useRef<HTMLDivElement | null>(null);
-  const bar2ref = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<HTMLDivElement | null>(null);
-  const timeRef = useRef<HTMLDivElement | null>(null);
-  const percentRef = useRef<HTMLDivElement | null>(null);
+  const [top1ref, top1rect] = useResizeObserver();
+  const [top2ref, top2rect] = useResizeObserver();
+  const [top3ref, top3rect] = useResizeObserver();
+  const [bar1ref, bar1rect] = useResizeObserver();
+  const [bar2ref, bar2rect] = useResizeObserver();
+  const [mapRef, mapRect] = useResizeObserver();
+  const [timeRef, timeRect] = useResizeObserver();
+  const [percentRef, percentRect] = useResizeObserver();
   const filterErrorTooMany = "Only five years may be displayed at once.";
   const filterErrorNotEnough = "At least one year must be selected.";
   const handleFilterClick = (event:MouseEvent<HTMLButtonElement>) => {
@@ -285,13 +286,13 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             title="Total GHG Emissions"
           >
             <div className={styles.chartContainer} ref={top1ref}>
-            {!!topLineData && top1ref?.current &&
+            {!!topLineData && !!top1rect &&
             <Infographic
               valueField="emissions"
               data={topLineData}
               years={filters.years}
               unit={<span>metric tons of CO<sub>2</sub>e</span>}
-              parentRect={top1ref.current.getBoundingClientRect()}
+              parentRect={top1rect}
             />
             }
             </div>
@@ -302,13 +303,13 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             title="Total Trips"
           >
             <div className={styles.chartContainer} ref={top2ref}>
-            {!!topLineData && top2ref?.current &&
+            {!!topLineData && !!top2rect &&
             <Infographic
               valueField="trips"
               data={topLineData}
               years={filters.years}
               unit="trips taken"
-              parentRect={top2ref.current.getBoundingClientRect()}
+              parentRect={top2rect}
             />
             }
             </div>
@@ -319,13 +320,13 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             title="Total Distance"
           >
             <div className={styles.chartContainer} ref={top3ref}>
-            {!!topLineData && top3ref?.current &&
+            {!!topLineData && !!top3rect &&
             <Infographic
               valueField="distance"
               data={topLineData}
               years={filters.years}
               unit="miles"
-              parentRect={top3ref.current.getBoundingClientRect()}
+              parentRect={top3rect}
               formatString=".4s"
             />
             }
@@ -344,13 +345,13 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             <span>Emissions</span>
             </div>
             <div className={styles.chartContainer} ref={bar1ref}>
-              {bar1ref?.current && !!travelerData &&
+              {!!bar1rect && !!travelerData &&
                 <BarChartVariants 
                   data={travelerData}
                   orientation="horizontal"
                   xScale="linear"
                   yScale="band"
-                  parentRect={bar1ref.current.getBoundingClientRect()}
+                  parentRect={bar1rect}
                   labelField={"traveler_type"}
                   valueField={toggleStateTraveler}
                   school={filters.school}
@@ -374,13 +375,13 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             <span>Emissions</span>
             </div>
             <div className={styles.chartContainer} ref={bar2ref}>
-              {bar2ref?.current && !!schoolData && !!schoolOptions &&
+              {!!bar2rect && !!schoolData && !!schoolOptions &&
                 <BarChartVariants 
                   data={schoolData}
                   orientation="horizontal"
                   xScale="linear"
                   yScale="band"
-                  parentRect={bar2ref.current.getBoundingClientRect()}
+                  parentRect={bar2rect}
                   labelField={"school"}
                   valueField={toggleStateSchool}
                   school={filters.school}
@@ -403,10 +404,10 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             <span>Emissions</span>
             </div>
             <div className={cx( styles.chartContainer, styles.lineChart )} ref={timeRef}>
-              {!!timelineData && timeRef?.current && !!colorScale &&
+              {!!timelineData && !!timeRect && !!colorScale &&
                 <Timeline 
                   data={timelineData.filter(f => filters.years.includes(f.fiscalyear))}
-                  parentRect={timeRef.current.getBoundingClientRect()}
+                  parentRect={timeRect}
                   colorScale={colorScale.domain(filters.years)}
                   valueField={toggleStateTimeline}
                   years={filters.years}
@@ -418,9 +419,9 @@ function Homepage({ loaderData }: Route.ComponentProps) {
       <div className={styles.map}>
         <Card title={`Where are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people travelling?`}>
           <div className={styles.chartContainer} ref={mapRef}>
-            {mapRef?.current && !!mapData && !!loaderData.places && 
+            {!!mapRect && !!mapData && !!loaderData.places && 
               <ConnectionMap
-                parentRect={mapRef.current.getBoundingClientRect()} 
+                parentRect={mapRect} 
                 data={mapData.filter(f => filters.years.includes(f.fiscalyear))}
                 places={loaderData.places}
                 colorScale={colorScale.domain(filters.years)}
@@ -453,13 +454,13 @@ function Homepage({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
             <div className={styles.chartContainer} ref={percentRef}>
-              {percentRef?.current && !!percentData && !!schoolOptions &&
+              {!!percentRect && !!percentData && !!schoolOptions &&
                 <BarChartVariants 
                   data={percentData}
                   orientation="horizontal"
                   xScale="linear"
                   yScale="band"
-                  parentRect={percentRef.current.getBoundingClientRect()}
+                  parentRect={percentRect}
                   labelField={toggleStatePercentDataset}
                   valueField={toggleStatePercentField}
                   school={filters.school}
