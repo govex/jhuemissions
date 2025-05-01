@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import type { ExtendedFeatureCollection, InternMap, ScaleOrdinal } from "d3";
 import { styled, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Autocomplete, TextField } from '@mui/material';
 import type {AutocompleteChangeReason} from "@mui/material";
-import { formatPlaces } from "~/utils/titleCase";
+import { formatPlaces } from "~/utils/stringFunctions";
 import styles from "./connectionMap.module.scss"
 
 type ColorScale = ScaleOrdinal<string, string>;

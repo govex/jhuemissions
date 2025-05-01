@@ -1,4 +1,4 @@
-export const toTitleCase = (str) => {
+export function toTitleCase(str) {
     if (!str) return '';
     return str.toLowerCase().split(' ').map((word) => {
         if (['coe', 'jhup', '(son)', '(som)', 'jh', 'jhu', 'cgepi', 'emrs', 'jhbmc', 'jhhcg', 'jhmmc', 'jhpeigo', 'smh', 'ach', 'aicgs', 'jhmi'].includes(word)) {
@@ -8,12 +8,7 @@ export const toTitleCase = (str) => {
     }).join(' ');
 };
 
-export const studentCorrection = (text, wordToReplace="Stud", replacement="Students") => {
-  const regex = new RegExp('\\b' + wordToReplace + '\\b', 'g');
-  return text.replace(regex, replacement);
-}
-
-export const formatPlaces = (place) => {
+export function formatPlaces(place) {
   let splits = place.split(', ')
   if (splits[1].length > 2) {
     return `${splits[0]}, ${toTitleCase(splits[1])}`
@@ -21,3 +16,4 @@ export const formatPlaces = (place) => {
     return splits.slice(0,2).join(", ")
   }
 }
+

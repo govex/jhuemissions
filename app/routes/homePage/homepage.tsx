@@ -14,7 +14,7 @@ import type { Route } from "./+types/homepage";
 import BarChartVariants from "~/components/barChart/barChart";
 import ConnectionMap from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
-import {toTitleCase} from "~/utils/titleCase";
+import {toTitleCase} from "~/utils/stringFunctions";
 import useResizeObserver from "~/utils/useResizeObserver";
 import supabase from "~/utils/supabase";
 import Timeline from "~/components/timeline/timeline";
