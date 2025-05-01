@@ -12,7 +12,6 @@ const theme = createTheme({
 export default function Layout(props:Route.ComponentProps) {
   const navigation = useNavigation();
   const isNavigating = navigation.state === 'loading';
-  console.log("navigating: ", isNavigating);
     return (
         <ThemeProvider theme={theme}>
             {isNavigating && (
