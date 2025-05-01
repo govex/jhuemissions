@@ -12,14 +12,32 @@
         text-decoration: underline;
     }
 }
-
 .para {
     color: #FFF;
     font-size: 20px;
     font-weight: 400;
     margin-bottom: 40px;
 }
-
+.carousel {
+    height: 650px;
+    padding: 50px;
+}
+.prompt {
+    font-weight: 600;
+    font-size: 24;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.slideshow {
+    border: 10px solid #8096B9;
+    border-radius: 20px;
+    height: 480px;
+    padding: 30px 100px;
+}
+.slideImg {
+    height: 380px;
+    width: 520px;
+}
 .about {
 
     h2 {

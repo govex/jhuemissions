@@ -68,6 +68,9 @@ importers:
       react-router:
         specifier: ^7.4.0
         version: 7.4.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-slideshow-image:
+        specifier: ^4.3.2
+        version: 4.3.2(react@19.0.0)
       react-spring:
         specifier: ^9.7.5
         version: 9.7.5(@react-three/fiber@9.1.2(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react-native@0.79.1(@babel/core@7.26.10)(@types/react@19.0.10)(react@19.0.0))(react@19.0.0)(three@0.176.0))(konva@9.3.20)(react-dom@19.0.0(react@19.0.0))(react-konva@18.2.10(@types/react@19.0.10)(konva@9.3.20)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-native@0.79.1(@babel/core@7.26.10)(@types/react@19.0.10)(react@19.0.0))(react-zdog@1.2.2)(react@19.0.0)(three@0.176.0)(zdog@1.1.3)
@@ -1199,6 +1202,9 @@ packages:
 
   '@supabase/supabase-js@2.49.4':
     resolution: {integrity: sha512-jUF0uRUmS8BKt37t01qaZ88H9yV1mbGYnqLeuFWLcdV+x1P4fl0yP9DGtaEhFPZcwSom7u16GkLEH9QJZOqOkw==}
+
+  '@tweenjs/tween.js@18.6.4':
+    resolution: {integrity: sha512-lB9lMjuqjtuJrx7/kOkqQBtllspPIN+96OvTCeJ2j5FEzinoAXTdAMFnDAQT1KVPRlnYfBrqxtqP66vDM40xxQ==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -2893,6 +2899,11 @@ packages:
     peerDependenciesMeta:
       react-dom:
         optional: true
+
+  react-slideshow-image@4.3.2:
+    resolution: {integrity: sha512-cALXr6RvP7er5QYWcX1ctBvG2x4jvZsgSPMPWUzQG47ZeKZjmXNmN9h8y4tScsWk/7TV23uAFQIESN8kxTaBHQ==}
+    peerDependencies:
+      react: '>=15'
 
   react-spring@9.7.5:
     resolution: {integrity: sha512-oG6DkDZIASHzPiGYw5KwrCvoFZqsaO3t2R7KE37U6S/+8qWSph/UjRQalPpZxlbgheqV9LT62H6H9IyoopHdug==}
@@ -4627,6 +4638,8 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  '@tweenjs/tween.js@18.6.4': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
@@ -6591,6 +6604,12 @@ snapshots:
       turbo-stream: 2.4.0
     optionalDependencies:
       react-dom: 19.0.0(react@19.0.0)
+
+  react-slideshow-image@4.3.2(react@19.0.0):
+    dependencies:
+      '@tweenjs/tween.js': 18.6.4
+      react: 19.0.0
+      resize-observer-polyfill: 1.5.1
 
   react-spring@9.7.5(@react-three/fiber@9.1.2(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react-native@0.79.1(@babel/core@7.26.10)(@types/react@19.0.10)(react@19.0.0))(react@19.0.0)(three@0.176.0))(konva@9.3.20)(react-dom@19.0.0(react@19.0.0))(react-konva@18.2.10(@types/react@19.0.10)(konva@9.3.20)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-native@0.79.1(@babel/core@7.26.10)(@types/react@19.0.10)(react@19.0.0))(react-zdog@1.2.2)(react@19.0.0)(three@0.176.0)(zdog@1.1.3):
     dependencies:

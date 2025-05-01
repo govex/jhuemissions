@@ -1,9 +1,63 @@
 import styles from "./about.module.scss";
-import Button from "~/components/button/button";
+import { ReactComponent as ArrowUpCircle } from "~/components/icons/arrow-up-circle";
+import { Slide } from 'react-slideshow-image';
+import 'react-slideshow-image/dist/styles.css';
 
 function About() {
+  const buttonStyle = {
+    width: "71px",
+    height: "71px",
+    background: 'none',
+    border: '0px',
+    margin: '0 30px'
+  };
 
-    return (
+  const properties = {
+    cssClass: styles.slideshow,
+    responsive: [
+      {
+        breakpoint: 800,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1
+        }
+      },{
+        breakpoint: 500,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ],
+    arrows: true, 
+    indicators: false, 
+    infinite: true,
+    prevArrow: <button style={{ ...buttonStyle }}><ArrowUpCircle strokecolor="black" style={{transform: "rotate(-90deg)", width: 71, height: 71}} /></button>,
+    nextArrow: <button style={{ ...buttonStyle }}><ArrowUpCircle strokecolor="black" style={{transform: "rotate(90deg)", width: 71, height: 71}} /></button>
+  }
+  const slides = [
+    {
+      url: "./general/screenshot1.png",
+      alt: ""
+    },{
+      url: "./general/screenshot2.png",
+      alt: ""
+    },{
+      url: "./general/screenshot3.png",
+      alt: ""
+    },{
+      url: "./general/screenshot4.png",
+      alt: ""
+    },{
+      url: "./general/screenshot5.png",
+      alt: ""
+    },{
+      url: "./general/screenshot6.png",
+      alt: ""
+    }
+  ]
+
+  return (
     <>
     <section className={styles.hero}>
       <h1>Travel Emissions Dashboard</h1>
@@ -14,6 +68,10 @@ function About() {
       </div>
     </section>
     <section className={styles.carousel}>
+      <p className={styles.prompt}>Please scroll through the images for a dashboard preview</p>
+      <Slide {...properties}>
+        {slides.map(img => <div className={styles.slideImg} style={{background: `url(${img.url})`}}></div>)}
+      </Slide>
     </section>
     <section className={styles.about}>
       <div className={styles.odd}>

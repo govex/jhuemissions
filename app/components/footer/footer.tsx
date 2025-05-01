@@ -37,7 +37,7 @@ const Footer = () => {
             {/* Bottom Section */}
             <div className={styles.footBottom}>
                 <span><Link to={"https://it.johnshopkins.edu/policies-privacystatement/"}>Privacy Policy</Link> | Copyright 2025</span>
-                <span><div className={styles.scrollTo} onClick={()=>window.scrollTo({top:0, left:0, behavior: "smooth"})}><ArrowUpCircle/></div></span>
+                <span><div className={styles.scrollTo} onClick={()=>window.scrollTo({top:0, left:0, behavior: "smooth"})}><ArrowUpCircle style={{}} strokecolor="white" /></div></span>
             </div>
         </div>
     );
