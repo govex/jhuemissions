@@ -70,7 +70,7 @@ function About() {
     <section className={styles.carousel}>
       <p className={styles.prompt}>Please scroll through the images for a dashboard preview</p>
       <Slide {...properties}>
-        {slides.map(img => <div className={styles.slideImg} style={{background: `url(${img.url})`}}></div>)}
+        {slides.map((img, i) => <div key={i} className={styles.slideImg} style={{background: `url(${img.url})`}}></div>)}
       </Slide>
     </section>
     <section className={styles.about}>
