@@ -220,7 +220,7 @@ function Homepage({ loaderData }: Route.ComponentProps) {
             text="Go to the About Section"
             color="secondary"
             size="large"
-            href="/about"
+            href="/"
           />
       </div>
       </section>

@@ -19,24 +19,27 @@
     margin-bottom: 40px;
 }
 .carousel {
-    height: 650px;
+    height: 620px;
     padding: 50px;
 }
 .prompt {
     font-weight: 600;
-    font-size: 24;
+    font-size: 24px;
     text-align: center;
     margin-bottom: 30px;
 }
 .slideshow {
     border: 10px solid #8096B9;
     border-radius: 20px;
-    height: 480px;
-    padding: 30px 100px;
+    height: 460px;
+    padding: 30px 105px;
 }
 .slideImg {
     height: 380px;
-    width: 520px;
+    width: 75%;
+    border: 1px solid #8D8E9A;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 .about {
 

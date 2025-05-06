@@ -1,8 +1,15 @@
-import { useState, useEffect, type ChangeEvent, type FC, type SyntheticEvent } from "react";
+import { useState, useEffect, type FC, type SyntheticEvent } from "react";
 import * as d3 from 'd3';
-import type { ExtendedFeatureCollection, InternMap, ScaleOrdinal } from "d3";
-import { styled, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Autocomplete, TextField } from '@mui/material';
-import type {AutocompleteChangeReason} from "@mui/material";
+import type { ExtendedFeatureCollection, ScaleOrdinal } from "d3";
+import { styled, 
+    Radio, 
+    RadioGroup, 
+    FormControlLabel, 
+    FormControl, 
+    FormLabel, 
+    Autocomplete, 
+    TextField } from '@mui/material';
+import type { AutocompleteChangeReason } from "@mui/material";
 import { formatPlaces } from "~/utils/stringFunctions";
 import styles from "./connectionMap.module.scss"
 
@@ -140,9 +147,15 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                         lineWidthScale.domain(extentTrips)
                         let yearLines = [];
                         let highlightLines = []; 
-                        yearData.forEach((connection, i) => {
+                        yearData.filter(y => y.from_full !== ' ' && y.to_full !== ' ').forEach((connection, i) => {
                             let from_place = places.find(f => f.place === connection.from_full)
                             let to_place = places.find(f => f.place === connection.to_full)
+                            if (!from_place) {
+                                console.log('from', connection.from_full, from_place);
+                            }
+                            if (!to_place) {
+                                console.log('to', connection.to_full, to_place);
+                            }
                             let highlight = formatPlaces(from_place.place) === placeHighlight || formatPlaces(to_place.place) === placeHighlight;
                             const path = geoPathGenerator({
                                 type: 'LineString',
@@ -231,8 +244,8 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
     const annotations = () => {
         if (placeHighlight && displayYear) {
             let yearData = connections?.find(f => f.year === displayYear);
-            let fromTrips = yearData ? yearData.yearData.filter(f => formatPlaces(f.from_full) === placeHighlight) : [];
-            let toTrips = yearData ? yearData.yearData.filter(f => formatPlaces(f.to_full) === placeHighlight) : [];
+            let fromTrips = yearData ? yearData.yearData.filter(f => f.from_full !== ' ' && formatPlaces(f.from_full) === placeHighlight) : [];
+            let toTrips = yearData ? yearData.yearData.filter(f => f.to_full !== ' ' && formatPlaces(f.to_full) === placeHighlight) : [];
             let totalFrom = fromTrips.reduce((a,c) => a + parseInt(c.trips), 0);
             let totalTo = toTrips.reduce((a,c) => a + parseInt(c.trips), 0);
             let fromMost = fromTrips.sort((a,b)=>b.trips - a.trips).slice(0,5);
@@ -242,14 +255,14 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                     <div>
                         {!!totalFrom && <p className={styles.legendTitle}>{totalFrom} trips from {placeHighlight}</p>}
                         {!!fromMost && <ul>
-                            {fromMost.map(m => {
-                                return (<li>{m.trips} to {formatPlaces(m.to_full)}</li>)}
+                            {fromMost.map((m,i) => {
+                                return (<li key={`from${i}`}>{m.trips} to {formatPlaces(m.to_full)}</li>)}
                             )}
                         </ul>}
                         {!!totalTo && <p className={styles.legendTitle}>{totalTo} trips to {placeHighlight}</p>}
                         {!!toMost && <ul>
-                            {toMost.map(m => {
-                               return (<li>{m.trips} from {formatPlaces(m.from_full)}</li>)}
+                            {toMost.map((m,i) => {
+                               return (<li key={`to${i}`}>{m.trips} from {formatPlaces(m.from_full)}</li>)}
                             )}
                         </ul>}
                     </div>
@@ -273,9 +286,9 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                     {!!extentTrips &&
                         <div className={styles.lineLegend}>
                             <span className={styles.legendTitle}># Trips To & From:</span>
-                            {stops.map(m => {
+                            {stops.map((m,i) => {
                                 return (
-                                    <div className={styles.legendEntry}>
+                                    <div key={`legend${i}`} className={styles.legendEntry}>
                                         <div style={{
                                             height: legendScale(m), 
                                             background: "black",
@@ -305,9 +318,10 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                                 onChange={handleChange}
                                 name="radio-buttons-group"
                             >
-                                {connections?.map(c => {
+                                {connections?.map((c,i) => {
                                     return (
                                         <FormControlLabel 
+                                            key={`chx${i}`}
                                             disabled={c.yearData.length < 1}
                                             value={c.year} 
                                             control={<Radio

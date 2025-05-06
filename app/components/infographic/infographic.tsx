@@ -35,10 +35,9 @@ function Infographic({valueField, data, years, parentRect, unit, formatString}:{
             )
         } else if (value?.length > 1) {
             const sparkData = years.map(m => parseInt(data.find(f => f.fiscalyear === m)?.[valueField]))
-            
             return (
                 <SparkLineChart 
-                    data={sparkData}
+                    data={sparkData.map(m => m ? m : 0)}
                     height={dims.height}
                     width={dims.width}
                     showHighlight

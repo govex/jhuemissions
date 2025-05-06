@@ -1,5 +1,7 @@
 import styles from "./about.module.scss";
-import { ReactComponent as ArrowUpCircle } from "~/components/icons/arrow-up-circle";
+import Button from "~/components/button/button";
+import { ReactComponent as ChevronRightCircle } from "~/components/icons/chevron-right-circle";
+import { ReactComponent as ChevronLeftCircle } from "~/components/icons/chevron-left-circle";
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css';
 
@@ -16,7 +18,7 @@ function About() {
     cssClass: styles.slideshow,
     responsive: [
       {
-        breakpoint: 800,
+        breakpoint: 900,
         settings: {
           slidesToShow: 2,
           slidesToScroll: 1
@@ -32,8 +34,8 @@ function About() {
     arrows: true, 
     indicators: false, 
     infinite: true,
-    prevArrow: <button style={{ ...buttonStyle }}><ArrowUpCircle strokecolor="black" style={{transform: "rotate(-90deg)", width: 71, height: 71}} /></button>,
-    nextArrow: <button style={{ ...buttonStyle }}><ArrowUpCircle strokecolor="black" style={{transform: "rotate(90deg)", width: 71, height: 71}} /></button>
+    prevArrow: <button style={{ ...buttonStyle }}><ChevronLeftCircle strokecolor="#7a97bc" style={{width: 71, height: 71}} /></button>,
+    nextArrow: <button style={{ ...buttonStyle }}><ChevronRightCircle strokecolor="#7a97bc" style={{width: 71, height: 71}} /></button>
   }
   const slides = [
     {
@@ -65,12 +67,20 @@ function About() {
         <p className={styles.para}>
         This dashboard aims to communicate the climate emissions impact of business travel to faculty and administrative leaders, inform estimates of JHU air travel scope 3 emissions to allow for better decision making, and foster an enabling environment, driven by faculty priorities, for mitigation efforts that address scope 3 emissions.</p>
         <p className={styles.para}>For additional background, please see <a href="https://sustainability.jhu.edu/news/a-climate-dashboard-on-jhu-business-travel-is-scheduled-to-take-off-in-april/">this article</a>.</p>
+        <Button
+            type="border"
+            icon="right-arrow"
+            text="Go to the Dashboard"
+            color="secondary"
+            size="large"
+            href="/dashboard"
+          />
       </div>
     </section>
     <section className={styles.carousel}>
       <p className={styles.prompt}>Please scroll through the images for a dashboard preview</p>
       <Slide {...properties}>
-        {slides.map((img, i) => <div key={i} className={styles.slideImg} style={{background: `url(${img.url})`}}></div>)}
+        {slides.map((img, i) => <div key={i} className={styles.slideImg} style={{backgroundImage: `url(${img.url})`}}></div>)}
       </Slide>
     </section>
     <section className={styles.about}>
