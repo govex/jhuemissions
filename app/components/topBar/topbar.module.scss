@@ -27,8 +27,16 @@
     margin-right: 30px;
     text-decoration: none;
     text-wrap: nowrap;
+    &:hover {
+        svg {
+            transition: 1000ms;
+            transform: rotate(90deg);
+        }
+    }
 }
-
+.activeNav {
+    transform: rotate(90deg);
+}
 img {
     height: 75px;
 }

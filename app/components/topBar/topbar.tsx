@@ -15,13 +15,25 @@ const TopBar = () => {
             <div className={styles.navs}>
                 <ul className={styles.topList}>
                     <li className={styles.topListItem}>
-                        <NavLink to="/"> About <ChevronDown/></NavLink>
+                        <NavLink to="/">
+                        {({ isActive }) => (
+                            <span> About <ChevronDown className={isActive ? styles.activeNav : ""} /> </span>
+                        )}
+                        </NavLink>
                     </li>
                     <li className={styles.topListItem}>
-                        <NavLink to="/methodology"> Methodology <ChevronDown/></NavLink>
+                        <NavLink to="/methodology"> 
+                        {({ isActive }) => (
+                            <span> Methodology <ChevronDown className={isActive ? styles.activeNav : ""} /> </span>
+                        )}
+                        </NavLink>
                     </li>
                     <li className={styles.topListItem}>
-                        <NavLink to="/dashboard"> Dashboard <ChevronDown/></NavLink>
+                        <NavLink to="/dashboard">
+                        {({ isActive }) => (
+                            <span> Dashboard <ChevronDown className={isActive ? styles.activeNav : ""} /> </span>
+                        )}
+                        </NavLink>
                     </li>
                     <li className={styles.topListItem}>
                         <Button 
