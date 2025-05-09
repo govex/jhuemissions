@@ -328,10 +328,11 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                                                 checkedIcon={<BpCheckedIcon />}
                                                 icon={<BpIcon />}
                                                 disableRipple
-                                                sx={{'& .MuiRadio-root': {
+                                                sx={{
                                                     padding: '0 9px 6px'
-                                                }}}
+                                                }}
                                             />} 
+                                            sx={{alignItems: 'start'}}
                                             label={c.year} />
                                     )
                                 })}

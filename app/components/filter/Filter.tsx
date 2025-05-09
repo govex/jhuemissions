@@ -122,11 +122,11 @@ function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
                         return (
                           <FormControlLabel
                           key={chk.value}
-                          sx={{fontFamily: "gentona", color: "#000000"}}
+                          sx={{fontFamily: "gentona", color: "#000000", alignItems: 'start'}}
                           control={
                             <Checkbox
                               onChange={change}
-                              sx={{ '&:hover': { bgcolor: 'transparent' }}}
+                              sx={{padding: '0 6px 14px 12px', '&:hover': { bgcolor: 'transparent' }}}
                               disableRipple
                               color="default"
                               checkedIcon={<BpCheckedIcon />}
