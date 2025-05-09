@@ -15,6 +15,7 @@ dist-ssr
 .react-router/
 .netlify/
 build/
+.env 
 
 # Editor directories and files
 .vscode/*
@@ -26,3 +27,4 @@ build/
 *.njsproj
 *.sln
 *.sw?
+.env

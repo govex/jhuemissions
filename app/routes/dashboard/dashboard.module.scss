@@ -1,6 +1,6 @@
 .hero {
     width: 100%;
-    min-height: 365px;
+    height: fit-content;
     background-color: #0E2D72;
     color: #FFF;
     padding: 50px 70px;
@@ -8,18 +8,14 @@
 }
 .info {
     height: 100%;
-    display: flex;
-    align-items: start;
-    justify-content: space-evenly;
-    gap: 80px;
+    width: 100%;
 }
 
 .para {
     color: #FFF;
     font-size: 20px;
-    font-style: normal;
     font-weight: 400;
-    line-height: normal;
+    margin-bottom: 50px;
 }
 
 .grid {
@@ -30,12 +26,12 @@
         "time time time time time time tool tool"
         "bar1 bar1 bar1 bar1 bar2 bar2 bar2 bar2" 
         "map map map map map map map map"
+        "percent percent percent percent percent percent percent percent"
         "donut donut donut donut method method method method";
-    width: 90vw;
     width: 100vw;
     padding: 20px 70px;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr ;
-    grid-template-rows: 50px 260px 436px 70vh 60vh 1fr;
+    grid-template-columns: repeat(4, minmax(200px, 1fr) minmax(0,1fr));
+    grid-template-rows: 50px 260px 436px 70vh 60vh 60vh 1fr;
     gap: 40px;
     margin-bottom: 30px;
 }
@@ -47,6 +43,7 @@
 }
 .tool {
     grid-area: tool;
+    min-width: 200px;
 }
 .kpi1 {
     grid-area: kpi1;
@@ -81,6 +78,9 @@
 .time {
     grid-area: time;
 }
+.percent {
+    grid-area: percent;
+}
 .chartContainer {
     width: 100%;
     height: 100%;
@@ -89,16 +89,6 @@
 .filterPopover {
     background-color: transparent;
     border-radius: 30px;
-}
-.left, .right {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 30px;
-    a {
-        text-decoration: underline;
-    }
 }
 .bar1{
     grid-area: bar1;
@@ -114,6 +104,20 @@
     gap: 10px;
     justify-content: flex-end;
     width: 100%;
+    span {
+        color: rgba(0, 0, 0, 0.6);
+    }
+}
+.multitoggle {
+    display: flex;
+    flex-direction: row;
+    column-gap: 70px;
+    flex-wrap: wrap;
+    justify-content: center;
+    .toggleBox {
+        width: fit-content;
+        margin-bottom: 10px;
+    }
 }
 .completenessCard {
     padding: 30px;
@@ -129,4 +133,47 @@
     top: 65vh;
     transform-origin: left;
     left: calc(100vw - 20px);
+}
+@media only screen and (max-width: 1150px) {
+    .grid {
+        grid-template-areas: 
+            "filter legend legend legend legend legend"
+            "kpi1 kpi1 kpi2 kpi2 kpi3 kpi3"
+            "time time time time time time"
+            "bar1 bar1 bar1 bar2 bar2 bar2" 
+            "map map map map map map"
+            "percent percent percent percent percent percent"
+            "donut donut method method tool tool";
+        grid-template-columns: repeat(3, minmax(200px, 1fr) minmax(0,1fr));
+    }    
+}
+@media only screen and (max-width: 870px) {
+    .grid {
+        display: block;
+        padding: 10px;
+    }
+    .filter {
+        width: fit-content;
+        margin: auto;
+    }
+    .legend {
+        height: fit-content;
+        margin-top: 30px;
+    }
+    .kpi1, .kpi2, .kpi3, .donut, .method, .tool, .bar1, .bar2, .time, .map, .percent {
+        margin: 10px 0;
+    }
+    .bar1, .bar2, .time, .map, .percent {
+        height: 80vh;
+    }
+    .info {
+        flex-direction: column;
+    }
+    .hero {
+        padding: 40px;
+        margin-top: 20px;
+    }
+    .left, .right {
+        width: 100%;
+    }
 }

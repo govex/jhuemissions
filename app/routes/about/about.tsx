@@ -1,10 +1,89 @@
 import styles from "./about.module.scss";
+import Button from "~/components/button/button";
+import { ReactComponent as ChevronRightCircle } from "~/components/icons/chevron-right-circle";
+import { ReactComponent as ChevronLeftCircle } from "~/components/icons/chevron-left-circle";
+import { Slide } from 'react-slideshow-image';
+import 'react-slideshow-image/dist/styles.css';
 
 function About() {
+  const buttonStyle = {
+    width: "71px",
+    height: "71px",
+    background: 'none',
+    border: '0px',
+    margin: '0 30px'
+  };
+
+  const properties = {
+    cssClass: styles.slideshow,
+    responsive: [
+      {
+        breakpoint: 900,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1
+        }
+      },{
+        breakpoint: 500,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ],
+    arrows: true, 
+    indicators: false, 
+    infinite: true,
+    prevArrow: <button style={{ ...buttonStyle }}><ChevronLeftCircle strokecolor="#7a97bc" style={{width: 71, height: 71}} /></button>,
+    nextArrow: <button style={{ ...buttonStyle }}><ChevronRightCircle strokecolor="#7a97bc" style={{width: 71, height: 71}} /></button>
+  }
+  const slides = [
+    {
+      url: "./general/screenshot1.png",
+      alt: ""
+    },{
+      url: "./general/screenshot2.png",
+      alt: ""
+    },{
+      url: "./general/screenshot3.png",
+      alt: ""
+    },{
+      url: "./general/screenshot4.png",
+      alt: ""
+    },{
+      url: "./general/screenshot5.png",
+      alt: ""
+    },{
+      url: "./general/screenshot6.png",
+      alt: ""
+    }
+  ]
+
   return (
     <>
-    <h1 className={styles.internal}>About</h1>
-    <div className={styles.about}>
+    <section className={styles.hero}>
+      <h1>Travel Emissions Dashboard | About This Project</h1>
+      <div className={styles.info}>
+        <p className={styles.para}>
+        This dashboard aims to communicate the climate emissions impact of business travel to faculty and administrative leaders, inform estimates of JHU air travel scope 3 emissions to allow for better decision making, and foster an enabling environment, driven by faculty priorities, for mitigation efforts that address scope 3 emissions.</p>
+        <p className={styles.para}>For additional background, please see <a href="https://sustainability.jhu.edu/news/a-climate-dashboard-on-jhu-business-travel-is-scheduled-to-take-off-in-april/">this article</a>.</p>
+        <Button
+            type="border"
+            icon="right-arrow"
+            text="Go to the Dashboard"
+            color="secondary"
+            size="large"
+            href="/dashboard"
+          />
+      </div>
+    </section>
+    <section className={styles.carousel}>
+      <p className={styles.prompt}>Please scroll through the images for a dashboard preview</p>
+      <Slide {...properties}>
+        {slides.map((img, i) => <div key={i} className={styles.slideImg} style={{backgroundImage: `url(${img.url})`}}></div>)}
+      </Slide>
+    </section>
+    <section className={styles.about}>
       <div className={styles.odd}>
         <div className={styles.about_block}>
           <div className={styles.imgOdd}>
@@ -98,7 +177,7 @@ function About() {
       <p className={styles.footnote}>
         Infographic reviewed by <a href="https://publichealth.jhu.edu/faculty/3991/shima-hamidi">Shima Hamidi</a>, <a href="https://engineering.jhu.edu/faculty/scot-miller/">Scot Miller</a>, and <a href="https://www.dylangaeta.com/">Dylan Gaeta</a>.
       </p>
-    </div>
+    </section>
     </>
   )
 }

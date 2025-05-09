@@ -26,10 +26,10 @@
 .wave {
     position: absolute;
     height: 400px;
-    width: 110%;
+    width: 100%;
     opacity: .5;
     background-image: url("/govex_wave.png");
-    background-size: contain;
+    background-size:110%;
     background-repeat: no-repeat;
     background-position-y: 150px;
     background-position-x: center;
@@ -74,4 +74,15 @@
 
 .scrollTo {
     cursor: pointer;
+}
+
+@media only screen and (max-width: 600px) {
+    .footTop {
+        flex-direction: column;
+    }
+    .footer {
+        height: fit-content;
+        padding-left: 40px;
+        padding-right: 40px;
+    }
 }
