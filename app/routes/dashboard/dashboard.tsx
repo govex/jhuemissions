@@ -387,7 +387,7 @@ function Homepage({ loaderData }: Route.ComponentProps) {
           </Card>
       </div>
       <div className={styles.time}>
-          <Card title={`When are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people travelling?`}>
+          <Card title={`When are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people traveling?`}>
           <div className={styles.toggleBox}><span>Trips</span>
             <Toggle 
               checked={toggleStateTimeline === "emissions" ? true : false} 
@@ -409,7 +409,7 @@ function Homepage({ loaderData }: Route.ComponentProps) {
           </Card>
       </div>
       <div className={styles.map}>
-        <Card title={`Where are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people travelling?`}>
+        <Card title={`Where are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people traveling?`}>
           <div className={styles.chartContainer} ref={mapRef}>
             {!!mapRect && !!mapData && !!loaderData.places && 
               <ConnectionMap

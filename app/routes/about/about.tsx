@@ -62,7 +62,7 @@ function About() {
   return (
     <>
     <section className={styles.hero}>
-      <h1>Travel Emissions Dashboard</h1>
+      <h1>Travel Emissions Dashboard | About This Project</h1>
       <div className={styles.info}>
         <p className={styles.para}>
         This dashboard aims to communicate the climate emissions impact of business travel to faculty and administrative leaders, inform estimates of JHU air travel scope 3 emissions to allow for better decision making, and foster an enabling environment, driven by faculty priorities, for mitigation efforts that address scope 3 emissions.</p>

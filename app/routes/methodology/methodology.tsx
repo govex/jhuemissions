@@ -15,7 +15,7 @@ function Methodology() {
       <p>
         CO<sub>2</sub>e emissions from business travel = 
         <br />sum across vehicle types: 
-        <br/> &#931; distance travelled by vehicle type (vehicle-km or passenger-km) <i>x</i> 
+        <br/> &#931; distance traveled by vehicle type (vehicle-km or passenger-km) <i>x</i> 
         <br/> vehicle specific emission factor (kg CO<sub>2</sub>e per vehicle-km or kg CO<sub>2</sub>e per passenger-km) <i>+</i> 
         <br/> <i>optional</i> &#931; annual number of hotal nights (nights) times hotel emission factor (kg CO<sub>2</sub>e per night).      
       </p>
