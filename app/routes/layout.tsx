@@ -14,11 +14,6 @@ export default function Layout(props:Route.ComponentProps) {
   const isNavigating = navigation.state === 'loading';
     return (
         <ThemeProvider theme={theme}>
-            {isNavigating && (
-                <div className="spinner-overlay">
-                  <div className="spinner"></div>
-                </div>
-            )}
             <TopBar />
             <Outlet />
             <Footer />
