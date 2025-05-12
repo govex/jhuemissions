@@ -4,8 +4,3 @@ publish = "build/client"
 
 [dev]
 command = "react-router dev"
-
-[[headers]]
- for = "/*"
- [headers.values]
-  Access-Control-Allow-Origin = "*"
