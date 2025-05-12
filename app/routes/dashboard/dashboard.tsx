@@ -2,6 +2,7 @@
 import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import { useState, useEffect } from "react";
+import { data } from "react-router";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
@@ -28,7 +29,10 @@ export function meta({ }: Route.MetaArgs) {
 }
 export async function loader({request}: Route.LoaderArgs) {
   let headers = request.headers;
-  console.log(headers);
+  console.log(request);
+  if (!headers) {
+    throw data("missing headers", { status: 404 });
+  }
   let places = await supabase.from('places').select();
   let schools = await supabase.from('business_area').select();
   let map = await supabase.from('map').select();
