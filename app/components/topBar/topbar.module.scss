@@ -5,7 +5,7 @@
     justify-content: space-between;
 }
 
-.logo .navs {
+.logo, .navs {
     flex: 3;
     display: flex;
     align-items: center;
@@ -26,8 +26,23 @@
     line-height: 100%;
     margin-right: 30px;
     text-decoration: none;
+    text-wrap: nowrap;
+    &:hover {
+        svg {
+            transition: 1000ms;
+            transform: rotate(90deg);
+        }
+    }
 }
-
+.activeNav {
+    transform: rotate(90deg);
+}
 img {
     height: 75px;
+}
+
+@media only screen and (max-width: 600px) {
+    .topBar {
+        flex-direction: column;
+    }
 }

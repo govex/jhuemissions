@@ -14,9 +14,33 @@ const Button = ({
     size="small", 
     onClick=null,
     href=undefined,
-    disabled=false
+    disabled=false,
+    arrowDirection=undefined
+}:{
+    type: "border" | "solid" | "feedback",
+    icon?: "chevron-down" | "close-x" | "arrow-up-circle" | "right-arrow" | undefined,
+    text?: string | undefined,
+    color: "primary" | "secondary",
+    size: "large" | "medium" | "small",
+    onClick?: any | null,
+    href?: string | undefined,
+    disabled?: boolean,
+    arrowDirection?: "right" | "left" | "up" | "down" | undefined
 }) => {
-
+    const arrowRotation = {
+        "arrow-up-circle": {
+            "right": "rotate(90deg)",
+            "left": "rotate(-90deg)",
+            "up": "rotate(0deg)",
+            "down": "rotate(180deg)"    
+        },
+        "chevron-down": {
+            "right": "rotate(-90deg)",
+            "left": "rotate(90deg)",
+            "up": "rotate(180deg)",
+            "down": "rotate(0deg"
+        }
+    }
     const innerContent = () => (
         <button
             className={cx(styles.base, styles[type], styles[color], styles[size], disabled ? styles.disabled : "")}
@@ -27,13 +51,13 @@ const Button = ({
                 <label className={cx(styles.label, icon ? styles.icon : "")}>{text}</label>
             }
             {icon === "chevron-down" &&
-                <ChevronDown />
+                <ChevronDown  style={{transform: arrowDirection ? arrowRotation[icon][arrowDirection] : ""}}/>
             }
             {icon === "close-x" && 
                 <CloseX />
             }
             {icon === "arrow-up-circle" &&
-                <ArrowUpCircle />
+                <ArrowUpCircle style={{transform: arrowDirection ? arrowRotation[icon][arrowDirection] : ""}}/>
             }
             {icon === "right-arrow" &&
                 <RightArrow />

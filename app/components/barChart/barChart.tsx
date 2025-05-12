@@ -1,18 +1,13 @@
-import { BarChart } from "@mui/x-charts/node/BarChart";
+import { BarChart, type BarSeriesType, type BarElementOwnerState } from "@mui/x-charts";
+import { styled } from '@mui/material';
+import { animated } from 'react-spring';
 import styles from "./barChart.module.scss";
 import cx from "classnames";
 import { type FC, useState, useEffect } from "react";
-import type { DataPoint } from "~/routes/homePage/homepage";
-import type { InternMap, ScaleOrdinal } from "d3";
-import { rollups, sum } from "d3";
+import type { ScaleOrdinal } from "d3";
+import { max, format, scaleSequential, interpolateRgbBasis } from "d3";
 
 type ColorScale = ScaleOrdinal<string, string>;
-
-type SeriesRolls = {
-    year: string;
-    rollup: [string, number][]
-}[];
-
 export default function BarChartVariants<FC>({
     data,
     orientation,
@@ -22,10 +17,13 @@ export default function BarChartVariants<FC>({
     labelField,
     valueField,
     school,
-    schoolFilter,
-    colorScale
+    schoolOptions,
+    colorScale,
+    years,
+    schoolFilter = true,
+    stack = false
 }:{
-    data: InternMap<string, DataPoint[]>,
+    data: any[],
     orientation: "horizontal" | "vertical" | undefined,
     xScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
     yScale: "band" | "point" | "log" | "pow" | "sqrt" | "time" | "utc" | "linear" | undefined,
@@ -39,72 +37,145 @@ export default function BarChartVariants<FC>({
         x: number,
         y: number
     },
-    labelField: keyof DataPoint,
-    valueField: keyof DataPoint,
+    labelField: string,
+    valueField: string,
     school: string,
-    schoolFilter: Boolean,
+    schoolOptions: any[],
     colorScale: ColorScale,
+    years: string[]
+    schoolFilter?: Boolean,
+    stack?: Boolean
 }) {
-    const [rolled, setRolled] = useState<SeriesRolls | undefined>(undefined);
-    useEffect(() => {
-        let seriesRolls = []
-        for (const [y,g] of data.entries()) {
-            if (school !== "All JHU" && schoolFilter) {
-                let filtered = g.filter(f => f.school === school)
-                let rolled = rollups(filtered, v => sum(v, d => d[valueField]), d => d[labelField]);
-                seriesRolls.push({
-                    year: y,
-                    rollup: rolled.sort((a,b)=>b[1]-a[1])
-                })
-            } else if (school !== "All JHU") {    
-                let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
-                let sorted = rolled.sort((a,b)=>b[1]-a[1])
-                let schoolIdx = sorted.findIndex(f => f[0] === school);
-                let spliced = sorted.splice(schoolIdx, 1);
-                let reordered = [spliced[0], ...sorted];
-
-                seriesRolls.push({
-                    year: y,
-                    rollup: reordered
-                })    
-            } else {
-                let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d[labelField]);
-                seriesRolls.push({
-                    year: y,
-                    rollup: rolled.sort((a,b)=>b[1]-a[1])
-                })    
-            }
-        }
-        setRolled(seriesRolls as SeriesRolls);
-    },[data, labelField, valueField, school])
+    const [schoolValue, setSchoolValue] = useState<string | undefined>(undefined);
     const [groupLabels, setGroupLabels] = useState<string[] | []>([]);
     const [overflowScroll, setOverflowScroll] = useState<Boolean>(false);
     const [marginLeft, setMarginLeft] = useState(0);
-    const [maxVal, setMaxVal] = useState(0)
+    const [maxVal, setMaxVal] = useState(0);
+    const [chartData, setChartData] = useState<any[]>([]);
+    const [seriesData, setSeriesData] = useState<BarSeriesType[] | []>([])
+    const stackedStrokeScaleDark = scaleSequential(interpolateRgbBasis(["#c091b8","#371f33"]))
+    const stackedStrokeScaleLight = scaleSequential(interpolateRgbBasis(["#f8f2f7","#ddc4d9"]))
+    const Bar = styled(animated.rect)(({ ownerState }:{ownerState: BarElementOwnerState}) => {
+        let seriesData = chartData.filter(f => f[labelField] === ownerState.id);
+        let dp = seriesData[ownerState.dataIndex] ? seriesData[ownerState.dataIndex][valueField] : undefined
+        return {
+            fill: ownerState?.color,
+            transition: 'opacity 0.2s ease-in, fill 0.2s ease-in',
+            opacity: 1,
+            strokeWidth: 2,
+            stroke:
+            ownerState?.isHighlighted && stack && maxVal !== 0
+                ? dp 
+                    ? dp < maxVal/2 ? stackedStrokeScaleDark(dp) : stackedStrokeScaleLight(dp) : 'black'
+                : 'none',
+        };
+    });
     useEffect(() => {
-        if (rolled !== undefined) {
-            let maxLength = 0;
-            let maxVal = 0;
-            let labels = new Set<string>();
-            for (const g of rolled.values()) {
-                g.rollup.forEach(i => {
-                    if (i[0].length > maxLength) {
-                        maxLength = i[0].length
-                    }
-                    if (i[1] > maxVal) {
-                        maxVal = i[1]
-                    }    
-                    labels.add(i[0]);
-                })
+        if (schoolOptions) {
+            let opt = schoolOptions.find(s => s.label === school)
+            setSchoolValue(opt?.value)    
+        } 
+    }, [school, schoolOptions])
+    useEffect(() => {
+        if (data && data?.length > 0) {
+            if (stack) {
+                let flatData = data.filter(f => years.includes(f.fiscalyear));
+                let groups = Array.from(new Set(flatData.map(m => m[labelField])));
+                let serieses = groups.map((group) => {
+                    let groupData = flatData.filter(f => f[labelField] === group);
+                    return {
+                        label: labelField === "school" ? schoolOptions.find(f => f.value === group).label : group,
+                        stack: "total",
+                        data: years.map(m => {
+                            let yearData = groupData.find(f => f.fiscalyear === m);
+                            return yearData ? yearData[valueField] : 0
+                        }),
+                        highlightScope: {
+                            highlight: "series",
+                            fade: "none"
+                        },
+                        valueFormatter: (v:number) => format(".3p")(v),
+                        type: "bar",
+                        id: `${group}`
+                    } as BarSeriesType;
+                });
+                const modifiedSeries:BarSeriesType[] = [{ ...serieses[0], stackOffset: "expand", stackOrder: "ascending" }, ...serieses.slice(1)];
+                setSeriesData(modifiedSeries);
+                setChartData(flatData);
+            } else if (school === "All JHU") {
+                let flatData = data.filter(f => years.includes(f.fiscalyear)).sort((a,b)=>b[valueField]-a[valueField]); 
+                let serieses = years.map((y) => {
+                    return {
+                        label: y,
+                        color: colorScale(y),
+                        data: flatData.filter(f => f.fiscalyear === y).map(m => m[valueField]),
+                        type: "bar"
+                    } as BarSeriesType;
+                });
+                setSeriesData(serieses);    
+                setChartData(flatData);
+            } else if (schoolFilter && schoolValue) {
+                let flatData = data.filter(f => years.includes(f.fiscalyear) && f.school === schoolValue).sort((a,b)=>b[valueField]-a[valueField]);
+                let serieses = years.map((y) => {
+                    return {
+                        label: y,
+                        color: colorScale(y),
+                        data: flatData.filter(f => f.fiscalyear === y).map(m => m[valueField]),
+                        type: "bar"
+                    } as BarSeriesType;
+                });
+                setSeriesData(serieses);    
+                setChartData(flatData);
+            } else if (schoolValue) {
+                let flatData = data.filter(f => years.includes(f.fiscalyear)).sort((a,b)=>b[valueField]-a[valueField]);
+                let serieses = years.map((y) => {
+                    let yearData = flatData.filter(f => f.fiscalyear === y);
+                    let schoolIdx = yearData.findIndex(f => f.school === schoolValue);
+                    let spliced = yearData.splice(schoolIdx, 1);
+                    let reordered = [spliced[0], ...yearData];
+                    return {
+                        label: y,
+                        color: colorScale(y),
+                        data: reordered.map(m => m[valueField]),
+                        type: "bar"
+                    } as BarSeriesType;
+                });
+                setSeriesData(serieses);
+                setChartData(flatData);
             }
-            setMaxVal(maxVal)
-            setMarginLeft(maxLength * 7);
-            setGroupLabels(Array.from(labels));
-        }
-    }, [rolled])
+        } 
+    }, [data, valueField, years, school, schoolOptions, schoolValue, stack])
+    useEffect(() => {
+        if (chartData.length > 0) {
+            let labels = Array.from(new Set<string>(chartData.map(m => m[labelField])));
+            if (schoolValue && !schoolFilter && !stack) {
+                let schoolIdx = labels.findIndex(f => f === schoolValue);
+                let spliced = labels.splice(schoolIdx, 1);
+                labels = [spliced[0], ...labels];
+            }
+            if (stack) {
+                labels = years
+            }
+            let maxLength = max(labels.map(m => m.length));
+            let maxVal = max(chartData, d => +d[valueField]);
+            if (maxVal) {
+                stackedStrokeScaleDark.domain([0, maxVal/2])
+                stackedStrokeScaleLight.domain([maxVal/2, maxVal])    
+            }
+            setMaxVal(maxVal ? maxVal : 0);
+            setMarginLeft(maxLength ? maxLength * 7 : 70);
+            setGroupLabels(!schoolFilter && !stack
+                ? labels.map(m => {
+                    let opt = schoolOptions.find(s => s.value === m)
+                    return opt.label
+                    })
+                : labels
+            );
+        } 
+    }, [chartData, labelField, valueField, schoolOptions, years, school, stack, parentRect.width])
     const [realHeight, setRealHeight] = useState(parentRect.height)
     useEffect(()=>{
-        if (groupLabels?.length > 15) {
+        if (!stack && groupLabels && groupLabels?.length > 15) {
             setRealHeight(groupLabels.length * 42)            
             setOverflowScroll(true)
         } else {
@@ -112,86 +183,68 @@ export default function BarChartVariants<FC>({
             setOverflowScroll(false)
         }
     },[groupLabels, parentRect.height])
-    const [seriesData, setSeriesData] = useState<{label: string, color: string, data: number[]}[]>([])
-    useEffect(()=>{
-        if (rolled !== undefined) {
-            let serieses = [];
-            for (const roll of rolled) {
-                let series = {
-                    label: roll.year,
-                    color: colorScale(roll.year),
-                    data: roll.rollup.map(d => valueField === "percapita_trips" || valueField === "percapita_emissions" ? (d[1]).toFixed(5) : d[1])
-                }
-                serieses.push(series)
-            }
-            setSeriesData(serieses);
-        }
-    },[rolled])
     const [render, setRender] = useState(false);
     useEffect(()=>{
         if (
             marginLeft > 0 &&
             seriesData.length > 0 &&
-            maxVal > 0 &&
-            groupLabels.length > 0 &&
-            !!realHeight
+            maxVal !== 0 &&
+            groupLabels.length > 0
         ) {
             setRender(true);
+        } else {
+            setRender(false);
         }
-    },[marginLeft, seriesData, maxVal, groupLabels, realHeight])
-    // const barClasses = getBarLabelUtilityClass("barLabel")
-    // console.log(barClasses);
-    // const BarLabelComponent = (x:BarLabelProps) => {
-    //     return (
-    //         <BarLabel {...x}></BarLabel>
-    //     )
-    // }
-    // const newBarLabel:ReactNode<BarLabelProps> = BarLabelComponent;
-    if (render) {
-        return (
-            <div className={cx(styles.base, overflowScroll ? styles.overflowscroll : "")}>
-            <BarChart className={styles.bar11}
-            margin={{left: marginLeft, right: 70}}
-            layout={orientation}
-            yAxis={[{ 
-                scaleType: yScale,
-                data: groupLabels      
-            }]}
-            xAxis={[{ scaleType: xScale, 
-                position: "top",
-                disableTicks: true,
-                label: valueField === "total_trips"
-                    ? "# of trips"
-                    : "MTCO2e"
-            }]}
-            series={seriesData}
-            width={parentRect?.width}
-            height={realHeight}
-            sx={{
-                // Customize x-axis line (grey, thick)
-                // "& .MuiChartsAxis-left .MuiChartsAxis-line": {
-                //     stroke: "#CCC",
-                //     strokeWidth: 4,
-                //     color: "#000",
-                // },
-                "& .MuiBarLabel-root": {
-                    textAnchor: "start"
-                }
-            }}
-            // slots={{barLabel: newBarLabel}}
-            slotProps={{
-                legend: {
-                    labelStyle: {
-                        fontFamily: "gentona",
-                        fontWeight: 600,
-                        fontSize: 20
+    },[marginLeft, seriesData, maxVal, groupLabels])
+    return (
+        <div className={cx(styles.base, overflowScroll ? styles.overflowscroll : "")}>
+            <BarChart 
+                className={styles.bar11}
+                loading={!render}
+                margin={{top: overflowScroll ? 80 : 50,left: stack ? 70 : marginLeft, right: 50}}
+                layout={orientation}
+                yAxis={[{ 
+                    scaleType: yScale,
+                    data: stack ? years : groupLabels      
+                }]}
+                xAxis={[{ id: "mainX", 
+                    scaleType: xScale, 
+                    disableTicks: true,
+                    label: valueField === "trips"
+                        ? `${stack ? "%" : "#"} of trips`
+                        : `${stack ? "% " : ""}MTCO2e`,
+                    colorMap: stack ? {
+                        type: "continuous",
+                        min: 0,
+                        max: maxVal,
+                        color: ["#f0e4ee","#62375a"]
+                    } : undefined,
+                }]}
+                axisHighlight={{y: stack ? "none" : "band"}}
+                bottomAxis={stack ? null : {}}
+                topAxis={stack || !overflowScroll ? undefined : "mainX"}
+                leftAxis={{disableLine: stack, disableTicks: stack}}
+                tooltip={{trigger: stack ? "item" : "axis"}}
+                series={seriesData}
+                width={parentRect?.width}
+                height={realHeight}
+                sx={{
+                    "& .MuiBarLabel-root": {
+                        textAnchor: "start"
                     }
-                }
-            }}
+                }}
+                slots={{
+                    bar: (props) => <Bar {...props} />
+                }}
+                slotProps={{
+                    legend: {
+                        hidden: stack,                        
+                        labelStyle: {
+                            fontFamily: "gentona",
+                        }
+                    }
+                }}
             />
-            </div>
-        )    
-    } else {
-        return null
-    }
+        </div>
+    )    
 }

@@ -1,11 +1,46 @@
-.internal {
+.hero {
+    width: 100%;
+    height: fit-content;
     background-color: #0E2D72;
-    color: #ffffff;
-    height: 2.75em;
-    padding: 30px 70px;
-    margin-bottom: 0;
+    color: #FFF;
+    padding: 50px 70px;
 }
-
+.info {
+    height: 100%;
+    width: 100%;
+    a {
+        text-decoration: underline;
+    }
+}
+.para {
+    color: #FFF;
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 40px;
+}
+.carousel {
+    height: 620px;
+    padding: 50px;
+}
+.prompt {
+    font-weight: 600;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.slideshow {
+    border: 10px solid #8096B9;
+    border-radius: 20px;
+    height: 460px;
+    padding: 30px 105px;
+}
+.slideImg {
+    height: 380px;
+    width: 75%;
+    border: 1px solid #8D8E9A;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
 .about {
 
     h2 {
@@ -18,6 +53,7 @@
     a {
         color: #002D72;
         font-weight: 500;
+        text-decoration: underline;
     }
     
 }
@@ -64,4 +100,26 @@
 .footnote {
     margin-bottom: 40px;
     text-align: center;
+}
+
+@media only screen and (max-width: 870px) {
+    .odd, .even {
+        padding: 30px 10px;
+    }    
+    .about_block {
+        width: 80%;
+    }
+    .imgOdd {
+        left: 0;
+        margin-left: -20px;
+    }
+    .imgEven {
+        left: 75%;
+    }
+    .imgEven, .imgOdd {
+        position: relative;
+        img {
+           width: 100px; 
+        }
+    }
 }

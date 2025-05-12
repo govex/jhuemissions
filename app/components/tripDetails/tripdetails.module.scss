@@ -1,0 +1,36 @@
+.modalContainer {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    width: 400px;
+    border-radius: 30px;
+    background: #A15A95;
+  }
+  
+  .modalBody{
+    padding: 20px;
+  }
+  
+  .header {
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: space-between; 
+  }
+  .accordionTitle {
+    color: #A15A95;
+  }
+  .buttonX {
+    border: 3px solid #FFFFFF99;
+    width: 40px;
+    height: 39px;
+    border-radius: 11px;
+    background-color: transparent;
+    padding-top: 2px;
+  }
+  .resultRow {
+    font-family: 'gentona';
+    font-size: 20px;
+  }

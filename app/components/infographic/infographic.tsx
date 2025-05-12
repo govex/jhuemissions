@@ -3,13 +3,9 @@ import { format } from "d3";
 import { SparkLineChart } from "@mui/x-charts";
 import styles from "./infographic.module.scss";
 
-type infoData = {
-    year: string,
-    value: number
-}[]
-
-function Infographic({data, years, parentRect, unit, formatString}:{
-    data: infoData, 
+function Infographic({valueField, data, years, parentRect, unit, formatString}:{
+    valueField: string,
+    data: any, 
     years: any, 
     parentRect: {
         bottom: number,
@@ -38,11 +34,10 @@ function Infographic({data, years, parentRect, unit, formatString}:{
                 </>
             )
         } else if (value?.length > 1) {
-            const sparkData = years.map(m => parseInt(data.find(f => f.year === m)?.value))
-            
+            const sparkData = years.map(m => parseInt(data.find(f => f.fiscalyear === m)?.[valueField]))
             return (
                 <SparkLineChart 
-                    data={sparkData}
+                    data={sparkData.map(m => m ? m : 0)}
                     height={dims.height}
                     width={dims.width}
                     showHighlight
@@ -57,23 +52,24 @@ function Infographic({data, years, parentRect, unit, formatString}:{
     }
     const [value, setValue] = useState<any | undefined>(undefined);
     useEffect(()=>{
-        let val = data.filter(f => years.includes(f.year));
+        let val = data.filter(f => years.includes(f.fiscalyear));
         if (val.length === 1) {
-            setValue([val[0].value])
+            setValue([val[0][valueField]])
         } else if (val.length > 1) {
-            setValue(val.map(m => m.value))
+            setValue(val.map(m => m[valueField]))
         }
-    },[data,years])
+    },[data,years,valueField])
     const [changeText, setChangeText] = useState<{value: string, priorYear: string} | undefined>(undefined);
     useEffect(()=>{
+        data.sort((a,b)=>b.fiscalyear.localeCompare(a.fiscalyear))
         if (value?.length === 1) {
-            let dataI = data.findIndex(d => d.year == years[0])
+            let dataI = data.findIndex(d => d.fiscalyear == years[0])
             let previousRow = data[dataI+1]
-            if (previousRow?.value > 0 && data[dataI].year == years[0]) {
-                const change = data[dataI].value - previousRow.value
-                const perCh = (change / previousRow.value)
+            if (previousRow?.[valueField] > 0 && data[dataI].fiscalyear == years[0]) {
+                const change = data[dataI][valueField] - previousRow[valueField]
+                const perCh = (change / previousRow[valueField])
                 if (!!perCh) {
-                    setChangeText({value: format("+.2p")(perCh), priorYear: previousRow.year})
+                    setChangeText({value: format("+.2p")(perCh), priorYear: previousRow.fiscalyear})
                 } else {
                     setChangeText(undefined)
                 }

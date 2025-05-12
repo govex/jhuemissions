@@ -1,8 +1,7 @@
 import styles from "./timeline.module.scss";
 import { type FC, useState, useEffect } from "react";
-import { LineChart } from "@mui/x-charts"; 
-import type { InternMap, ScaleOrdinal } from "d3";
-import { rollups, sum } from "d3";
+import { LineChart, type LineSeriesType } from "@mui/x-charts"; 
+import type { ScaleOrdinal } from "d3";
 
 type ColorScale = ScaleOrdinal<string, string>;
 
@@ -10,10 +9,10 @@ export default function Timeline<FC>({
     data,
     parentRect,
     colorScale,
-    school,
-    valueField
+    valueField,
+    years
 }:{
-    data: InternMap<string, any[]>,
+    data: any[],
     parentRect: {
         bottom: number,
         height: number,
@@ -25,61 +24,117 @@ export default function Timeline<FC>({
         y: number
     },
     colorScale: ColorScale,
-    school: string,
-    valueField: string
+    valueField: string,
+    years: string[]
 }) {
-    const months = ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"]
-    const [seriesData, setSeriesData] = useState<{label: string, color: string, data: number[]}[] | []>([])
-    useEffect(()=>{
-        let serieses = [];
-        for (const [y,g] of data.entries()) {
-            if (!school || school === "All JHU") {
-                let rolled = rollups(g, v => sum(v, d => d[valueField]), d => d.month);
-                let series = {
-                    label: y,
-                    color: colorScale(y),
-                    data: rolled.sort((a,b)=>months.indexOf(a[0])-months.indexOf(b[0])).map(d => d[1])
-                }
-                serieses.push(series)
-            } else {
-                let filtered = g.filter(d => d.school === school)
-                let series = {
-                    label: y,
-                    color: colorScale(y),
-                    data: filtered.sort((a,b)=>months.indexOf(a.month)-months.indexOf(b.month)).map(d => d[valueField])
-                }
-                serieses.push(series)
-            }
+    const months = [
+        {
+            label: "Jul",
+            value: 7,
+            order: 1
+        },{
+            label: "Aug",
+            value: 8,
+            order: 2
+        },{
+            label: "Sep",
+            value: 9,
+            order: 3
+        },{
+            label: "Oct",
+            value: 10,
+            order: 4
+        },{
+            label: "Nov",
+            value: 11,
+            order: 5
+        },{
+            label: "Dec",
+            value: 12,
+            order: 6
+        },{
+            label: "Jan",
+            value: 1,
+            order: 7
+        },{
+            label: "Feb",
+            value: 2,
+            order: 8
+        },{
+            label: "Mar",
+            value: 3,
+            order: 9
+        },{
+            label: "Apr",
+            value: 4,
+            order: 10
+        },{
+            label: "May",
+            value: 5,
+            order: 11
+        },{
+            label: "Jun",
+            value: 6,
+            order: 12
         }
-        setSeriesData(serieses);
-    },[data])
-    if (seriesData.length > 0) {
-        return (
-            <LineChart 
-                xAxis={[{
-                    scaleType: "point",
-                    data: months
-                }]}
-                yAxis={[{
-                    label: "# of trips",
-                }]}
-                series={seriesData}
-                width={parentRect.width}
-                height={parentRect.height}
-                margin={{left:80}}
-                sx={{
-                    "& .MuiChartsAxis-directionY": {
-                        "& .MuiChartsAxis-label": {
-                            transform: "translateX(-30px) !important"
-                          }    
-                    }
-                
-                }}
-            />
-        )    
-    } else {
-        return (
-            <p>working on it</p>
-        )
-    }
+    ]
+    const [seriesData, setSeriesData] = useState<LineSeriesType[] | []>([]);
+    const [chartData, setChartData] = useState<any[] | []>([]);
+    useEffect(()=>{
+        if (data?.length > 0) {
+            let flatData = data.filter(f => years.includes(f.fiscalyear)).sort((a,b) => {
+                let aMonth = months.find(f => f.value === a.month);
+                let bMonth = months.find(f => f.value === b.month);
+                return aMonth && bMonth ? aMonth.order - bMonth.order : 0;
+            })
+            let serieses = years.map((y) => {
+                return {
+                    label: y,
+                    color: colorScale(y),
+                    data: flatData.filter(f => f.fiscalyear === y).map(m => m[valueField] ? m[valueField] : null),
+                    type: "line"
+                } as LineSeriesType
+            })
+            setSeriesData(serieses);
+            setChartData(flatData);    
+        }
+    },[years, data, valueField])
+    const [loading, setLoading] = useState(true);
+    useEffect(()=>{
+        if (chartData.length > 0 && seriesData.length > 0) {
+            setLoading(false)
+        } else {
+            setLoading(true)
+        }
+    },[chartData, seriesData])
+    return (
+        <LineChart 
+            loading={loading}
+            xAxis={[{
+                scaleType: "point",
+                data: months.map(m => m.value),
+                dataKey: "month",
+                valueFormatter: v => {
+                    let month = months.find(f => f.value === v)
+                    return month ? month.label : "xxx"
+                }
+            }]}
+            yAxis={[{
+                scaleType: "linear",
+                label: valueField === "trips" ? "# of trips" : "MTCO2e",
+            }]}
+            series={seriesData}
+            width={parentRect.width}
+            height={parentRect.height}
+            margin={{left:80}}
+            sx={{
+                "& .MuiChartsAxis-directionY": {
+                    "& .MuiChartsAxis-label": {
+                        transform: "translateX(-30px) !important"
+                        }    
+                }
+            
+            }}
+        />
+    )    
 }
