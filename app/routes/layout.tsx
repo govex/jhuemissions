@@ -12,9 +12,13 @@ const theme = createTheme({
 export default function Layout(props:Route.ComponentProps) {
   const navigation = useNavigation();
   const isNavigating = navigation.state === 'loading';
-  console.log(navigation);
     return (
         <ThemeProvider theme={theme}>
+            {isNavigating && (
+                <div className="spinner-overlay">
+                  <div className="spinner"></div>
+                </div>
+            )}
             <TopBar />
             <Outlet />
             <Footer />
