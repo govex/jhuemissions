@@ -5,6 +5,7 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
+    data
   } from "react-router";
   import type { Route } from "./+types/root";
   import stylesheet from "./app.css?url";
@@ -13,6 +14,10 @@ import {
     { rel: "stylesheet", href: stylesheet }
   ];
   
+  export async function loader({request}: Route.LoaderArgs) {
+    console.log(request);
+  }
+
   export function Layout({ children }: { children: React.ReactNode }) {
     return (
       <html lang="en">
