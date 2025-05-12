@@ -1,9 +1,19 @@
 import styles from "./about.module.scss";
+import type { Route } from "./+types/about";
+import { data } from "react-router";
 import Button from "~/components/button/button";
 import { ReactComponent as ChevronRightCircle } from "~/components/icons/chevron-right-circle";
 import { ReactComponent as ChevronLeftCircle } from "~/components/icons/chevron-left-circle";
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css';
+
+export async function loader({request}: Route.LoaderArgs) {
+  let headers = request.headers;
+  console.log(request);
+  if (!headers) {
+    throw data("missing headers", { status: 404 });
+  }
+}
 
 function About() {
   const buttonStyle = {
