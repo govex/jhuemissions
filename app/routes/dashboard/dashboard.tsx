@@ -26,7 +26,9 @@ export function meta({ }: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
-export async function loader({}: Route.LoaderArgs) {
+export async function loader({request}: Route.LoaderArgs) {
+  let headers = request.headers;
+  console.log(headers);
   let places = await supabase.from('places').select();
   let schools = await supabase.from('business_area').select();
   let map = await supabase.from('map').select();

@@ -12,6 +12,7 @@ const theme = createTheme({
 export default function Layout(props:Route.ComponentProps) {
   const navigation = useNavigation();
   const isNavigating = navigation.state === 'loading';
+  console.log(navigation);
     return (
         <ThemeProvider theme={theme}>
             <TopBar />
