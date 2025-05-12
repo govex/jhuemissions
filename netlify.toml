@@ -6,6 +6,6 @@ publish = "build/client"
 command = "react-router dev"
 
 [[headers]]
- for = "/dashboard"
+ for = "/*"
  [headers.values]
   Access-Control-Allow-Origin = "*"
