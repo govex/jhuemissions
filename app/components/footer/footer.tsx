@@ -17,7 +17,7 @@ const Footer = () => {
                 <img src="general/logoD.png" alt="Logo" className={styles.footImage} />
                 <ul className={styles.footList}>
                     <li className={styles.footListItem}>
-                        <Link to="/about"> About</Link>
+                        <Link to="/"> About</Link>
                     </li>
                     <li className={styles.footListItem}>
                         <Link to="https://form.asana.com/?k=4W32Fdf5p7zPNIV-3gKh5A&d=1108016200678557"> Contact </Link>
