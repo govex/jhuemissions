@@ -27,21 +27,24 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-export async function checkAuth({request}: Route.ClientActionArgs) {
+export async function clientLoader({request}: Route.ClientLoaderArgs) {
   let uid = await request.headers.get("JHED_UID");
-  console.log(request.headers)
+  console.log(request)
   return !!uid
 }
-function Dashboard({actionData}: Route.ComponentProps) {
-  console.log(actionData);
-  const loaderData = useRouteLoaderData("root");
+// export function HydrateFallback() {
+//   return <div>Loading...</div>;
+// }
+export default function Dashboard({loaderData}: Route.ComponentProps) {
+  console.log(loaderData);
+  const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
-  const [schoolData, setSchoolData] = useState<any>(loaderData.bookings.school);
-  const [travelerData, setTravelerData] = useState<any>(loaderData.bookings.traveler_jhu);
-  const [timelineData, setTimelineData] = useState<any>(loaderData.timeline.jhu);
-  const [percentData, setPercentData] = useState<any>(loaderData.percent.school);
-  const [mapData, setMapData] = useState<any>(loaderData.map.jhu);
-  const [topLineData, setTopLineData] = useState<any>(loaderData.bookings.topline);
+  const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
+  const [travelerData, setTravelerData] = useState<any>(rootData.bookings.traveler_jhu);
+  const [timelineData, setTimelineData] = useState<any>(rootData.timeline.jhu);
+  const [percentData, setPercentData] = useState<any>(rootData.percent.school);
+  const [mapData, setMapData] = useState<any>(rootData.map.jhu);
+  const [topLineData, setTopLineData] = useState<any>(rootData.bookings.topline);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [toggleStateTimeline, setToggleStateTimeline] = useState<"emissions" | "trips">("trips");
   const [toggleStateTraveler, setToggleStateTraveler] = useState<"emissions" | "trips" >("trips");
@@ -96,16 +99,16 @@ function Dashboard({actionData}: Route.ComponentProps) {
   const handleToggleChangePercentDataset = (event:ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       setToggleStatePercentDataset("traveler_type")
-      setPercentData(loaderData.percent.traveler)
+      setPercentData(rootData.percent.traveler)
     } else {
       setToggleStatePercentDataset("school")
-      setPercentData(loaderData.percent.school)
+      setPercentData(rootData.percent.school)
     }
   }  
-  const [fiscalYearOptions, setFiscalYearOptions] = useState<any>(loaderData.fiscalYearOptions)
+  const [fiscalYearOptions, setFiscalYearOptions] = useState<any>(rootData.fiscalYearOptions)
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popover' : undefined;
-  const [filters, setFilters] = useState<any>(loaderData.filters);
+  const [filters, setFilters] = useState<any>(rootData.filters);
   const [filterError, setFilterError] = useState<errorText>(undefined); 
   const handleFilters = (event: SyntheticEvent, value: string, reason: AutocompleteChangeReason) => {
     if (reason) {
@@ -148,26 +151,26 @@ function Dashboard({actionData}: Route.ComponentProps) {
   }
   useEffect(() => {
     if (filters.school === "All JHU") {
-      setTopLineData(loaderData.bookings.topline)
-      setTravelerData(loaderData.bookings.traveler_jhu)
-      setMapData(loaderData.map.jhu)
-      setTimelineData(loaderData.timeline.jhu)
+      setTopLineData(rootData.bookings.topline)
+      setTravelerData(rootData.bookings.traveler_jhu)
+      setMapData(rootData.map.jhu)
+      setTimelineData(rootData.timeline.jhu)
     } else {
-      let schoolBookings = loaderData.bookings.school?.filter(f => toTitleCase(f.school) === filters.school);
+      let schoolBookings = rootData.bookings.school?.filter(f => toTitleCase(f.school) === filters.school);
       setTopLineData(schoolBookings ? schoolBookings : []);
-      setTravelerData(loaderData.bookings.traveler_school ? loaderData.bookings.traveler_school : []);
-      let schoolCode = loaderData.schools?.find(f => toTitleCase(f.employeeGroupName) === filters.school);
-      let schoolMap = schoolCode ? loaderData.map.school?.filter(f => f.school === schoolCode.code) : undefined;
+      setTravelerData(rootData.bookings.traveler_school ? rootData.bookings.traveler_school : []);
+      let schoolCode = rootData.schools?.find(f => toTitleCase(f.employeeGroupName) === filters.school);
+      let schoolMap = schoolCode ? rootData.map.school?.filter(f => f.school === schoolCode.code) : undefined;
       setMapData(schoolMap ? schoolMap : []);
-      let schoolTimeline = loaderData.timeline.school?.filter(f => toTitleCase(f.school) === filters.school);
+      let schoolTimeline = rootData.timeline.school?.filter(f => toTitleCase(f.school) === filters.school);
       setTimelineData(schoolTimeline ? schoolTimeline : [])
     }
-  }, [filters.school, loaderData.bookings, loaderData.map, loaderData.timeline])
+  }, [filters.school, rootData.bookings, rootData.map, rootData.timeline])
   const [schoolOptions, setSchoolOptions] = useState<{label: string, value: string, code: number}[] | undefined>(undefined)
   useEffect(()=>{
-    if (loaderData.schools && schoolData.length > 0) {
+    if (rootData.schools && schoolData.length > 0) {
       let bookingsSchools = schoolData.map(m => m.school)
-      let schools = loaderData.schools.filter(f => {
+      let schools = rootData.schools.filter(f => {
         return bookingsSchools.includes(f.employeeGroupName)
       }).map(m => {
         return {
@@ -178,7 +181,7 @@ function Dashboard({actionData}: Route.ComponentProps) {
       })
       setSchoolOptions(schools.sort((a,b)=>a.label.localeCompare(b.label)))
     }
-  },[loaderData.schools, schoolData])
+  },[rootData.schools, schoolData])
   return (
     <>
       <section className={styles.hero}>
@@ -382,11 +385,11 @@ function Dashboard({actionData}: Route.ComponentProps) {
       <div className={styles.map}>
         <Card title={`Where are ${filters.school !== "All JHU" ? `${filters.school} ` : ""}people traveling?`}>
           <div className={styles.chartContainer} ref={mapRef}>
-            {!!mapRect && !!mapData && !!loaderData.places && 
+            {!!mapRect && !!mapData && !!rootData.places && 
               <ConnectionMap
                 parentRect={mapRect} 
                 data={mapData.filter(f => filters.years.includes(f.fiscalyear))}
-                places={loaderData.places}
+                places={rootData.places}
                 colorScale={colorScale.domain(filters.years)}
                 years={filters.years}
                 />
@@ -439,8 +442,8 @@ function Dashboard({actionData}: Route.ComponentProps) {
       </div>
       <div className={styles.tool}>
         <Card title="Emissions Calculator">
-          {!!loaderData.airports && loaderData.airports.length > 0 &&
-            <Form airports={loaderData.airports} />
+          {!!rootData.airports && rootData.airports.length > 0 &&
+            <Form airports={rootData.airports} />
           }
         </Card>
       </div>
@@ -483,5 +486,3 @@ function Dashboard({actionData}: Route.ComponentProps) {
     </>
   )
 }
-
-export default Dashboard
