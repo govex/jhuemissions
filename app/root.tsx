@@ -15,7 +15,10 @@ import {
     { rel: "stylesheet", href: stylesheet }
   ];
   
-  export async function loader({}: Route.LoaderArgs) {
+  export async function loader({request}: Route.LoaderArgs) {
+    let uid = await request.headers.get("JHED_UID");
+    console.log(uid)
+
     let places = await supabase.from('places').select();
     let schools = await supabase.from('business_area').select();
     let map = await supabase.from('map').select();
@@ -48,7 +51,8 @@ import {
       percent: {school: school_percent.data, traveler: traveler_percent.data},
       airports: airports.data,
       filters,
-      fiscalYearOptions
+      fiscalYearOptions,
+      authenticated: !!uid
     }
   }
 
