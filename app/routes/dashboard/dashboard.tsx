@@ -28,7 +28,7 @@ export function meta({ }: Route.MetaArgs) {
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 export async function checkAuth({request}: Route.ClientActionArgs) {
-  let uid = await request.headers.get("jhu_id");
+  let uid = await request.headers.get("JHED_UID");
   console.log(request.headers)
   return !!uid
 }
