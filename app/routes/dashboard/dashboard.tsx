@@ -27,14 +27,16 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-export async function clientLoader({request}: Route.ClientLoaderArgs) {
+export async function loader({request}: Route.LoaderArgs) {
   let uid = await request.headers.get("JHED_UID");
   console.log(request)
   return !!uid
 }
-// export function HydrateFallback() {
-//   return <div>Loading...</div>;
-// }
+export function HydrateFallback() {
+  return  <div className="spinner-overlay">
+            <div className="spinner"></div>
+          </div>
+}
 export default function Dashboard({loaderData}: Route.ComponentProps) {
   console.log(loaderData);
   const rootData = useRouteLoaderData("root");
