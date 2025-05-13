@@ -27,7 +27,13 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-function Homepage({}: Route.ComponentProps) {
+export async function checkAuth({request}: Route.ClientActionArgs) {
+  let uid = await request.headers.get("jhu_id");
+  console.log(request.headers)
+  return !!uid
+}
+function Dashboard({actionData}: Route.ComponentProps) {
+  console.log(actionData);
   const loaderData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(loaderData.bookings.school);
@@ -478,4 +484,4 @@ function Homepage({}: Route.ComponentProps) {
   )
 }
 
-export default Homepage
+export default Dashboard
