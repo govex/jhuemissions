@@ -42,7 +42,7 @@ export function HydrateFallback() {
 export function shouldRevalidate(
   arg: ShouldRevalidateFunctionArgs
 ) {
-  return true;
+  return false;
 }
 export default function Dashboard({loaderData}: Route.ComponentProps) {
   console.log(loaderData);
