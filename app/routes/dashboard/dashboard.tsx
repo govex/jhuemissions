@@ -3,7 +3,6 @@ import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import { useState, useEffect } from "react";
 import { useRouteLoaderData } from "react-router";
-import type { ShouldRevalidateFunctionArgs } from "react-router";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
@@ -28,26 +27,8 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-export async function loader({request}: Route.LoaderArgs) {
-  let uid = request.headers.get("JHED_UID");
-  console.log(request)
-  return {authenticated: !!uid, source: "server loader"}
-}
-export function HydrateFallback() {
-  return  <div className="spinner-overlay">
-            <div className="spinner"></div>
-          </div>
-}
-
-export function shouldRevalidate(
-  arg: ShouldRevalidateFunctionArgs
-) {
-  return false;
-}
-export default function Dashboard({loaderData}: Route.ComponentProps) {
-  console.log(loaderData);
+export default function Dashboard({}: Route.ComponentProps) {
   const rootData = useRouteLoaderData("root");
-  console.log(rootData.authenticated);
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
   const [travelerData, setTravelerData] = useState<any>(rootData.bookings.traveler_jhu);
