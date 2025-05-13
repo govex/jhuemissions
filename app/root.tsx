@@ -5,7 +5,6 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
-    data
   } from "react-router";
   import type { Route } from "./+types/root";
   import supabase from "~/utils/supabase";
@@ -16,7 +15,7 @@ import {
   ];
   
   export async function loader({request}: Route.LoaderArgs) {
-    let uid = await request.headers.get("JHED_UID");
+    let uid = request.headers.get("JHED_UID");
     console.log(uid)
 
     let places = await supabase.from('places').select();

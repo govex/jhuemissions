@@ -3,6 +3,7 @@ import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import { useState, useEffect } from "react";
 import { useRouteLoaderData } from "react-router";
+import type { ShouldRevalidateFunctionArgs } from "react-router";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
@@ -28,28 +29,23 @@ export function meta({ }: Route.MetaArgs) {
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 export async function loader({request}: Route.LoaderArgs) {
-  let uid = await request.headers.get("JHED_UID");
+  let uid = request.headers.get("JHED_UID");
   console.log(request)
   return {authenticated: !!uid, source: "server loader"}
-}
-export async function action({request}: Route.ActionArgs) {
-  let uid = await request.headers.get("JHED_UID");
-  console.log("server",request)
-  return {authenticated: !!uid, source: "server action"}
-}
-export async function clientAction({request}: Route.ClientActionArgs) {
-  let uid = await request.headers.get("JHED_UID");
-  console.log("client",request)
-  return {authenticated: !!uid, source: "client action"}
 }
 export function HydrateFallback() {
   return  <div className="spinner-overlay">
             <div className="spinner"></div>
           </div>
 }
-export default function Dashboard({loaderData, actionData}: Route.ComponentProps) {
+
+export function shouldRevalidate(
+  arg: ShouldRevalidateFunctionArgs
+) {
+  return true;
+}
+export default function Dashboard({loaderData}: Route.ComponentProps) {
   console.log(loaderData);
-  console.log(actionData)
   const rootData = useRouteLoaderData("root");
   console.log(rootData.authenticated);
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
