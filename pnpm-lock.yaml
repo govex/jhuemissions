@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@axa-fr/react-oidc':
+        specifier: 7.0.0
+        version: 7.0.0(react@19.0.0)
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.0.10)(react@19.0.0)
@@ -129,6 +132,17 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@axa-fr/oidc-client-service-worker@7.0.0':
+    resolution: {integrity: sha512-YpU5AAJVchosFKhkXwzy48wERF340um89PruyUE0/mLwHeZr7Ufsa2rbdpRVBoi+TLc7MwtzUDcEoPOnya4WWg==}
+
+  '@axa-fr/oidc-client@7.0.0':
+    resolution: {integrity: sha512-jZkvkzOcGvVrhTp6iPP9KlzFtTyr2lxuY7skK5P9RxLQtWPeSvqwJqJdqL4MEno+z7HP8mD/mfYYirj9a5AWWw==}
+
+  '@axa-fr/react-oidc@7.0.0':
+    resolution: {integrity: sha512-F8NvhUOdVzPzCZgRT01ItFWdocI3QfXkPX9HgyAIqX98t/wM5Se4HqYvHB39cwjgLF5wmDa6XhDRMLm4N27lUg==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0
 
   '@babel/code-frame@7.26.2':
     resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
@@ -3466,6 +3480,19 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
+
+  '@axa-fr/oidc-client-service-worker@7.0.0': {}
+
+  '@axa-fr/oidc-client@7.0.0':
+    dependencies:
+      '@axa-fr/oidc-client-service-worker': 7.0.0
+
+  '@axa-fr/react-oidc@7.0.0(react@19.0.0)':
+    dependencies:
+      '@axa-fr/oidc-client': 7.0.0
+      '@axa-fr/oidc-client-service-worker': 7.0.0
+      base64-js: 1.5.1
+      react: 19.0.0
 
   '@babel/code-frame@7.26.2':
     dependencies:
