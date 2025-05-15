@@ -1,5 +1,6 @@
 import {
     isRouteErrorResponse,
+    useSearchParams,
     Links,
     Meta,
     Outlet,
@@ -53,6 +54,9 @@ import {
   }
 
   export function Layout({ children }: { children: React.ReactNode }) {
+    const searchParams = useSearchParams();
+    console.log(searchParams);
+
     return (
       <html lang="en">
         <head>
