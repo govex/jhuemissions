@@ -30,11 +30,7 @@ export function meta({ }: Route.MetaArgs) {
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Dashboard({}: Route.ComponentProps) {
   const auth = useAuth();
-  
-  useEffect(()=>{
-    auth.signinSilent();
-    console.log(auth);
-  },[])
+  const [authenticated, setAuthenticated] = useState(false);  
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
@@ -196,6 +192,7 @@ function Dashboard({}: Route.ComponentProps) {
           />
       </div>
       </section>
+      {authenticated ? (
       <section className={styles.grid}>
         <div className={styles.filter}>
           <Button
@@ -472,7 +469,19 @@ function Dashboard({}: Route.ComponentProps) {
             />
           </Card>
         </div>
-    </section>
+      </section>      
+      ) : (
+        <div className={styles.redirect}>
+          <Button
+            type="solid"
+            text="Login"
+            size="large"
+            color="primary"
+            onClick={() => auth.signinRedirect()}
+          />
+        </div>
+      )
+    }
     <div className={styles.feedback}>
       <Button 
         color="primary"
