@@ -481,6 +481,4 @@ function Dashboard({}: Route.ComponentProps) {
     </>
   )
 }
-export default import.meta.env.Dev ? Dashboard : withAuthenticationRequired(Dashboard, {
-    OnRedirecting: () => (<div className={styles.redirect}>Redirecting to the login page...</div>)
-});
+export default import.meta.env.Dev ? Dashboard : withAuthenticationRequired(Dashboard);
