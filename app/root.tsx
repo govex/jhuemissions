@@ -54,9 +54,9 @@ import {
   }
 
   export function Layout({ children }: { children: React.ReactNode }) {
-    const searchParams = useSearchParams();
+    const [searchParams] = useSearchParams();
     console.log(searchParams);
-
+    console.log(searchParams.get("code"))
     return (
       <html lang="en">
         <head>
