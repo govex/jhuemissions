@@ -2,7 +2,7 @@
 import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import { useState, useEffect } from "react";
-import { useRouteLoaderData } from "react-router";
+import { useRouteLoaderData, useSearchParams } from "react-router";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import { withAuthenticationRequired, useAuth } from "react-oidc-context";
 import Button from "~/components/button/button";
@@ -29,6 +29,8 @@ export function meta({ }: Route.MetaArgs) {
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Dashboard({}: Route.ComponentProps) {
+  const searchParams = useSearchParams();
+  console.log(searchParams);
   const auth = useAuth();
   console.log(auth);
   const rootData = useRouteLoaderData("root");
