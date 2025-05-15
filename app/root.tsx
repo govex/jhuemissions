@@ -84,7 +84,8 @@ import {
       client_id: root + "/auth/oidc",
       redirect_uri: root + "/auth/oidc/callback",
       authority: "https://login.jh.edu",
-      client_secret: secret
+      client_secret: secret,
+      client_authentication: "client_secret_basic"
     }
     if (import.meta.env.PROD) {
       return (
