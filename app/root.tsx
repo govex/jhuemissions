@@ -83,10 +83,13 @@ import {
     const configuration = {
       client_id: root + "/auth/oidc",
       redirect_uri: root + "/auth/oidc/callback",
-      authority: "https://login.jh.edu/idp/profile/oidc/authorize",
+      authority: "https://login.jh.edu",
       client_secret: secret,
       client_authentication: "client_secret_basic"
     }
+
+    // Access to fetch at 'https://login.jh.edu/idp/profile/oidc/authorize/.well-known/openid-configuration' from origin 'https://travelemissionsdashboard.govex.jhu.edu' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+
     if (import.meta.env.PROD) {
       return (
         <AuthProvider {...configuration}>
