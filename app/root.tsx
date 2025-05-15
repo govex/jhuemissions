@@ -86,7 +86,7 @@ import {
       authority: "https://login.jh.edu",
       client_secret: secret,
       client_authentication: "client_secret_basic",
-      metadata: {
+      metadata: { // https://login.jh.edu/.well-known/openid-configuration
         issuer:"https://login.jh.edu/idp/shibboleth",
         authorization_endpoint:"https://login.jh.edu/idp/profile/oidc/authorize",
         registration_endpoint:"https://login.jh.edu/idp/profile/oidc/register",
