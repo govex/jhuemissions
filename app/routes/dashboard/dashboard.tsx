@@ -2,7 +2,7 @@
 import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import { useState, useEffect } from "react";
-import { useRouteLoaderData, useSearchParams } from "react-router";
+import { useRouteLoaderData } from "react-router";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import { useAuth } from "react-oidc-context";
 import Button from "~/components/button/button";
@@ -30,7 +30,20 @@ export function meta({ }: Route.MetaArgs) {
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Dashboard({}: Route.ComponentProps) {
   const auth = useAuth();
-  const [authenticated, setAuthenticated] = useState(false);  
+  const [authenticated, setAuthenticated] = useState(auth.isAuthenticated);  
+  if (!authenticated) {
+    return (
+      <div className={styles.redirect}>
+        <Button
+          type="solid"
+          text="Login"
+          size="large"
+          color="primary"
+          onClick={() => auth.signinRedirect()}
+        />
+      </div>
+    )        
+  }
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
@@ -192,7 +205,6 @@ function Dashboard({}: Route.ComponentProps) {
           />
       </div>
       </section>
-      {authenticated ? (
       <section className={styles.grid}>
         <div className={styles.filter}>
           <Button
@@ -470,18 +482,6 @@ function Dashboard({}: Route.ComponentProps) {
           </Card>
         </div>
       </section>      
-      ) : (
-        <div className={styles.redirect}>
-          <Button
-            type="solid"
-            text="Login"
-            size="large"
-            color="primary"
-            onClick={() => auth.signinRedirect()}
-          />
-        </div>
-      )
-    }
     <div className={styles.feedback}>
       <Button 
         color="primary"
