@@ -1,6 +1,5 @@
 import {
     isRouteErrorResponse,
-    useSearchParams,
     Links,
     Meta,
     Outlet,
