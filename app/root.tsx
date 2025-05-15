@@ -83,7 +83,7 @@ import {
     const configuration = {
       client_id: root + "/auth/oidc",
       redirect_uri: root + "/auth/oidc/callback",
-      authority: "https://login.jh.edu/idp/shibboleth",
+      authority: "https://login.jh.edu/idp/profile/oidc/authorize",
       client_secret: secret,
       client_authentication: "client_secret_basic"
     }
