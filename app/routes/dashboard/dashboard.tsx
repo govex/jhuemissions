@@ -4,7 +4,7 @@ import cx from "classnames";
 import { useState, useEffect } from "react";
 import { useRouteLoaderData, useSearchParams } from "react-router";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
-import { withAuthenticationRequired, useAuth } from "react-oidc-context";
+import { useAuth } from "react-oidc-context";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover, type AutocompleteChangeReason } from "@mui/material";
@@ -29,10 +29,12 @@ export function meta({ }: Route.MetaArgs) {
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Dashboard({}: Route.ComponentProps) {
-  const searchParams = useSearchParams();
-  console.log(searchParams);
   const auth = useAuth();
-  console.log(auth);
+  if (auth.isAuthenticated) {
+    console.log(auth);
+  } else {
+    auth.signinRedirect();
+  }
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
@@ -483,4 +485,4 @@ function Dashboard({}: Route.ComponentProps) {
     </>
   )
 }
-export default import.meta.env.Dev ? Dashboard : withAuthenticationRequired(Dashboard);
+export default Dashboard;
