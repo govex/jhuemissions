@@ -5,7 +5,6 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
-    Navigate
   } from "react-router";
   import type { Route } from "./+types/root";
   import { AuthProvider } from "react-oidc-context";
@@ -80,7 +79,7 @@ import {
   
   export default function App() {
     const root = typeof window !== 'undefined' ? window.location.origin : '';
-    const secret = import.meta.env.PROD ? root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS : '';
+    const secret = root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS;
     const configuration = {
       client_id: root + "/auth/oidc",
       redirect_uri: root + "/auth/oidc/callback",
@@ -98,22 +97,12 @@ import {
         jwks_uri:"https://login.jh.edu/idp/profile/oidc/keyset",
       },
     }
-    const onSigninCallback = () => {
-      <Navigate replace to="/dashboard" />
-    }
-    if (import.meta.env.PROD) {
-      return (
-        <AuthProvider 
-          onSigninCallback={onSigninCallback}
-          {...configuration}>
-          <Outlet />
-        </AuthProvider>
-      );
-    } else {
-      return (
+
+    return (
+      <AuthProvider {...configuration}>
         <Outlet />
-      );
-    }
+      </AuthProvider>
+    );
   }
   
   export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
