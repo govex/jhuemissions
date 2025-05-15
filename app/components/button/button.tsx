@@ -17,11 +17,11 @@ const Button = ({
     disabled=false,
     arrowDirection=undefined
 }:{
-    type: "border" | "solid" | "feedback",
+    type: "border" | "solid",
     icon?: "chevron-down" | "close-x" | "arrow-up-circle" | "right-arrow" | undefined,
     text?: string | undefined,
     color: "primary" | "secondary",
-    size: "large" | "medium" | "small",
+    size: "large" | "medium" | "small" | "feedback",
     onClick?: any | null,
     href?: string | undefined,
     disabled?: boolean,

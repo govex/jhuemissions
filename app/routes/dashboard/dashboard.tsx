@@ -4,6 +4,7 @@ import cx from "classnames";
 import { useState, useEffect } from "react";
 import { useRouteLoaderData } from "react-router";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
+import { withAuthenticationRequired } from "react-oidc-context";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover, type AutocompleteChangeReason } from "@mui/material";
@@ -27,7 +28,7 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-export default function Dashboard({}: Route.ComponentProps) {
+function Dashboard({}: Route.ComponentProps) {
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
@@ -471,9 +472,13 @@ export default function Dashboard({}: Route.ComponentProps) {
         color="primary"
         text="Feedback"
         size="feedback"
+        type="solid"
         href="https://form.asana.com/?k=4W32Fdf5p7zPNIV-3gKh5A&d=1108016200678557"
       />
     </div>
     </>
   )
 }
+export default import.meta.env.PROD ? withAuthenticationRequired(Dashboard, {
+    OnRedirecting: () => (<div className={styles.redirect}>Redirecting to the login page...</div>)
+}) : Dashboard;

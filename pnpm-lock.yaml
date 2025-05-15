@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@axa-fr/react-oidc':
-        specifier: 7.0.0
-        version: 7.0.0(react@19.0.0)
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.0.10)(react@19.0.0)
@@ -62,12 +59,18 @@ importers:
       isbot:
         specifier: ^5
         version: 5.1.25
+      oidc-client-ts:
+        specifier: ^3.2.1
+        version: 3.2.1
       react:
         specifier: ^19.0.0
         version: 19.0.0
       react-dom:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
+      react-oidc-context:
+        specifier: ^3.3.0
+        version: 3.3.0(oidc-client-ts@3.2.1)(react@19.0.0)
       react-router:
         specifier: ^7.4.0
         version: 7.4.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -132,17 +135,6 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
-
-  '@axa-fr/oidc-client-service-worker@7.0.0':
-    resolution: {integrity: sha512-YpU5AAJVchosFKhkXwzy48wERF340um89PruyUE0/mLwHeZr7Ufsa2rbdpRVBoi+TLc7MwtzUDcEoPOnya4WWg==}
-
-  '@axa-fr/oidc-client@7.0.0':
-    resolution: {integrity: sha512-jZkvkzOcGvVrhTp6iPP9KlzFtTyr2lxuY7skK5P9RxLQtWPeSvqwJqJdqL4MEno+z7HP8mD/mfYYirj9a5AWWw==}
-
-  '@axa-fr/react-oidc@7.0.0':
-    resolution: {integrity: sha512-F8NvhUOdVzPzCZgRT01ItFWdocI3QfXkPX9HgyAIqX98t/wM5Se4HqYvHB39cwjgLF5wmDa6XhDRMLm4N27lUg==}
-    peerDependencies:
-      react: ^17.0.0 || ^18.0.0
 
   '@babel/code-frame@7.26.2':
     resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
@@ -2434,6 +2426,10 @@ packages:
   jsonfile@6.1.0:
     resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==}
 
+  jwt-decode@4.0.0:
+    resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==}
+    engines: {node: '>=18'}
+
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
@@ -2681,6 +2677,10 @@ packages:
     resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
     engines: {node: '>= 0.4'}
 
+  oidc-client-ts@3.2.1:
+    resolution: {integrity: sha512-hS5AJ5s/x4bXhHvNJT1v+GGvzHUwdRWqNQQbSrp10L1IRmzfRGKQ3VWN3dstJb+oF3WtAyKezwD2+dTEIyBiAA==}
+    engines: {node: '>=18'}
+
   on-finished@2.3.0:
     resolution: {integrity: sha512-ikqdkGAAyf/X/gPhXGvfgAytDZtDbr+bkNUJ0N9h5MI/dmdgCs3l6hoHrcUv41sRKew3jIwrp4qQDXiK99Utww==}
     engines: {node: '>= 0.8'}
@@ -2887,6 +2887,13 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  react-oidc-context@3.3.0:
+    resolution: {integrity: sha512-302T/ma4AOVAxrHdYctDSKXjCq9KNHT564XEO2yOPxRfxEP58xa4nz+GQinNl8x7CnEXECSM5JEjQJk3Cr5BvA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      oidc-client-ts: ^3.1.0
+      react: '>=16.14.0'
 
   react-reconciler@0.29.2:
     resolution: {integrity: sha512-zZQqIiYgDCTP/f1N/mAR10nJGrPD2ZR+jDSEsKWJHYC7Cm2wodlwbR3upZRdC3cjIjSlTLNVyO7Iu0Yy7t2AYg==}
@@ -3480,19 +3487,6 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
-
-  '@axa-fr/oidc-client-service-worker@7.0.0': {}
-
-  '@axa-fr/oidc-client@7.0.0':
-    dependencies:
-      '@axa-fr/oidc-client-service-worker': 7.0.0
-
-  '@axa-fr/react-oidc@7.0.0(react@19.0.0)':
-    dependencies:
-      '@axa-fr/oidc-client': 7.0.0
-      '@axa-fr/oidc-client-service-worker': 7.0.0
-      base64-js: 1.5.1
-      react: 19.0.0
 
   '@babel/code-frame@7.26.2':
     dependencies:
@@ -6036,6 +6030,8 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
+  jwt-decode@4.0.0: {}
+
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
@@ -6372,6 +6368,10 @@ snapshots:
 
   object-inspect@1.13.4: {}
 
+  oidc-client-ts@3.2.1:
+    dependencies:
+      jwt-decode: 4.0.0
+
   on-finished@2.3.0:
     dependencies:
       ee-first: 1.1.1
@@ -6608,6 +6608,11 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+
+  react-oidc-context@3.3.0(oidc-client-ts@3.2.1)(react@19.0.0):
+    dependencies:
+      oidc-client-ts: 3.2.1
+      react: 19.0.0
 
   react-reconciler@0.29.2(react@19.0.0):
     dependencies:

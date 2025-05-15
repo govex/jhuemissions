@@ -7,6 +7,7 @@ import {
     ScrollRestoration,
   } from "react-router";
   import type { Route } from "./+types/root";
+  import { AuthProvider } from "react-oidc-context";
   import supabase from "~/utils/supabase";
   import stylesheet from "./app.css?url";
 
@@ -77,7 +78,25 @@ import {
   }
   
   export default function App() {
-    return <Outlet />;
+    const root = typeof window !== 'undefined' ? window.location.origin : '';
+    const secret = import.meta.env.PROD ? root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS : '';
+    const configuration = {
+      client_id: root + "/auth/oidc",
+      redirect_uri: root + "/auth/oidc/callback",
+      authority: "https://login.jh.edu",
+      client_secret: secret
+    }
+    if (import.meta.env.PROD) {
+      return (
+        <AuthProvider {...configuration}>
+          <Outlet />
+        </AuthProvider>
+      );
+    } else {
+      return (
+        <Outlet />
+      );
+    }
   }
   
   export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
