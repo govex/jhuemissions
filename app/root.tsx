@@ -5,6 +5,7 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
+    Navigate
   } from "react-router";
   import type { Route } from "./+types/root";
   import { AuthProvider } from "react-oidc-context";
@@ -82,7 +83,7 @@ import {
     const secret = import.meta.env.PROD ? root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS : '';
     const configuration = {
       client_id: root + "/auth/oidc",
-      redirect_uri: root + "/dashboard",
+      redirect_uri: root + "/auth/oidc/callback",
       authority: "https://login.jh.edu",
       client_secret: secret,
       client_authentication: "client_secret_basic",
@@ -97,12 +98,14 @@ import {
         jwks_uri:"https://login.jh.edu/idp/profile/oidc/keyset",
       },
     }
-
-    // Access to fetch at 'https://login.jh.edu/.well-known/openid-configuration' from origin 'https://travelemissionsdashboard.govex.jhu.edu' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
-
+    const onSigninCallback = () => {
+      <Navigate replace to="/dashboard" />
+    }
     if (import.meta.env.PROD) {
       return (
-        <AuthProvider {...configuration}>
+        <AuthProvider 
+          onSigninCallback={onSigninCallback}
+          {...configuration}>
           <Outlet />
         </AuthProvider>
       );
