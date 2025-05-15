@@ -36,7 +36,7 @@ function Dashboard({}: Route.ComponentProps) {
       } else {
         auth.signinRedirect();
       }
-  },[auth])
+  },[])
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
