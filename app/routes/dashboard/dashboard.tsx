@@ -21,6 +21,8 @@ import useResizeObserver from "~/utils/useResizeObserver";
 import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
 
+const secret = import.meta.env.VITE_CS;
+
 export function meta({ }: Route.MetaArgs) {
   return [
     { title: "JHU Travel Emissions Dashboard" },
@@ -479,6 +481,6 @@ function Dashboard({}: Route.ComponentProps) {
     </>
   )
 }
-export default import.meta.env.PROD ? withAuthenticationRequired(Dashboard, {
+export default import.meta.env.PROD && !!secret ? withAuthenticationRequired(Dashboard, {
     OnRedirecting: () => (<div className={styles.redirect}>Redirecting to the login page...</div>)
 }) : Dashboard;
