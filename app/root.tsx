@@ -85,10 +85,20 @@ import {
       redirect_uri: root + "/auth/oidc/callback",
       authority: "https://login.jh.edu",
       client_secret: secret,
-      client_authentication: "client_secret_basic"
+      client_authentication: "client_secret_basic",
+      metadata: {
+        issuer:"https://login.jh.edu/idp/shibboleth",
+        authorization_endpoint:"https://login.jh.edu/idp/profile/oidc/authorize",
+        registration_endpoint:"https://login.jh.edu/idp/profile/oidc/register",
+        token_endpoint:"https://login.jh.edu/idp/profile/oidc/token",
+        userinfo_endpoint:"https://login.jh.edu/idp/profile/oidc/userinfo",
+        introspection_endpoint:"https://login.jh.edu/idp/profile/oauth2/introspection",
+        revocation_endpoint:"https://login.jh.edu/idp/profile/oauth2/revocation",
+        jwks_uri:"https://login.jh.edu/idp/profile/oidc/keyset",
+      },
     }
 
-    // Access to fetch at 'https://login.jh.edu/idp/profile/oidc/authorize/.well-known/openid-configuration' from origin 'https://travelemissionsdashboard.govex.jhu.edu' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+    // Access to fetch at 'https://login.jh.edu/.well-known/openid-configuration' from origin 'https://travelemissionsdashboard.govex.jhu.edu' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
 
     if (import.meta.env.PROD) {
       return (
