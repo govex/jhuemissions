@@ -8,6 +8,7 @@ export const hasAuthParams = (location = window.location): boolean => {
     let searchParams = new URLSearchParams(location.search);
     if ((searchParams.get("code") || searchParams.get("error")) &&
         searchParams.get("state")) {
+        console.log("hasauthparams", searchParams.get("code"));
         return true;
     }
 

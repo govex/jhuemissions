@@ -237,6 +237,7 @@ export const AuthProvider = (props: AuthProviderProps): React.JSX.Element => {
                     if (onSigninCallback) await onSigninCallback(user);
                 }
                 user = !user ? await userManager.getUser() : user;
+                console.log("provider",user);
                 dispatch({ type: "INITIALISED", user });
             } catch (error) {
                 dispatch({
