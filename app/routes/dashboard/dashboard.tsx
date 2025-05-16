@@ -27,7 +27,7 @@ export function meta({ }: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
-export async function action({ request }: Route.ActionArgs) {
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const auth = useAuth();
   auth.signinRedirect() 
   const sessionStatus = await auth.querySessionStatus();
@@ -38,10 +38,11 @@ export async function action({ request }: Route.ActionArgs) {
   return {formObj, sessionStatus}
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-function Dashboard({actionData}: Route.ComponentProps) {
-  console.log(actionData)
+function Dashboard({loaderData}: Route.ComponentProps) {
+  console.log(loaderData);
   const auth = useAuth();
   const [authenticated, setAuthenticated] = useState(auth.isAuthenticated);  
+  console.log("auth: ", authenticated);
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
