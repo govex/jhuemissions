@@ -14,7 +14,7 @@ import {
   export const links: Route.LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet }
   ];
-  export async function actions({ request }: Route.ActionArgs) {
+  export async function clientLoader({ request }: Route.ClientLoaderArgs) {
     let uid = request.headers.get("jhu_id");
     let formData = await request.formData();
     return {uidExists: !!uid, formData, headers: request.headers}
