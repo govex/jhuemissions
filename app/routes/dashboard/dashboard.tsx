@@ -27,7 +27,7 @@ export function meta({ }: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
-export async function clientLoader({ request }: Route.ClientLoaderArgs) {
+export async function action({ request }: Route.ClientActionArgs) {
   const auth = useAuth();
   auth.signinRedirect() 
   const sessionStatus = await auth.querySessionStatus();
@@ -38,8 +38,8 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   return {formObj, sessionStatus}
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-function Dashboard({loaderData}: Route.ComponentProps) {
-  console.log(loaderData);
+function Dashboard({actionData}: Route.ComponentProps) {
+  console.log(actionData);
   const auth = useAuth();
   const [authenticated, setAuthenticated] = useState(auth.isAuthenticated);  
   console.log("auth: ", authenticated);
