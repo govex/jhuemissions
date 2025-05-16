@@ -68,9 +68,6 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
-      react-oidc-context:
-        specifier: ^3.3.0
-        version: 3.3.0(oidc-client-ts@3.2.1)(react@19.0.0)
       react-router:
         specifier: ^7.4.0
         version: 7.4.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -2887,13 +2884,6 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
-
-  react-oidc-context@3.3.0:
-    resolution: {integrity: sha512-302T/ma4AOVAxrHdYctDSKXjCq9KNHT564XEO2yOPxRfxEP58xa4nz+GQinNl8x7CnEXECSM5JEjQJk3Cr5BvA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      oidc-client-ts: ^3.1.0
-      react: '>=16.14.0'
 
   react-reconciler@0.29.2:
     resolution: {integrity: sha512-zZQqIiYgDCTP/f1N/mAR10nJGrPD2ZR+jDSEsKWJHYC7Cm2wodlwbR3upZRdC3cjIjSlTLNVyO7Iu0Yy7t2AYg==}
@@ -6608,11 +6598,6 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
-
-  react-oidc-context@3.3.0(oidc-client-ts@3.2.1)(react@19.0.0):
-    dependencies:
-      oidc-client-ts: 3.2.1
-      react: 19.0.0
 
   react-reconciler@0.29.2(react@19.0.0):
     dependencies:

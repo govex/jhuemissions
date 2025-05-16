@@ -6,8 +6,8 @@ import {
     Scripts,
     ScrollRestoration,
   } from "react-router";
+  import {AuthProvider} from "~/provider/AuthProvider";
   import type { Route } from "./+types/root";
-  import { AuthProvider } from "react-oidc-context";
   import supabase from "~/utils/supabase";
   import stylesheet from "./app.css?url";
 

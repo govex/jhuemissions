@@ -3,8 +3,8 @@ import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import { useState, useEffect } from "react";
 import { useRouteLoaderData } from "react-router";
+import { withAuthenticationRequired } from "~/provider/withAuthenticationRequired";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
-import { withAuthenticationRequired } from "react-oidc-context";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover, type AutocompleteChangeReason } from "@mui/material";
@@ -27,8 +27,14 @@ export function meta({ }: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
+export function actions({ request }: Route.ClientActionArgs) {
+  let uid = request.headers.get("jhu_id");
+  console.log(request.headers);
+  return !!uid
+}
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-function Dashboard({}: Route.ComponentProps) {
+function Dashboard({ actionData }: Route.ComponentProps) {
+  console.log("uid", actionData);
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
@@ -479,6 +485,4 @@ function Dashboard({}: Route.ComponentProps) {
     </>
   )
 }
-export default import.meta.env.Dev ? Dashboard : withAuthenticationRequired(Dashboard, {OnRedirecting: ()=>{return (<div className="spinner-overlay">
-                  <div className="spinner"></div>
-                </div>)}});
+export default import.meta.env.DEV ? Dashboard : withAuthenticationRequired(Dashboard);
