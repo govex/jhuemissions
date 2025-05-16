@@ -28,6 +28,10 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 export async function action({ request }: Route.ActionArgs) {
+  const auth = useAuth();
+  if (!auth.isAuthenticated) {
+    auth.signinRedirect() 
+  }
   if (request.method === "POST") {
     const formData = await request.formData();
     console.log(formData);
