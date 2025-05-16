@@ -43,6 +43,7 @@ function Dashboard({actionData}: Route.ComponentProps) {
   const auth = useAuth();
   const [authenticated, setAuthenticated] = useState(auth.isAuthenticated);  
   console.log("auth: ", authenticated);
+  console.log("sessionStatus", auth.querySessionStatus())
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
