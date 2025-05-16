@@ -14,10 +14,11 @@ import {
   export const links: Route.LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet }
   ];
-  export function actions({ request }: Route.ClientActionArgs) {
+  export async function actions({ request }: Route.ClientActionArgs) {
     let uid = request.headers.get("jhu_id");
     console.log(request.headers);
-    return !!uid
+    let formData = await request.formData();
+    return {uidExists: !!uid, formData}
   }
 
   export async function loader({}: Route.LoaderArgs) {
