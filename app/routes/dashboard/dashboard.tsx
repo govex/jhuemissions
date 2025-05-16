@@ -29,14 +29,13 @@ export function meta({ }: Route.MetaArgs) {
 }
 export async function action({ request }: Route.ActionArgs) {
   const auth = useAuth();
-  if (!auth.isAuthenticated) {
-    auth.signinRedirect() 
-  }
-  if (request.method === "POST") {
-    const formData = await request.formData();
-    console.log(formData);
-    return Object.fromEntries(formData);
-  }
+  auth.signinRedirect() 
+  const sessionStatus = await auth.querySessionStatus();
+  const formData = await request.formData();
+  console.log(sessionStatus);
+  console.log(formData);
+  let formObj = Object.fromEntries(formData);
+  return {formObj, sessionStatus}
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Dashboard({actionData}: Route.ComponentProps) {
