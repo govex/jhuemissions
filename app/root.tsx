@@ -14,11 +14,6 @@ import {
   export const links: Route.LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet }
   ];
-  export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-    let uid = request.headers.get("jhu_id");
-    let formData = await request.formData();
-    return {uidExists: !!uid, formData, headers: request.headers}
-  }
 
   export async function loader({}: Route.LoaderArgs) {
     let places = await supabase.from('places').select();
@@ -83,8 +78,6 @@ import {
   }
   
   export default function App({actionData, loaderData}:Route.ComponentProps) {
-    console.log("root actiondata", actionData)
-    console.log("root loaderdata", loaderData)
     const root = typeof window !== 'undefined' ? window.location.origin : '';
     const secret = root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS;
     const configuration = {
