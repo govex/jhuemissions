@@ -102,7 +102,6 @@ import {
         revocation_endpoint:"https://login.jh.edu/idp/profile/oauth2/revocation",
         jwks_uri:"https://login.jh.edu/idp/profile/oidc/keyset",
       },
-      loadUserInfo: true
     }
 
     return (
