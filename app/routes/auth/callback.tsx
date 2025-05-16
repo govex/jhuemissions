@@ -1,20 +1,13 @@
 import type { Route } from "./+types/callback";
+import { Navigate } from "react-router";
 import { getUser } from "~/provider/utils";
 
-export function action({request, params, context}:Route.ActionArgs) {
-    console.log("callback action", request);
-    const body = request.body;
-    return {body:body, params:params, context:context};
-}
-export function clientAction({request, params, context}:Route.ClientActionArgs) {
-    console.log("callback clientAction", request);
-    const body = request.body;
-    return {body:body, params:params, context:context};
-}
-function Callback({actionData}:Route.ComponentProps) {
-    console.log("callback actiondata", actionData);
-    let user = getUser();
+function Callback({}:Route.ComponentProps) {
+    const user = getUser();
     console.log("callback getUser", user)
+    if (!!user) {
+        return <Navigate replace to={"/dashboard"} />
+    }
     return <div>
             <div className="spinner-overlay">
                 <div className="spinner"></div>        
