@@ -3,7 +3,7 @@ import type { ErrorContext } from "./AuthState";
 /**
  * @public
  */
-export const hasAuthParams = () => {
+export const hasAuthParams = (location = window.location) => {
     // response_mode: query
     let searchParams = new URLSearchParams(location.search);
     if ((searchParams.get("code") || searchParams.get("error")) &&
