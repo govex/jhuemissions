@@ -7,7 +7,7 @@ import {
     ScrollRestoration,
   } from "react-router";
   import type { Route } from "./+types/root";
-  import { AuthProvider, useAuth } from "react-oidc-context";
+  import { AuthProvider } from "react-oidc-context";
   import supabase from "~/utils/supabase";
   import stylesheet from "./app.css?url";
 
@@ -16,7 +16,6 @@ import {
   ];
   
   export async function loader({}: Route.LoaderArgs) {
-    let auth = useAuth();
     let places = await supabase.from('places').select();
     let schools = await supabase.from('business_area').select();
     let map = await supabase.from('map').select();
@@ -50,7 +49,6 @@ import {
       airports: airports.data,
       filters,
       fiscalYearOptions,
-      authenticated: auth.isAuthenticated
     }
   }
 

@@ -479,4 +479,6 @@ function Dashboard({}: Route.ComponentProps) {
     </>
   )
 }
-export default import.meta.env.Dev ? Dashboard : withAuthenticationRequired(Dashboard);
+export default import.meta.env.Dev ? Dashboard : withAuthenticationRequired(Dashboard, {OnRedirecting: ()=>{return (<div className="spinner-overlay">
+                  <div className="spinner"></div>
+                </div>)}});
