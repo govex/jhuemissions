@@ -1,13 +1,13 @@
 import { useAuth } from "react-oidc-context";
-import { useParams, Navigate } from "react-router";
+import { useLocation, Navigate } from "react-router";
 function Authentication() {
-    let params = useParams();
+    let location = useLocation();
     let auth = useAuth();
     console.log("auth", auth.isAuthenticated);
-
-    if (params.code) {
-        return <Navigate replace to={"/dashboard"} />
-    }
+    console.log(location);
+    // if (params.code) {
+    //     return <Navigate replace to={"/dashboard"} />
+    // }
     return <div>authenticating</div>
 }
 
