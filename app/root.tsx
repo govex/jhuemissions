@@ -77,7 +77,7 @@ import {
     );
   }
   
-  export default function App({actionData, loaderData}:Route.ComponentProps) {
+  export default function App({}:Route.ComponentProps) {
     const root = typeof window !== 'undefined' ? window.location.origin : '';
     const secret = root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS;
     const configuration = {
@@ -85,7 +85,7 @@ import {
       redirect_uri: root + "/dashboard",
       authority: "https://login.jh.edu",
       client_secret: secret,
-      client_authentication: "client_secret_post",
+      client_authentication: "client_secret_basic",
       metadata: {
         issuer:"https://login.jh.edu/idp/shibboleth",
         authorization_endpoint:"https://login.jh.edu/idp/profile/oidc/authorize",
