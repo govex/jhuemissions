@@ -230,10 +230,11 @@ export const AuthProvider = (props: AuthProviderProps): React.JSX.Element => {
             // sign-in
             try {
                 let user: User | undefined | null = null;
-
+                let authParams = hasAuthParams();
                 // check if returning back from authority server
-                if (hasAuthParams() && !skipSigninCallback) {
+                if (!!authParams?.code && !skipSigninCallback) {
                     user = await userManager.signinCallback();
+                    console.log("provider", user);
                     if (onSigninCallback) await onSigninCallback(user);
                 }
                 user = !user ? await userManager.getUser() : user;

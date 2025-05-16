@@ -14,7 +14,12 @@ import {
   export const links: Route.LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet }
   ];
-  
+  export function actions({ request }: Route.ClientActionArgs) {
+    let uid = request.headers.get("jhu_id");
+    console.log(request.headers);
+    return !!uid
+  }
+
   export async function loader({}: Route.LoaderArgs) {
     let places = await supabase.from('places').select();
     let schools = await supabase.from('business_area').select();
@@ -77,7 +82,8 @@ import {
     );
   }
   
-  export default function App() {
+  export default function App({actionData}:Route.ComponentProps) {
+    console.log("root", actionData)
     const root = typeof window !== 'undefined' ? window.location.origin : '';
     const secret = root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS;
     const configuration = {
@@ -96,6 +102,7 @@ import {
         revocation_endpoint:"https://login.jh.edu/idp/profile/oauth2/revocation",
         jwks_uri:"https://login.jh.edu/idp/profile/oidc/keyset",
       },
+      loadUserInfo: true
     }
 
     return (

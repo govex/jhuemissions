@@ -3,23 +3,23 @@ import type { ErrorContext } from "./AuthState";
 /**
  * @public
  */
-export const hasAuthParams = (location = window.location): boolean => {
+export const hasAuthParams = () => {
     // response_mode: query
     let searchParams = new URLSearchParams(location.search);
     if ((searchParams.get("code") || searchParams.get("error")) &&
         searchParams.get("state")) {
         console.log("hasauthparams", searchParams.get("code"));
-        return true;
+        return {code: searchParams.get("code"), error: searchParams.get("error"), state: searchParams.get("state")};
     }
 
     // response_mode: fragment
     searchParams = new URLSearchParams(location.hash.replace("#", "?"));
     if ((searchParams.get("code") || searchParams.get("error")) &&
         searchParams.get("state")) {
-        return true;
+        return {code: searchParams.get("code"), error: searchParams.get("error"), state: searchParams.get("state")};
     }
 
-    return false;
+    return {code: null, error: null, state: null};
 };
 
 export const signinError = normalizeErrorFn("signinCallback", "Sign-in failed");

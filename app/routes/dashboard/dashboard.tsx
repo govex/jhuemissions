@@ -27,11 +27,6 @@ export function meta({ }: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
-export function actions({ request }: Route.ClientActionArgs) {
-  let uid = request.headers.get("jhu_id");
-  console.log(request.headers);
-  return !!uid
-}
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Dashboard({ actionData }: Route.ComponentProps) {
   console.log("uid", actionData);
