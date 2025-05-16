@@ -82,7 +82,7 @@ import {
     const secret = root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS;
     const configuration = {
       client_id: root + "/auth/oidc",
-      redirect_uri: root + "/dashboard",
+      redirect_uri: root + "/auth/oidc/callback",
       authority: "https://login.jh.edu",
       client_secret: secret,
       client_authentication: "client_secret_basic",

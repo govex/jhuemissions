@@ -42,6 +42,9 @@
     &.secondary {
         background-color: #A15B96;
     }
+    &.small {
+        width: fit-content;
+    }
 }
 
 .large {
@@ -59,8 +62,6 @@
 .small {
     font-size: 14px;
     font-weight: 400;
-    width: 72px;
-    padding: 4px;
     height: 35px;
 }
 

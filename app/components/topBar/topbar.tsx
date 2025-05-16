@@ -1,9 +1,11 @@
 import Button from 'app/components/button/button';
-import { NavLink } from 'react-router';
+import { Navigate, NavLink } from 'react-router';
+import { useAuth } from '~/provider/useAuth';
 import { ReactComponent as ChevronDown } from 'app/components/icons/chevron-down';
 import styles from './topbar.module.scss';
 
 const TopBar = () => {
+    const auth = useAuth();
     return (
         <div className={styles.topBar}>
             {/* image */}
@@ -29,11 +31,13 @@ const TopBar = () => {
                         </NavLink>
                     </li>
                     <li className={styles.topListItem}>
-                        <NavLink to="/dashboard">
-                        {({ isActive }) => (
-                            <span> Dashboard <ChevronDown className={isActive ? styles.activeNav : ""} /> </span>
-                        )}
-                        </NavLink>
+                        <Button 
+                            color='primary'
+                            size='small'
+                            type='solid'
+                            text='Dashboard' 
+                            onClick={() => auth.signinRedirect()}
+                        />
                     </li>
                     <li className={styles.topListItem}>
                         <Button 

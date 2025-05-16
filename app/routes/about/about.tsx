@@ -3,6 +3,7 @@ import Button from "~/components/button/button";
 import { ReactComponent as ChevronRightCircle } from "~/components/icons/chevron-right-circle";
 import { ReactComponent as ChevronLeftCircle } from "~/components/icons/chevron-left-circle";
 import { Slide } from 'react-slideshow-image';
+import { useAuth } from "~/provider/useAuth";
 import 'react-slideshow-image/dist/styles.css';
 
 function About() {
@@ -58,7 +59,7 @@ function About() {
       alt: ""
     }
   ]
-
+  const auth = useAuth();
   return (
     <>
     <section className={styles.hero}>
@@ -73,7 +74,7 @@ function About() {
             text="Go to the Dashboard"
             color="secondary"
             size="large"
-            href="/dashboard"
+            onClick={() => auth.signinRedirect()}
           />
       </div>
     </section>
