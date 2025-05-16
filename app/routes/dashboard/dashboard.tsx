@@ -27,23 +27,16 @@ export function meta({ }: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
+export async function action({ request }: Route.ActionArgs) {
+  if (request.method === "POST") {
+    const formData = await request.formData();
+    console.log(formData);
+  }
+}
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Dashboard({}: Route.ComponentProps) {
   const auth = useAuth();
   const [authenticated, setAuthenticated] = useState(auth.isAuthenticated);  
-  if (!authenticated) {
-    return (
-      <div className={styles.redirect}>
-        <Button
-          type="solid"
-          text="Login"
-          size="large"
-          color="primary"
-          onClick={() => auth.signinRedirect()}
-        />
-      </div>
-    )        
-  }
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
