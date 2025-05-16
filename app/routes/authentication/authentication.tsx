@@ -1,19 +1,15 @@
-import type { Route } from "../+types/authentication";
 import { useAuth } from "react-oidc-context";
+import { useParams, Navigate, useRouteLoaderData } from "react-router";
+function Authentication() {
+    let params = useParams();
+    let auth = useAuth();
+    let rootData = useRouteLoaderData("root");
+    console.log("auth", auth.isAuthenticated);
+    console.log("root", rootData.authenticated);
 
-export async function action({ request }: Route.ClientActionArgs) {
-  const auth = useAuth();
-  auth.signinRedirect() 
-  const sessionStatus = await auth.querySessionStatus();
-  const formData = await request.formData();
-  console.log(sessionStatus);
-  console.log(formData);
-  let formObj = Object.fromEntries(formData);
-  return {"form": formObj, "session": sessionStatus}
-}
-
-function Authentication({actionData}:Route.ComponentProps) {
-    console.log(actionData);
+    if (params.code) {
+        return <Navigate replace to={"/dashboard"} />
+    }
     return <div>authenticating</div>
 }
 
