@@ -14,11 +14,10 @@ import {
   export const links: Route.LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet }
   ];
-  export async function actions({ request }: Route.ClientActionArgs) {
+  export async function actions({ request }: Route.ActionArgs) {
     let uid = request.headers.get("jhu_id");
-    console.log(request.headers);
     let formData = await request.formData();
-    return {uidExists: !!uid, formData}
+    return {uidExists: !!uid, formData, headers: request.headers}
   }
 
   export async function loader({}: Route.LoaderArgs) {
@@ -83,8 +82,9 @@ import {
     );
   }
   
-  export default function App({actionData}:Route.ComponentProps) {
-    console.log("root", actionData)
+  export default function App({actionData, loaderData}:Route.ComponentProps) {
+    console.log("root actiondata", actionData)
+    console.log("root loaderdata", loaderData)
     const root = typeof window !== 'undefined' ? window.location.origin : '';
     const secret = root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS;
     const configuration = {
