@@ -5,5 +5,6 @@ export default [
         index("routes/about/about.tsx"),
         route("dashboard", "routes/dashboard/dashboard.tsx"),
         route("methodology", "routes/methodology/methodology.tsx"),
+        route("auth/oidc/callback", "routes/authentication/authentication.tsx")
     ])
 ] satisfies RouteConfig;

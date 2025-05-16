@@ -4,7 +4,7 @@ import cx from "classnames";
 import { useState, useEffect } from "react";
 import { useRouteLoaderData } from "react-router";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
-import { useAuth } from "react-oidc-context";
+import { withAuthenticationRequired } from "react-oidc-context";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover, type AutocompleteChangeReason } from "@mui/material";
@@ -27,25 +27,8 @@ export function meta({ }: Route.MetaArgs) {
     { name: "JHU Travel Emissions Dashboard", content: "Welcome to the JHU Travel Emissions Dashboard!" },
   ];
 }
-export async function action({ request }: Route.ClientActionArgs) {
-  const auth = useAuth();
-  auth.signinRedirect() 
-  const sessionStatus = await auth.querySessionStatus();
-  const formData = await request.formData();
-  console.log(sessionStatus);
-  console.log(formData);
-  let formObj = Object.fromEntries(formData);
-  return {formObj, sessionStatus}
-}
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-function Dashboard({actionData}: Route.ComponentProps) {
-  const auth = useAuth();
-  const [authenticated, setAuthenticated] = useState(auth.isAuthenticated);  
-  console.log("auth: ", authenticated);
-  useEffect(()=>{
-    console.log("actiondata", actionData);
-    console.log("session status", auth.querySessionStatus());
-  },[auth, actionData])
+function Dashboard({}: Route.ComponentProps) {
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
@@ -496,4 +479,4 @@ function Dashboard({actionData}: Route.ComponentProps) {
     </>
   )
 }
-export default Dashboard;
+export default import.meta.env.Dev ? Dashboard : withAuthenticationRequired(Dashboard);
