@@ -85,7 +85,7 @@ import {
       redirect_uri: root + "/dashboard",
       authority: "https://login.jh.edu",
       client_secret: secret,
-      client_authentication: "client_secret_basic",
+      client_authentication: "client_secret_post",
       metadata: {
         issuer:"https://login.jh.edu/idp/shibboleth",
         authorization_endpoint:"https://login.jh.edu/idp/profile/oidc/authorize",
