@@ -7,7 +7,7 @@ import {
     ScrollRestoration,
   } from "react-router";
   import type { Route } from "./+types/root";
-  import { AuthProvider } from "react-oidc-context";
+  import { AuthProvider, useAuth } from "react-oidc-context";
   import supabase from "~/utils/supabase";
   import stylesheet from "./app.css?url";
 
@@ -16,6 +16,7 @@ import {
   ];
   
   export async function loader({}: Route.LoaderArgs) {
+    let auth = useAuth();
     let places = await supabase.from('places').select();
     let schools = await supabase.from('business_area').select();
     let map = await supabase.from('map').select();
@@ -48,7 +49,8 @@ import {
       percent: {school: school_percent.data, traveler: traveler_percent.data},
       airports: airports.data,
       filters,
-      fiscalYearOptions
+      fiscalYearOptions,
+      authenticated: auth.isAuthenticated
     }
   }
 
