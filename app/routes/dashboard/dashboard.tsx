@@ -35,10 +35,12 @@ export async function action({ request }: Route.ActionArgs) {
   if (request.method === "POST") {
     const formData = await request.formData();
     console.log(formData);
+    return Object.fromEntries(formData);
   }
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-function Dashboard({}: Route.ComponentProps) {
+function Dashboard({actionData}: Route.ComponentProps) {
+  console.log(actionData)
   const auth = useAuth();
   const [authenticated, setAuthenticated] = useState(auth.isAuthenticated);  
   const rootData = useRouteLoaderData("root");
