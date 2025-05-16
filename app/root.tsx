@@ -105,7 +105,7 @@ import {
     }
 
     return (
-      <AuthProvider {...configuration} onSigninCallback={(user)=>{console.log(user)}}>
+      <AuthProvider {...configuration} >
         <Outlet />
       </AuthProvider>
     );
