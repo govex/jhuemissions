@@ -7,9 +7,7 @@ function Callback({}:Route.ComponentProps) {
     const auth = useAuth();
     const navigate = useNavigate();
     console.log(auth.isAuthenticated);
-    const [safe, setSafe] = useState(auth.isAuthenticated)
-    console.log(safe);
-    if (safe) {
+    if (auth.isAuthenticated) {
         navigate("/dashboard");
     }
     return <div>
