@@ -45,8 +45,7 @@ type errorText = "Only five years may be displayed at once" | "At least one year
 function Dashboard({ }: Route.ComponentProps) {
   const auth = useAuth();
   useEffect(()=> {
-    let user = getUser(auth.settings.authority, auth.settings.client_id);
-    if (!user && !import.meta.env.DEV) {
+    if (!auth.isAuthenticated && !import.meta.env.DEV) {
       auth.signinRedirect();
     }
   },[])

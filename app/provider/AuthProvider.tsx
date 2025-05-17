@@ -235,13 +235,11 @@ export const AuthProvider = (props: AuthProviderProps): React.JSX.Element => {
                 // check if returning back from authority server
                 if (authParams && !skipSigninCallback) {
                     let signinResponse = new SigninResponse(authParams);
-                    console.log(signinResponse);
                     user = new User(signinResponse);
                     await userManager.storeUser(user);
                     if (onSigninCallback) await onSigninCallback(user);
                 }
                 user = !user ? await userManager.getUser() : user;
-                console.log("provider",user);
                 dispatch({ type: "INITIALISED", user });
             } catch (error) {
                 dispatch({
@@ -310,8 +308,6 @@ export const AuthProvider = (props: AuthProviderProps): React.JSX.Element => {
     }, [userManager, onRemoveUser]);
 
     const contextValue = React.useMemo(() => {
-        console.log("authProvider state", state)
-        console.log("authProvider context", userManagerContext)
         return {
             ...state,
             ...userManagerContext,
