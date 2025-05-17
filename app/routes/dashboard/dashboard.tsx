@@ -25,7 +25,8 @@ import { User } from "oidc-client-ts"
 
 export function getUser() {
     if (typeof window !== undefined) {
-        const oidcStorage = window.localStorage.getItem(`oidc.user:<your authority>:<your client id>`)
+        const auth = useAuth();
+        const oidcStorage = window.localStorage.getItem(`oidc.user:${auth.settings.authority}:${auth.settings.client_id}`)
         if (!oidcStorage) {
             return null;
         }
