@@ -2,7 +2,7 @@
 import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import { useState, useEffect } from "react";
-import { useRouteLoaderData } from "react-router";
+import { useRouteLoaderData, useLocation } from "react-router";
 import { withAuthenticationRequired } from "~/provider/withAuthenticationRequired";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import { useAuth } from "~/provider/useAuth";
@@ -21,19 +21,6 @@ import {toTitleCase} from "~/utils/stringFunctions";
 import useResizeObserver from "~/utils/useResizeObserver";
 import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
-import { User } from "oidc-client-ts"
-
-function getUser(authority:string, client_id:string) {
-    if (typeof window !== undefined) {
-        const oidcStorage = window.localStorage.getItem(`oidc.user:${authority}:${client_id}`)
-        if (!oidcStorage) {
-            return null;
-        }
-        return User.fromStorageString(oidcStorage);
-    } else {
-        return null;
-    }
-}
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -44,9 +31,15 @@ export function meta({ }: Route.MetaArgs) {
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Dashboard({ }: Route.ComponentProps) {
   const auth = useAuth();
+  const location = useLocation();
+  const { authenticated } = location.state || false;
   useEffect(()=> {
-    if (!auth.isAuthenticated && !import.meta.env.DEV) {
-      auth.signinRedirect();
+    if (!import.meta.env.DEV) {
+      if (!authenticated) {
+        if (!auth.isAuthenticated) {
+          auth.signinRedirect();
+        }
+      }
     }
   },[])
   const rootData = useRouteLoaderData("root");
