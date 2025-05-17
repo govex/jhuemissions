@@ -5,6 +5,7 @@ import { useAuth } from "~/provider/useAuth";
 
 function Callback({}:Route.ComponentProps) {
     const auth = useAuth();
+    console.log(auth);
     const [safe, setSafe] = useState(auth.isAuthenticated)
     if (safe) {
         return <Navigate replace to={"/dashboard"} />
