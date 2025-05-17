@@ -1,14 +1,16 @@
 import type { Route } from "./+types/callback";
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router";
 import {useState} from "react";
 import { useAuth } from "~/provider/useAuth";
 
 function Callback({}:Route.ComponentProps) {
     const auth = useAuth();
-    console.log(auth);
+    const navigate = useNavigate();
+    console.log(auth.isAuthenticated);
     const [safe, setSafe] = useState(auth.isAuthenticated)
+    console.log(safe);
     if (safe) {
-        return <Navigate replace to={"/dashboard"} />
+        navigate("/dashboard");
     }
     return <div>
             <div className="spinner-overlay">
