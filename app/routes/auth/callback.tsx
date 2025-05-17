@@ -10,7 +10,7 @@ function Callback({}:Route.ComponentProps) {
         if (auth.isAuthenticated || import.meta.env.DEV) {
             navigate("/dashboard", {replace: true, state: {authenticated: auth.isAuthenticated}});
         }
-    }, [navigate])
+    }, [navigate, auth.isAuthenticated])
     return <div>
             <div className="spinner-overlay">
                 <div className="spinner"></div>        
