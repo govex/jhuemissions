@@ -1,11 +1,13 @@
 import type { Route } from "./+types/callback";
-import { Navigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
 import {useState, useEffect} from "react";
-import { User } from "oidc-client-ts"
+import { User } from "oidc-client-ts";
+import { useAuth } from "~/provider/useAuth";
 
 export function getUser() {
     if (typeof window !== undefined) {
-        const oidcStorage = window.localStorage.getItem(`oidc.user:<your authority>:<your client id>`)
+        const auth = useAuth();
+        const oidcStorage = window.localStorage.getItem(`oidc.user:${auth.settings.authority}:${auth.settings.client_id}`)
         if (!oidcStorage) {
             return null;
         }
