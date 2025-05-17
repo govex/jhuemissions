@@ -10,7 +10,7 @@ const TopBar = () => {
         <div className={styles.topBar}>
             {/* image */}
             <div className={styles.logo}>
-                <img src="general/logoL.png" alt="Johns Hopkins University Bloomberg Center for Government Excellence" />
+                <img src="/general/logoL.png" alt="Johns Hopkins University Bloomberg Center for Government Excellence" />
             </div>
 
             {/* buttons */}

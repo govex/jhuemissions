@@ -6,7 +6,6 @@ export default [
         route("dashboard", "routes/dashboard/dashboard.tsx"),
         route("methodology", "routes/methodology/methodology.tsx"),
         ...prefix("auth/oidc", [
-            index("routes/auth/auth.tsx"),
             route("callback", "routes/auth/callback.tsx")
         ])
     ])

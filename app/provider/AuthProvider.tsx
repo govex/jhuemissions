@@ -231,8 +231,9 @@ export const AuthProvider = (props: AuthProviderProps): React.JSX.Element => {
             try {
                 let user: User | undefined | null = null;
                 let authParams = hasAuthParams();
+                console.log("provider authparams", authParams);
                 // check if returning back from authority server
-                if (!!authParams?.code && !skipSigninCallback) {
+                if (authParams?.code && !skipSigninCallback) {
                     user = await userManager.signinCallback();
                     console.log("provider", user);
                     if (onSigninCallback) await onSigninCallback(user);
