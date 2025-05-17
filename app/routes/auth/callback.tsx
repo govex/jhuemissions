@@ -1,13 +1,12 @@
 import type { Route } from "./+types/callback";
-import { Navigate, useLocation } from "react-router";
-import {useState, useEffect} from "react";
+import { Navigate } from "react-router";
+import {useState, useEffect, useContext} from "react";
 import { User } from "oidc-client-ts";
-import { useAuth } from "~/provider/useAuth";
+import { AuthContext } from "~/provider/AuthContext";
 
-export function getUser() {
+function getUser(authority:string, client_id:string) {
     if (typeof window !== undefined) {
-        const auth = useAuth();
-        const oidcStorage = window.localStorage.getItem(`oidc.user:${auth.settings.authority}:${auth.settings.client_id}`)
+        const oidcStorage = window.localStorage.getItem(`oidc.user:${authority}:${client_id}`)
         if (!oidcStorage) {
             return null;
         }
@@ -19,8 +18,11 @@ export function getUser() {
 
 function Callback({}:Route.ComponentProps) {
     const [user, setUser] = useState<any>(undefined)
-    useEffect(() => {
-        setUser(getUser())
+    const auth = useContext(AuthContext);
+   useEffect(() => {
+        if (auth) {
+            setUser(getUser(auth.settings.authority, auth.settings.client_id))
+        }
     }, [])
     console.log("callback getUser", user)
     if (user) {

@@ -23,10 +23,9 @@ import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
 import { User } from "oidc-client-ts"
 
-export function getUser() {
+function getUser(authority:string, client_id:string) {
     if (typeof window !== undefined) {
-        const auth = useAuth();
-        const oidcStorage = window.localStorage.getItem(`oidc.user:${auth.settings.authority}:${auth.settings.client_id}`)
+        const oidcStorage = window.localStorage.getItem(`oidc.user:${authority}:${client_id}`)
         if (!oidcStorage) {
             return null;
         }
@@ -46,8 +45,8 @@ type errorText = "Only five years may be displayed at once" | "At least one year
 function Dashboard({ }: Route.ComponentProps) {
   const auth = useAuth();
   useEffect(()=> {
-    let user = getUser();
-    if (!user) {
+    let user = getUser(auth.settings.authority, auth.settings.client_id);
+    if (!user && !import.meta.env.DEV) {
       auth.signinRedirect();
     }
   },[])
