@@ -1,14 +1,5 @@
 import type { ErrorContext } from "./AuthState";
-import { User } from "oidc-client-ts"
 
-export function getUser() {
-    const oidcStorage = localStorage.getItem(`oidc.user:<your authority>:<your client id>`)
-    if (!oidcStorage) {
-        return null;
-    }
-
-    return User.fromStorageString(oidcStorage);
-}
 /**
  * @public
  */

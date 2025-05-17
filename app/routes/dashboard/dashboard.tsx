@@ -6,7 +6,6 @@ import { useRouteLoaderData } from "react-router";
 import { withAuthenticationRequired } from "~/provider/withAuthenticationRequired";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
 import { useAuth } from "~/provider/useAuth";
-import { getUser } from "~/provider/utils";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover, type AutocompleteChangeReason } from "@mui/material";
@@ -22,6 +21,19 @@ import {toTitleCase} from "~/utils/stringFunctions";
 import useResizeObserver from "~/utils/useResizeObserver";
 import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
+import { User } from "oidc-client-ts"
+
+export function getUser() {
+    if (typeof window !== undefined) {
+        const oidcStorage = window.localStorage.getItem(`oidc.user:<your authority>:<your client id>`)
+        if (!oidcStorage) {
+            return null;
+        }
+        return User.fromStorageString(oidcStorage);
+    } else {
+        return null;
+    }
+}
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -32,10 +44,12 @@ export function meta({ }: Route.MetaArgs) {
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
 function Dashboard({ }: Route.ComponentProps) {
   const auth = useAuth();
-  const user = getUser();
-  if (!user) {
-    auth.signinRedirect();
-  }
+  useEffect(()=> {
+    let user = getUser();
+    if (!user) {
+      auth.signinRedirect();
+    }
+  },[])
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
