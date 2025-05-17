@@ -9,17 +9,17 @@ export const hasAuthParams = (location = window.location) => {
     if ((searchParams.get("code") || searchParams.get("error")) &&
         searchParams.get("state")) {
         console.log("hasauthparams", searchParams.get("code"));
-        return {code: searchParams.get("code"), error: searchParams.get("error"), state: searchParams.get("state")};
+        return searchParams;
     }
 
     // response_mode: fragment
     searchParams = new URLSearchParams(location.hash.replace("#", "?"));
     if ((searchParams.get("code") || searchParams.get("error")) &&
         searchParams.get("state")) {
-        return {code: searchParams.get("code"), error: searchParams.get("error"), state: searchParams.get("state")};
+        return searchParams;
     }
 
-    return {code: null, error: null, state: null};
+    return null;
 };
 
 export const signinError = normalizeErrorFn("signinCallback", "Sign-in failed");

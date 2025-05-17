@@ -1,5 +1,5 @@
 import type { ProcessResourceOwnerPasswordCredentialsArgs, SignoutResponse } from "oidc-client-ts";
-import { User, UserManager, type UserManagerSettings } from "oidc-client-ts";
+import { SigninResponse, User, UserManager, type UserManagerSettings } from "oidc-client-ts";
 import React from "react";
 
 import { AuthContext } from "./AuthContext";
@@ -233,8 +233,10 @@ export const AuthProvider = (props: AuthProviderProps): React.JSX.Element => {
                 let authParams = hasAuthParams();
                 console.log("provider authparams", authParams);
                 // check if returning back from authority server
-                if (authParams?.code && !skipSigninCallback) {
-                    user = await userManager.signinCallback();
+                if (authParams && !skipSigninCallback) {
+                    let signinResponse = new SigninResponse(authParams);
+                    user = new User(signinResponse);
+                    await userManager.storeUser(user);
                     console.log("provider", user);
                     if (onSigninCallback) await onSigninCallback(user);
                 }
