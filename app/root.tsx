@@ -79,7 +79,7 @@ import {
   
   export default function App({}:Route.ComponentProps) {
     const root = typeof window !== 'undefined' ? window.location.origin : '';
-    const secret = root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS;
+    const secret = import.meta.env.VITE_CS;
     const configuration = {
       client_id: root + "/auth/oidc",
       redirect_uri: root + "/auth/oidc/callback",
@@ -116,7 +116,7 @@ import {
         error.status === 404
           ? "The requested page could not be found."
           : error.statusText || details;
-    } else if (error && error instanceof Error) {
+    } else if (import.meta.env.DEV && error && error instanceof Error) {
       details = error.message;
       stack = error.stack;
     }
