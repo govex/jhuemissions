@@ -14,7 +14,7 @@ const Footer = () => {
             </div>
             {/* Top Section */}
             <div className={styles.footTop}>
-                <img src="general/logoD.png" alt="Logo" className={styles.footImage} />
+                <img src="/general/logoD.png" alt="Logo" className={styles.footImage} />
                 <ul className={styles.footList}>
                     <li className={styles.footListItem}>
                         <Link to="/"> About</Link>

@@ -6,15 +6,15 @@ import {
     Scripts,
     ScrollRestoration,
   } from "react-router";
+  import {AuthProvider} from "~/provider/AuthProvider";
   import type { Route } from "./+types/root";
-  import { AuthProvider } from "react-oidc-context";
   import supabase from "~/utils/supabase";
   import stylesheet from "./app.css?url";
 
   export const links: Route.LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet }
   ];
-  
+
   export async function loader({}: Route.LoaderArgs) {
     let places = await supabase.from('places').select();
     let schools = await supabase.from('business_area').select();
@@ -48,7 +48,7 @@ import {
       percent: {school: school_percent.data, traveler: traveler_percent.data},
       airports: airports.data,
       filters,
-      fiscalYearOptions
+      fiscalYearOptions,
     }
   }
 
@@ -77,7 +77,7 @@ import {
     );
   }
   
-  export default function App() {
+  export default function App({}:Route.ComponentProps) {
     const root = typeof window !== 'undefined' ? window.location.origin : '';
     const secret = root.includes('jhutravel') ? import.meta.env.VITE_CS_JHU : import.meta.env.VITE_CS;
     const configuration = {
@@ -99,7 +99,7 @@ import {
     }
 
     return (
-      <AuthProvider {...configuration}>
+      <AuthProvider {...configuration} >
         <Outlet />
       </AuthProvider>
     );
@@ -116,7 +116,7 @@ import {
         error.status === 404
           ? "The requested page could not be found."
           : error.statusText || details;
-    } else if (import.meta.env.DEV && error && error instanceof Error) {
+    } else if (error && error instanceof Error) {
       details = error.message;
       stack = error.stack;
     }

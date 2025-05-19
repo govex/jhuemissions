@@ -2,9 +2,10 @@
 import styles from "./dashboard.module.scss";
 import cx from "classnames";
 import { useState, useEffect } from "react";
-import { useRouteLoaderData } from "react-router";
+import { useRouteLoaderData, useLocation } from "react-router";
+import { withAuthenticationRequired } from "~/provider/withAuthenticationRequired";
 import type { ChangeEvent, MouseEvent, SyntheticEvent } from "react";
-import { withAuthenticationRequired } from "react-oidc-context";
+import { useAuth } from "~/provider/useAuth";
 import Button from "~/components/button/button";
 import Card from "~/components/card/card";
 import { Popover, type AutocompleteChangeReason } from "@mui/material";
@@ -28,7 +29,19 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 type errorText = "Only five years may be displayed at once" | "At least one year must be selected." | undefined;
-function Dashboard({}: Route.ComponentProps) {
+function Dashboard({ }: Route.ComponentProps) {
+  const auth = useAuth();
+  const location = useLocation();
+  const { authenticated } = location.state || false;
+  useEffect(()=> {
+    if (!import.meta.env.DEV) {
+      if (!authenticated) {
+        if (!auth.isAuthenticated) {
+          auth.signinRedirect();
+        }
+      }
+    }
+  },[])
   const rootData = useRouteLoaderData("root");
   const colorScale = d3.scaleOrdinal(["#86c8bc", "#af6e5d", "#f2c80f", "#884c7e", "#3b81ca"]);
   const [schoolData, setSchoolData] = useState<any>(rootData.bookings.school);
@@ -466,7 +479,7 @@ function Dashboard({}: Route.ComponentProps) {
             />
           </Card>
         </div>
-    </section>
+      </section>      
     <div className={styles.feedback}>
       <Button 
         color="primary"
@@ -479,6 +492,4 @@ function Dashboard({}: Route.ComponentProps) {
     </>
   )
 }
-export default import.meta.env.Dev ? Dashboard : withAuthenticationRequired(Dashboard, {
-    OnRedirecting: () => (<div className={styles.redirect}>Redirecting to the login page...</div>)
-});
+export default import.meta.env.DEV ? Dashboard : withAuthenticationRequired(Dashboard);
