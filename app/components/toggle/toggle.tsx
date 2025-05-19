@@ -34,7 +34,7 @@ const Toggle = styled(Switch)(({ theme }) => ({
       opacity: 1,
       boxSizing: "border-box",
     },
-    "& .MuiSwitch-input": {
+    "& .MuiSwitch-input.PrivateSwitchBase-input": {
       width: "270px",
       left: "-135px"
     }
