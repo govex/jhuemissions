@@ -37,7 +37,7 @@
     width: 100vw;
     padding: 20px 70px;
     grid-template-columns: repeat(4, minmax(200px, 1fr) minmax(0,1fr));
-    grid-template-rows: 50px 260px 436px 70vh 60vh 60vh 1fr;
+    grid-template-rows: 50px 260px 436px 70vh 65vh 60vh 1fr;
     gap: 40px;
     margin-bottom: 30px;
 }
@@ -71,9 +71,6 @@
     button {
         margin-bottom: 40px;
     }
-}
-.bar1 {
-    grid-area: bar1;
 }
 .bar2 {
     grid-area: bar2;
@@ -150,7 +147,7 @@
             "map map map map map map"
             "percent percent percent percent percent percent"
             "donut donut method method tool tool";
-        grid-template-columns: repeat(3, minmax(200px, 1fr) minmax(0,1fr));
+        grid-template-columns: repeat(3, minmax(100px, 1fr) minmax(0,1fr));
     }    
 }
 @media only screen and (max-width: 870px) {

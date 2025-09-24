@@ -308,7 +308,7 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                             <FormLabel
                                 sx={{
                                     "& .MuiFormLabel-root": {
-                                        fontFamily: 'gentona'
+                                        fontFamily: 'Work Sans'
                                     }
                                 }} 
                                 id="radio-buttons-group-label">Fiscal Year</FormLabel>
@@ -343,7 +343,7 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                     <FormLabel
                         sx={{
                             "& .MuiFormLabel-root": {
-                                fontFamily: 'gentona'
+                                fontFamily: 'Work Sans'
                             }
                         }} 
                         >Highlight Place</FormLabel>

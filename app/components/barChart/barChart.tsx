@@ -174,6 +174,18 @@ export default function BarChartVariants<FC>({
         } 
     }, [chartData, labelField, valueField, schoolOptions, years, school, stack, parentRect.width])
     const [realHeight, setRealHeight] = useState(parentRect.height)
+    const [realWidth, setRealWidth] = useState(parentRect.width)
+    useEffect(()=>{
+        if (marginLeft > 0) {
+            if (marginLeft > parentRect.width) {
+                setRealWidth(marginLeft + parentRect.width)
+                setOverflowScroll(true)
+            } else {
+                setRealWidth(parentRect.width)
+                setOverflowScroll(false)
+            }
+        }
+    },[marginLeft])
     useEffect(()=>{
         if (!stack && groupLabels && groupLabels?.length > 15) {
             setRealHeight(groupLabels.length * 42)            
@@ -226,7 +238,7 @@ export default function BarChartVariants<FC>({
                 leftAxis={{disableLine: stack, disableTicks: stack}}
                 tooltip={{trigger: stack ? "item" : "axis"}}
                 series={seriesData}
-                width={parentRect?.width}
+                width={realWidth}
                 height={realHeight}
                 sx={{
                     "& .MuiBarLabel-root": {
@@ -240,7 +252,7 @@ export default function BarChartVariants<FC>({
                     legend: {
                         hidden: stack,                        
                         labelStyle: {
-                            fontFamily: "gentona",
+                            fontFamily: "Work Sans",
                         }
                     }
                 }}

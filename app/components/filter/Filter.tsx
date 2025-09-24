@@ -63,7 +63,7 @@ function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
                   borderRadius: "10px",
                   boxShadow: "0px 4px 4px 0px #00000040",
                   backgroundColor: "#FFFFFFCC",
-                  fontFamily: "gentona",
+                  fontFamily: "Work Sans",
                   fontWeight: "600",
                   fontSize: "24px",
                   color: "#A15B96",
@@ -100,7 +100,7 @@ function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
                   borderRadius: "10px",
                   boxShadow: "0px 4px 4px 0px #00000040",
                   backgroundColor: "#FFFFFFCC",
-                  fontFamily: "gentona",
+                  fontFamily: "Work Sans",
                   fontWeight: "600",
                   fontSize: "24px",
                   color: "#A15B96",
@@ -122,7 +122,7 @@ function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
                         return (
                           <FormControlLabel
                           key={chk.value}
-                          sx={{fontFamily: "gentona", color: "#000000", alignItems: 'start'}}
+                          sx={{fontFamily: "Work Sans", color: "#000000", alignItems: 'start'}}
                           control={
                             <Checkbox
                               onChange={change}
