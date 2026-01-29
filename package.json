@@ -1,7 +1,7 @@
 {
-  "name": "my-react-dashboard",
+  "name": "jhu-emissions-dashboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "react-router dev",
@@ -17,8 +17,6 @@
     "@react-router/node": "^7.4.0",
     "@react-router/serve": "^7.4.0",
     "@react-spring/web": "^9.7.5",
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.49.4",
     "@types/geojson": "^7946.0.16",
     "axios": "^1.8.4",
     "classnames": "^2.5.1",

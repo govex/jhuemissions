@@ -23,7 +23,6 @@ IVAC demoed this tool at JHU’s Symposium on Sustainability, April 2, 2025.
 ![react](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![react-router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
 ![netlify](https://img.shields.io/badge/Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![MUI](https://img.shields.io/badge/MUI-%230081CB.svg?style=for-the-badge&logo=mui&logoColor=white)
 
 - map using [D3.js](https://d3js.org/) and [Natural Earth GeoJSON](https://github.com/martynafford/natural-earth-geojson)
@@ -31,7 +30,7 @@ IVAC demoed this tool at JHU’s Symposium on Sustainability, April 2, 2025.
 
 ## Maintenance Information
 
-GovEx accounts were created for the implementation and deployment of this project at Netlify, Supabase, and Carbon Interface by Heather Bree. Analytics for this project can be viewed in GovEx's Google Tag Manager Dashboard. SSO authentication is configured under the GovEx owned JHU IMI account.
+GovEx accounts were created for the implementation and deployment of this project at Netlify, and Carbon Interface by Heather Bree. Analytics for this project can be viewed in GovEx's Google Tag Manager Dashboard. SSO authentication is configured under the GovEx owned JHU IMI account.
 
 ### For Future Development
 
@@ -41,4 +40,4 @@ Development workflow:
 
 Local branch -> Staging -> Main
 
-Scripts used to process data can be found in [a separate repository](https://github.com/govex/jhuemissions_data). Scripts output CSV files that are uploaded into tables in Supabase. To update data new source files must be requested from JHU Travel and processed with these scripts.
+Scripts used to process data can be found in [a separate repository](https://github.com/govex/jhuemissions_data). Scripts output JSON files that replace the `*_rows.json` files in the public data folder. To update data new source files must be requested from JHU Travel and processed with these scripts.
