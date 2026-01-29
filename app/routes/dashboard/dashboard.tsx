@@ -255,6 +255,7 @@ function Dashboard({ }: Route.ComponentProps) {
         <div className={styles.kpi1}>
           <Card
             title="Total GHG Emissions"
+            wraptitle={false}
           >
             <div className={styles.chartContainer} ref={top1ref}>
             {!!topLineData && !!top1rect &&
