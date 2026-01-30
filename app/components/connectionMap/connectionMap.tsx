@@ -147,7 +147,7 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                         lineWidthScale.domain(extentTrips)
                         let yearLines = [];
                         let highlightLines = []; 
-                        yearData.filter(y => y.from_full !== ' ' && y.to_full !== ' ').forEach((connection, i) => {
+                        yearData.filter(y => y.from_full !== '' && y.to_full !== '').forEach((connection, i) => {
                             let from_place = places.find(f => f.place === connection.from_full)
                             let to_place = places.find(f => f.place === connection.to_full)
                             if (!from_place) {
