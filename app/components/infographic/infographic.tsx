@@ -46,6 +46,7 @@ function Infographic({valueField, data, years, parentRect, unit, formatString}:{
                         scaleType:"point",
                         data: years
                     }}
+                    valueFormatter={v => format(",")(v)}
                 />
             )
         }

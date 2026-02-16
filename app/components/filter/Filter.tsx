@@ -116,7 +116,6 @@ function Filter({close, change, yearOptions, schoolOptions, error, filters}:{
                 </AccordionSummary>
                 <AccordionDetails>
                   <FormControl component="fieldset" variant="standard" error={!!error}>
-                    <FormLabel component="legend">Pick up to 5</FormLabel>
                     <FormGroup row={true}>
                       {yearOptions?.length > 0 && yearOptions.map((chk) => {
                         return (

@@ -18,16 +18,6 @@ import {
   ];
 
   export async function loader({ request }: Route.LoaderArgs) {
-    let filters = {school: "All JHU", years:["FY23-24"]};
-    const fiscalYearOptions = [
-      {label: "FY23-24", value: "FY23-24", order: 7},
-      {label: "FY22-23", value: "FY22-23", order: 6},
-      {label: "FY21-22", value: "FY21-22", order: 5},
-      {label: "FY20-21", value: "FY20-21", order: 4},
-      {label: "FY19-20", value: "FY19-20", order: 3},
-      {label: "FY18-19", value: "FY18-19", order: 2},
-      {label: "FY17-18", value: "FY17-18", order: 1}
-    ]
     const origin = new URL(request.url).origin;
     let places = await fetch(origin + '/data/places_rows.json').then(res => res.json());
     let schools = await fetch(origin + '/data/business_area_rows.json').then(res => res.json());
@@ -42,6 +32,9 @@ import {
     let timeline_jhu = await fetch(origin + '/data/timeline_alljhu_rows.json').then(res => res.json());
     let school_percent = await fetch(origin + '/data/school_percent_rows.json').then(res => res.json());
     let traveler_percent = await fetch(origin + '/data/traveler_percent_rows.json').then(res => res.json());
+    const fiscalYearOptions = Array.from(new Set(timeline.sort((a,b)=> a.date - b.date).map(m => m.fiscalyear))).map((m,i) => {return {label: m, value: m, order: i}});
+    let filters = {school: "All JHU", years: [fiscalYearOptions.find(f => f.order === Math.max(...fiscalYearOptions.map(m => m.order)))?.label]};
+
     return {
       places: places,
       schools: schools,

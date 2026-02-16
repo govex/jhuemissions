@@ -17,7 +17,7 @@ import type { Route } from "./+types/dashboard";
 import BarChartVariants from "~/components/barChart/barChart";
 import ConnectionMap from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
-import {toTitleCase} from "~/utils/stringFunctions";
+// import {toTitleCase} from "~/utils/stringFunctions";
 import useResizeObserver from "~/utils/useResizeObserver";
 import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
@@ -120,6 +120,7 @@ function Dashboard({ }: Route.ComponentProps) {
       setFilters({...filters, school: value ? value : 'All JHU'})
     } else if (event.target.checked === false) {
       let checked = Array.from(filters.years);
+      console.log("checked", checked)
       if (checked.length === 1) {
         setFilterError(filterErrorNotEnough as errorText);
       } else if (checked.length <= 5) {
@@ -131,24 +132,26 @@ function Dashboard({ }: Route.ComponentProps) {
           }
           setFilterError(undefined)
           let sorted = checked.sort((a,b)=>{
-            let orderA = fiscalYearOptions.find(f => f.label === a)?.order
-            let orderB = fiscalYearOptions.find(f => f.label === b)?.order
-            return !!orderA && !!orderB ? orderA - orderB : 0
+          let orderA = fiscalYearOptions.find(f => f.label === a)
+          let orderB = fiscalYearOptions.find(f => f.label === b)
+          return !!orderA && !!orderB ? orderA.order - orderB.order : 0
           })
+          console.log("removed", sorted)
           setFilters({...filters, years: sorted})
         }
       } 
     } else if (event.target.checked) {
       let checked = Array.from(filters.years);
+      console.log("checked", checked)
       if (checked.length >= 5) {
         setFilterError(filterErrorTooMany as errorText)
       } else {
         setFilterError(undefined)
         checked.push(event.target.value);
         let sorted = checked.sort((a,b)=>{
-          let orderA = fiscalYearOptions.find(f => f.label === a)?.order
-          let orderB = fiscalYearOptions.find(f => f.label === b)?.order
-          return !!orderA && !!orderB ? orderA - orderB : 0
+          let orderA = fiscalYearOptions.find(f => f.label === a)
+          let orderB = fiscalYearOptions.find(f => f.label === b)
+          return !!orderA && !!orderB ? orderA.order - orderB.order : 0
         })
         setFilters({...filters, years: sorted})
       }
@@ -161,13 +164,13 @@ function Dashboard({ }: Route.ComponentProps) {
       setMapData(rootData.map.jhu)
       setTimelineData(rootData.timeline.jhu)
     } else {
-      let schoolBookings = rootData.bookings.school?.filter(f => toTitleCase(f.school) === filters.school);
+      let schoolBookings = rootData.bookings.school?.filter(f => f.school === filters.school);
       setTopLineData(schoolBookings ? schoolBookings : []);
       setTravelerData(rootData.bookings.traveler_school ? rootData.bookings.traveler_school : []);
-      let schoolCode = rootData.schools?.find(f => toTitleCase(f.employeeGroupName) === filters.school);
+      let schoolCode = rootData.schools?.find(f => f.employeeGroupName === filters.school);
       let schoolMap = schoolCode ? rootData.map.school?.filter(f => f.school === schoolCode.code) : undefined;
       setMapData(schoolMap ? schoolMap : []);
-      let schoolTimeline = rootData.timeline.school?.filter(f => toTitleCase(f.school) === filters.school);
+      let schoolTimeline = rootData.timeline.school?.filter(f => f.school === filters.school);
       setTimelineData(schoolTimeline ? schoolTimeline : [])
     }
   }, [filters.school, rootData.bookings, rootData.map, rootData.timeline])
@@ -179,7 +182,7 @@ function Dashboard({ }: Route.ComponentProps) {
         return bookingsSchools.includes(f.employeeGroupName)
       }).map(m => {
         return {
-          label: toTitleCase(m.employeeGroupName),
+          label: m.employeeGroupName,
           value: m.employeeGroupName,
           code: m.code
         }
