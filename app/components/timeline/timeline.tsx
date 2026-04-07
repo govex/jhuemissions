@@ -97,6 +97,9 @@ export default function Timeline<FC>({
             })
             setSeriesData(serieses);
             setChartData(flatData);    
+        } else {
+            setSeriesData([])
+            setChartData([])
         }
     },[years, data, valueField])
     const [loading, setLoading] = useState(true);

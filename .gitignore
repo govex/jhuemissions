@@ -16,6 +16,7 @@ dist-ssr
 .netlify/
 build/
 .env 
+.github/
 
 # Editor directories and files
 .vscode/*

@@ -167,8 +167,8 @@ function Dashboard({ }: Route.ComponentProps) {
       let schoolBookings = rootData.bookings.school?.filter(f => f.school === filters.school);
       setTopLineData(schoolBookings ? schoolBookings : []);
       setTravelerData(rootData.bookings.traveler_school ? rootData.bookings.traveler_school : []);
-      let schoolCode = rootData.schools?.find(f => f.employeeGroupName === filters.school);
-      let schoolMap = schoolCode ? rootData.map.school?.filter(f => f.school === schoolCode.code) : undefined;
+      let schoolCodes = rootData.schools?.filter(f => f.employeeGroupName === filters.school).map(f => f.code);
+      let schoolMap = schoolCodes?.length ? rootData.map.school?.filter(f => schoolCodes.includes(f.school)) : undefined;
       setMapData(schoolMap ? schoolMap : []);
       let schoolTimeline = rootData.timeline.school?.filter(f => f.school === filters.school);
       setTimelineData(schoolTimeline ? schoolTimeline : [])
@@ -187,7 +187,8 @@ function Dashboard({ }: Route.ComponentProps) {
           code: m.code
         }
       })
-      setSchoolOptions(schools.sort((a,b)=>a.label.localeCompare(b.label)))
+      let uniqueSchools = schools.filter((s, i, arr) => arr.findIndex(x => x.label === s.label) === i)
+      setSchoolOptions(uniqueSchools.sort((a,b)=>a.label.localeCompare(b.label)))
     }
   },[rootData.schools, schoolData])
   return (

@@ -118,8 +118,11 @@ export default function BarChartVariants<FC>({
                 let serieses = years.map((y) => {
                     let yearData = flatData.filter(f => f.fiscalyear === y);
                     let schoolIdx = yearData.findIndex(f => f.school === schoolValue);
-                    let spliced = yearData.splice(schoolIdx, 1);
-                    let reordered = [spliced[0], ...yearData];
+                    let reordered = yearData;
+                    if (schoolIdx !== -1) {
+                        let spliced = yearData.splice(schoolIdx, 1);
+                        reordered = [spliced[0], ...yearData];
+                    }
                     return {
                         label: y,
                         color: colorScale(y),
@@ -138,8 +141,10 @@ export default function BarChartVariants<FC>({
             let labels = Array.from(new Set<string>(chartData.map(m => m[labelField]))).filter(l => l);
             if (schoolValue && !schoolFilter && !stack) {
                 let schoolIdx = labels.findIndex(f => f === schoolValue);
-                let spliced = labels.splice(schoolIdx, 1);
-                labels = [spliced[0], ...labels];
+                if (schoolIdx !== -1) {
+                    let spliced = labels.splice(schoolIdx, 1);
+                    labels = [spliced[0], ...labels];
+                }
             }
             if (stack) {
                 labels = years

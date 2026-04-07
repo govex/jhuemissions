@@ -58,21 +58,25 @@ function Infographic({valueField, data, years, parentRect, unit, formatString}:{
             setValue([val[0][valueField]])
         } else if (val.length > 1) {
             setValue(val.map(m => m[valueField]))
+        } else {
+            setValue(undefined)
         }
     },[data,years,valueField])
     const [changeText, setChangeText] = useState<{value: string, priorYear: string} | undefined>(undefined);
     useEffect(()=>{
-        data.sort((a,b)=>b.fiscalyear.localeCompare(a.fiscalyear))
+        const sorted = [...data].sort((a,b)=>b.fiscalyear.localeCompare(a.fiscalyear))
         if (value?.length === 1) {
-            let dataI = data.findIndex(d => d.fiscalyear == years[0])
-            let previousRow = data[dataI+1]
-            if (previousRow?.[valueField] > 0 && data[dataI].fiscalyear == years[0]) {
-                const change = data[dataI][valueField] - previousRow[valueField]
-                const perCh = (change / previousRow[valueField])
-                if (!!perCh) {
-                    setChangeText({value: format("+.2p")(perCh), priorYear: previousRow.fiscalyear})
-                } else {
-                    setChangeText(undefined)
+            let dataI = sorted.findIndex(d => d.fiscalyear == years[0])
+            if (dataI !== -1) {
+                let previousRow = sorted[dataI+1]
+                if (previousRow?.[valueField] > 0 && sorted[dataI].fiscalyear == years[0]) {
+                    const change = sorted[dataI][valueField] - previousRow[valueField]
+                    const perCh = (change / previousRow[valueField])
+                    if (!!perCh) {
+                        setChangeText({value: format("+.2p")(perCh), priorYear: previousRow.fiscalyear})
+                    } else {
+                        setChangeText(undefined)
+                    }
                 }
             }
         } else {
@@ -100,8 +104,11 @@ function Infographic({valueField, data, years, parentRect, unit, formatString}:{
     }, [data, years, dims, value])
     return (
         <div>
-            {render &&
-                innercontent()
+            {render
+                ? innercontent()
+                : data?.length > 0
+                    ? <div className={styles.noData}>No data for selected year</div>
+                    : null
             }
         </div>
     )

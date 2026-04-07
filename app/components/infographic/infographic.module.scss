@@ -15,3 +15,12 @@
     color: #A15B96;
     text-align: center;
 }
+.noData {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #888;
+  font-size: 0.875rem;
+  font-style: italic;
+}

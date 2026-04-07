@@ -119,10 +119,14 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                 let cYear = connections.find(f => f.year === displayYear)
                 if (cYear?.paths?.length > 0) {
                     setDisplayPaths([...cYear.paths, ...cYear.highlight])
+                } else {
+                    setDisplayPaths(undefined)
                 }
             } else {
                 if (connections[0].paths?.length > 0) {
                     setDisplayPaths([...connections[0].paths, ...connections[0].highlight])
+                } else {
+                    setDisplayPaths(undefined)
                 }
             }                
         }
