@@ -17,7 +17,7 @@ import type { Route } from "./+types/dashboard";
 import BarChartVariants from "~/components/barChart/barChart";
 import ConnectionMap from "~/components/connectionMap/connectionMap";
 import Toggle from "~/components/toggle/toggle";
-import {toTitleCase} from "~/utils/stringFunctions";
+// import {toTitleCase} from "~/utils/stringFunctions";
 import useResizeObserver from "~/utils/useResizeObserver";
 import Timeline from "~/components/timeline/timeline";
 import Legend from "~/components/legend/legend";
@@ -131,9 +131,9 @@ function Dashboard({ }: Route.ComponentProps) {
           }
           setFilterError(undefined)
           let sorted = checked.sort((a,b)=>{
-            let orderA = fiscalYearOptions.find(f => f.label === a)?.order
-            let orderB = fiscalYearOptions.find(f => f.label === b)?.order
-            return !!orderA && !!orderB ? orderA - orderB : 0
+          let orderA = fiscalYearOptions.find(f => f.label === a)
+          let orderB = fiscalYearOptions.find(f => f.label === b)
+          return !!orderA && !!orderB ? orderA.order - orderB.order : 0
           })
           setFilters({...filters, years: sorted})
         }
@@ -146,9 +146,9 @@ function Dashboard({ }: Route.ComponentProps) {
         setFilterError(undefined)
         checked.push(event.target.value);
         let sorted = checked.sort((a,b)=>{
-          let orderA = fiscalYearOptions.find(f => f.label === a)?.order
-          let orderB = fiscalYearOptions.find(f => f.label === b)?.order
-          return !!orderA && !!orderB ? orderA - orderB : 0
+          let orderA = fiscalYearOptions.find(f => f.label === a)
+          let orderB = fiscalYearOptions.find(f => f.label === b)
+          return !!orderA && !!orderB ? orderA.order - orderB.order : 0
         })
         setFilters({...filters, years: sorted})
       }
@@ -161,13 +161,13 @@ function Dashboard({ }: Route.ComponentProps) {
       setMapData(rootData.map.jhu)
       setTimelineData(rootData.timeline.jhu)
     } else {
-      let schoolBookings = rootData.bookings.school?.filter(f => toTitleCase(f.school) === filters.school);
+      let schoolBookings = rootData.bookings.school?.filter(f => f.school === filters.school);
       setTopLineData(schoolBookings ? schoolBookings : []);
       setTravelerData(rootData.bookings.traveler_school ? rootData.bookings.traveler_school : []);
-      let schoolCode = rootData.schools?.find(f => toTitleCase(f.employeeGroupName) === filters.school);
-      let schoolMap = schoolCode ? rootData.map.school?.filter(f => f.school === schoolCode.code) : undefined;
+      let schoolCodes = rootData.schools?.filter(f => f.employeeGroupName === filters.school).map(f => f.code);
+      let schoolMap = schoolCodes?.length ? rootData.map.school?.filter(f => schoolCodes.includes(f.school)) : undefined;
       setMapData(schoolMap ? schoolMap : []);
-      let schoolTimeline = rootData.timeline.school?.filter(f => toTitleCase(f.school) === filters.school);
+      let schoolTimeline = rootData.timeline.school?.filter(f => f.school === filters.school);
       setTimelineData(schoolTimeline ? schoolTimeline : [])
     }
   }, [filters.school, rootData.bookings, rootData.map, rootData.timeline])
@@ -179,12 +179,13 @@ function Dashboard({ }: Route.ComponentProps) {
         return bookingsSchools.includes(f.employeeGroupName)
       }).map(m => {
         return {
-          label: toTitleCase(m.employeeGroupName),
+          label: m.employeeGroupName,
           value: m.employeeGroupName,
           code: m.code
         }
       })
-      setSchoolOptions(schools.sort((a,b)=>a.label.localeCompare(b.label)))
+      let uniqueSchools = schools.filter((s, i, arr) => arr.findIndex(x => x.label === s.label) === i)
+      setSchoolOptions(uniqueSchools.sort((a,b)=>a.label.localeCompare(b.label)))
     }
   },[rootData.schools, schoolData])
   return (

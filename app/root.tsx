@@ -8,7 +8,6 @@ import {
   } from "react-router";
   import {AuthProvider} from "~/provider/AuthProvider";
   import type { Route } from "./+types/root";
-  import supabase from "~/utils/supabase";
   import stylesheet from "./app.css?url";
 
   export const links: Route.LinksFunction = () => [
@@ -18,38 +17,66 @@ import {
     { rel: "stylesheet", href: stylesheet }
   ];
 
-  export async function loader({}: Route.LoaderArgs) {
-    let places = await supabase.from('places').select();
-    let schools = await supabase.from('business_area').select();
-    let map = await supabase.from('map').select();
-    let bookings = await supabase.from('bookings').select();
-    let timeline = await supabase.from('timeline').select();
-    let filters = {school: "All JHU", years:["FY23-24"]};
-    let airports = await supabase.from('airports').select();
-    const fiscalYearOptions = [
-      {label: "FY23-24", value: "FY23-24", order: 7},
-      {label: "FY22-23", value: "FY22-23", order: 6},
-      {label: "FY21-22", value: "FY21-22", order: 5},
-      {label: "FY20-21", value: "FY20-21", order: 4},
-      {label: "FY19-20", value: "FY19-20", order: 3},
-      {label: "FY18-19", value: "FY18-19", order: 2},
-      {label: "FY17-18", value: "FY17-18", order: 1}
-    ]
-    let topline_jhu = await supabase.from('alljhutopline').select();
-    let topline_school = await supabase.from('school_topline').select();
-    let traveler_jhu = await supabase.from('traveler_topline').select();
-    let map_jhu = await supabase.from('map_alljhu').select();
-    let timeline_jhu = await supabase.from('timeline_alljhu').select();
-    let school_percent = await supabase.from('school_percent').select();
-    let traveler_percent = await supabase.from('traveler_percent').select();
+  export async function loader({ request }: Route.LoaderArgs) {
+    const origin = new URL(request.url).origin;
+    const fetchJson = async (path: string) => {
+      const response = await fetch(origin + path);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ${path}: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    };
+
+    const [
+      places,
+      schools,
+      map,
+      bookings,
+      timeline,
+      airports,
+      topline_jhu,
+      topline_school,
+      traveler_jhu,
+      map_jhu,
+      timeline_jhu,
+      school_percent,
+      traveler_percent,
+    ] = await Promise.all([
+      fetchJson('/data/places_rows.json'),
+      fetchJson('/data/business_area_rows.json'),
+      fetchJson('/data/map_rows.json'),
+      fetchJson('/data/bookings_rows.json'),
+      fetchJson('/data/timeline_rows.json'),
+      fetchJson('/data/airports_rows.json'),
+      fetchJson('/data/alljhutopline_rows.json'),
+      fetchJson('/data/school_topline_rows.json'),
+      fetchJson('/data/traveler_topline_rows.json'),
+      fetchJson('/data/map_alljhu_rows.json'),
+      fetchJson('/data/timeline_alljhu_rows.json'),
+      fetchJson('/data/school_percent_rows.json'),
+      fetchJson('/data/traveler_percent_rows.json'),
+    ]);
+
+    const parseTimelineDate = (date: string): number => {
+      if (!date || typeof date !== 'string') return 0;
+      const parts = date.split('-').map(Number);
+      if (parts.length !== 3 || parts.some(isNaN)) return 0;
+      const [month, day, year] = parts;
+      return new Date(year, month - 1, day).getTime();
+    };
+    const sortedTimeline = timeline.sort((a: {date: string}, b: {date: string}) => parseTimelineDate(a.date) - parseTimelineDate(b.date));
+    const uniqueFiscalYears = Array.from(new Set(sortedTimeline.map((m: {fiscalyear: string}) => m.fiscalyear)));
+    const fiscalYearOptions = uniqueFiscalYears.map((m, i) => ({ label: m, value: m, order: i }));
+    let filters = {school: "All JHU", years: [fiscalYearOptions.find(f => f.order === Math.max(...fiscalYearOptions.map(m => m.order)))?.label]};
+
     return {
-      places: places.data,
-      schools: schools.data,
-      map: {school: map.data, jhu: map_jhu.data},
-      timeline: {school: timeline.data, jhu: timeline_jhu.data},
-      bookings: {school: topline_school.data, traveler_jhu: traveler_jhu.data, traveler_school: bookings.data, topline: topline_jhu.data }, 
-      percent: {school: school_percent.data, traveler: traveler_percent.data},
-      airports: airports.data,
+      places: places,
+      schools: schools,
+      map: {school: map, jhu: map_jhu},
+      timeline: {school: timeline, jhu: timeline_jhu},
+      bookings: {school: topline_school, traveler_jhu: traveler_jhu, traveler_school: bookings, topline: topline_jhu }, 
+      percent: {school: school_percent, traveler: traveler_percent},
+      airports: airports,
       filters,
       fiscalYearOptions,
     }

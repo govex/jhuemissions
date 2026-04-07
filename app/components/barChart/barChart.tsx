@@ -55,21 +55,6 @@ export default function BarChartVariants<FC>({
     const [seriesData, setSeriesData] = useState<BarSeriesType[] | []>([])
     const stackedStrokeScaleDark = scaleSequential(interpolateRgbBasis(["#c091b8","#371f33"]))
     const stackedStrokeScaleLight = scaleSequential(interpolateRgbBasis(["#f8f2f7","#ddc4d9"]))
-    const Bar = styled(animated.rect)(({ ownerState }:{ownerState: BarElementOwnerState}) => {
-        let seriesData = chartData.filter(f => f[labelField] === ownerState.id);
-        let dp = seriesData[ownerState.dataIndex] ? seriesData[ownerState.dataIndex][valueField] : undefined
-        return {
-            fill: ownerState?.color,
-            transition: 'opacity 0.2s ease-in, fill 0.2s ease-in',
-            opacity: 1,
-            strokeWidth: 2,
-            stroke:
-            ownerState?.isHighlighted && stack && maxVal !== 0
-                ? dp 
-                    ? dp < maxVal/2 ? stackedStrokeScaleDark(dp) : stackedStrokeScaleLight(dp) : 'black'
-                : 'none',
-        };
-    });
     useEffect(() => {
         if (schoolOptions) {
             let opt = schoolOptions.find(s => s.label === school)
@@ -88,7 +73,7 @@ export default function BarChartVariants<FC>({
                         stack: "total",
                         data: years.map(m => {
                             let yearData = groupData.find(f => f.fiscalyear === m);
-                            return yearData ? yearData[valueField] : 0
+                            return yearData ? +yearData[valueField] : 0
                         }),
                         highlightScope: {
                             highlight: "series",
@@ -103,41 +88,50 @@ export default function BarChartVariants<FC>({
                 setSeriesData(modifiedSeries);
                 setChartData(flatData);
             } else if (school === "All JHU") {
-                let flatData = data.filter(f => years.includes(f.fiscalyear)).sort((a,b)=>b[valueField]-a[valueField]); 
+                let flatData = data.filter(f => years.includes(f.fiscalyear)).sort((a,b)=>+b[valueField]-a[valueField]); 
                 let serieses = years.map((y) => {
                     return {
                         label: y,
                         color: colorScale(y),
-                        data: flatData.filter(f => f.fiscalyear === y).map(m => m[valueField]),
-                        type: "bar"
+                        data: flatData.filter(f => f.fiscalyear === y).map(m => +m[valueField]),
+                        type: "bar",
+                        id: `${y}`
                     } as BarSeriesType;
                 });
                 setSeriesData(serieses);    
                 setChartData(flatData);
             } else if (schoolFilter && schoolValue) {
-                let flatData = data.filter(f => years.includes(f.fiscalyear) && f.school === schoolValue).sort((a,b)=>b[valueField]-a[valueField]);
+                let flatData = data.filter(f => years.includes(f.fiscalyear) && f.school === schoolValue).sort((a,b)=>+b[valueField]-a[valueField]);
                 let serieses = years.map((y) => {
                     return {
                         label: y,
                         color: colorScale(y),
-                        data: flatData.filter(f => f.fiscalyear === y).map(m => m[valueField]),
-                        type: "bar"
+                        data: flatData.filter(f => f.fiscalyear === y).map(m => +m[valueField]),
+                        type: "bar",
+                        id: `${y}`
                     } as BarSeriesType;
                 });
                 setSeriesData(serieses);    
                 setChartData(flatData);
             } else if (schoolValue) {
-                let flatData = data.filter(f => years.includes(f.fiscalyear)).sort((a,b)=>b[valueField]-a[valueField]);
+                let flatData = data.filter(f => years.includes(f.fiscalyear)).sort((a,b)=>+b[valueField]-a[valueField]);
                 let serieses = years.map((y) => {
                     let yearData = flatData.filter(f => f.fiscalyear === y);
                     let schoolIdx = yearData.findIndex(f => f.school === schoolValue);
-                    let spliced = yearData.splice(schoolIdx, 1);
-                    let reordered = [spliced[0], ...yearData];
+                    let reordered = yearData;
+                    if (schoolIdx !== -1) {
+                        let spliced = yearData.splice(schoolIdx, 1);
+                        reordered = [spliced[0], ...yearData];
+                    } else if (yearData.length > 0) {
+                        const placeholder = { ...yearData[0], school: schoolValue, [valueField]: 0 };
+                        reordered = [placeholder, ...yearData];
+                    }
                     return {
                         label: y,
                         color: colorScale(y),
-                        data: reordered.map(m => m[valueField]),
-                        type: "bar"
+                        data: reordered.map(m => +m[valueField]),
+                        type: "bar",
+                        id: `${y}`
                     } as BarSeriesType;
                 });
                 setSeriesData(serieses);
@@ -147,11 +141,15 @@ export default function BarChartVariants<FC>({
     }, [data, valueField, years, school, schoolOptions, schoolValue, stack])
     useEffect(() => {
         if (chartData.length > 0) {
-            let labels = Array.from(new Set<string>(chartData.map(m => m[labelField])));
+            let labels = Array.from(new Set<string>(chartData.map(m => m[labelField]))).filter(l => l);
             if (schoolValue && !schoolFilter && !stack) {
                 let schoolIdx = labels.findIndex(f => f === schoolValue);
-                let spliced = labels.splice(schoolIdx, 1);
-                labels = [spliced[0], ...labels];
+                if (schoolIdx !== -1) {
+                    let spliced = labels.splice(schoolIdx, 1);
+                    labels = [spliced[0], ...labels];
+                } else {
+                    labels = [schoolValue, ...labels];
+                }
             }
             if (stack) {
                 labels = years
@@ -167,7 +165,7 @@ export default function BarChartVariants<FC>({
             setGroupLabels(!schoolFilter && !stack
                 ? labels.map(m => {
                     let opt = schoolOptions.find(s => s.value === m)
-                    return opt.label
+                    return opt?.label
                     })
                 : labels
             );
@@ -185,7 +183,7 @@ export default function BarChartVariants<FC>({
                 setOverflowScroll(false)
             }
         }
-    },[marginLeft])
+    },[marginLeft, parentRect.width])
     useEffect(()=>{
         if (!stack && groupLabels && groupLabels?.length > 15) {
             setRealHeight(groupLabels.length * 42)            
@@ -196,21 +194,45 @@ export default function BarChartVariants<FC>({
         }
     },[groupLabels, parentRect.height])
     const [render, setRender] = useState(false);
+    const [isEmpty, setIsEmpty] = useState(false);
     useEffect(()=>{
         if (
             marginLeft > 0 &&
             seriesData.length > 0 &&
+            chartData.length > 0 &&
             maxVal !== 0 &&
-            groupLabels.length > 0
+            groupLabels.length > 0 
         ) {
             setRender(true);
         } else {
             setRender(false);
         }
-    },[marginLeft, seriesData, maxVal, groupLabels])
+    },[marginLeft, seriesData, chartData, maxVal, groupLabels])
+    useEffect(() => {
+        if (data !== undefined && chartData.length === 0) {
+            setIsEmpty(true)
+        } else {
+            setIsEmpty(false)
+        }
+    }, [data, chartData])
+    const Bar = styled(animated.rect)(({ ownerState }:{ownerState: BarElementOwnerState}) => {
+        let seriesData = chartData.filter(f => f[labelField] === ownerState.id);
+        let dp = seriesData?.[ownerState.dataIndex] ? seriesData[ownerState.dataIndex][valueField] : undefined
+        return {
+            fill: ownerState?.color,
+            stroke:
+            ownerState?.isHighlighted && stack && maxVal !== 0
+                ? dp 
+                    ? dp < maxVal/2 ? stackedStrokeScaleDark(dp) : stackedStrokeScaleLight(dp) : 'black'
+                : 'none',
+        };
+    });
+
     return (
         <div className={cx(styles.base, overflowScroll ? styles.overflowscroll : "")}>
-            <BarChart 
+            {isEmpty
+                ? <div className={styles.noData}>No data available</div>
+                : <BarChart 
                 className={styles.bar11}
                 loading={!render}
                 margin={{top: overflowScroll ? 80 : 50,left: stack ? 70 : marginLeft, right: 50}}
@@ -257,6 +279,7 @@ export default function BarChartVariants<FC>({
                     }
                 }}
             />
+            }
         </div>
     )    
 }

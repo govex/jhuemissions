@@ -119,10 +119,14 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                 let cYear = connections.find(f => f.year === displayYear)
                 if (cYear?.paths?.length > 0) {
                     setDisplayPaths([...cYear.paths, ...cYear.highlight])
+                } else {
+                    setDisplayPaths(undefined)
                 }
             } else {
                 if (connections[0].paths?.length > 0) {
                     setDisplayPaths([...connections[0].paths, ...connections[0].highlight])
+                } else {
+                    setDisplayPaths(undefined)
                 }
             }                
         }
@@ -147,7 +151,7 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                         lineWidthScale.domain(extentTrips)
                         let yearLines = [];
                         let highlightLines = []; 
-                        yearData.filter(y => y.from_full !== ' ' && y.to_full !== ' ').forEach((connection, i) => {
+                        yearData.filter(y => y.from_full !== '' && y.to_full !== '').forEach((connection, i) => {
                             let from_place = places.find(f => f.place === connection.from_full)
                             let to_place = places.find(f => f.place === connection.to_full)
                             if (!from_place) {
@@ -208,7 +212,7 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                 setConnections(lines);
                 if (lines.length > 1) {
                     let displayableYear = lines.find(f => f.yearData.length > 0);
-                    setDisplayYear(displayableYear?.year)
+                    setDisplayYear(displayableYear?.year ?? lines[0].year)
                 } else {
                     setDisplayYear(lines[0].year)
                 }
@@ -375,6 +379,9 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                 {!loading && countryPaths}
                 {!loading && displayPaths}
             </svg>
+            {!loading && connections !== undefined && displayPaths === undefined &&
+                <div className={styles.noDataOverlay}>No data available for this selection.</div>
+            }
             <div className={styles.annotations}>
                 {!!connections && annotations()}
             </div>

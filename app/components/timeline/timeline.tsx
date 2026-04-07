@@ -97,9 +97,13 @@ export default function Timeline<FC>({
             })
             setSeriesData(serieses);
             setChartData(flatData);    
+        } else {
+            setSeriesData([])
+            setChartData([])
         }
     },[years, data, valueField])
     const [loading, setLoading] = useState(true);
+    const [isEmpty, setIsEmpty] = useState(false);
     useEffect(()=>{
         if (chartData.length > 0 && seriesData.length > 0) {
             setLoading(false)
@@ -107,8 +111,18 @@ export default function Timeline<FC>({
             setLoading(true)
         }
     },[chartData, seriesData])
+    useEffect(() => {
+        if (data !== undefined && data !== null && chartData.length === 0) {
+            setIsEmpty(true)
+        } else {
+            setIsEmpty(false)
+        }
+    }, [data, chartData])
     return (
-        <LineChart 
+        <>
+        {isEmpty
+            ? <div className={styles.noData}>No data available</div>
+            : <LineChart 
             loading={loading}
             xAxis={[{
                 scaleType: "point",
@@ -136,5 +150,7 @@ export default function Timeline<FC>({
             
             }}
         />
+        }
+        </>
     )    
 }
