@@ -7,6 +7,6 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   plugins: [reactRouter(), tsconfigPaths(), netlifyPlugin()],
   server: {
-    allowedHosts: "devserver-staging--jhutravelemissionsdashboard.netlify.app",
+    allowedHosts: ["devserver-staging--jhutravelemissionsdashboard.netlify.app"],
   },
 })

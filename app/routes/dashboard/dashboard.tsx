@@ -120,7 +120,6 @@ function Dashboard({ }: Route.ComponentProps) {
       setFilters({...filters, school: value ? value : 'All JHU'})
     } else if (event.target.checked === false) {
       let checked = Array.from(filters.years);
-      console.log("checked", checked)
       if (checked.length === 1) {
         setFilterError(filterErrorNotEnough as errorText);
       } else if (checked.length <= 5) {
@@ -136,13 +135,11 @@ function Dashboard({ }: Route.ComponentProps) {
           let orderB = fiscalYearOptions.find(f => f.label === b)
           return !!orderA && !!orderB ? orderA.order - orderB.order : 0
           })
-          console.log("removed", sorted)
           setFilters({...filters, years: sorted})
         }
       } 
     } else if (event.target.checked) {
       let checked = Array.from(filters.years);
-      console.log("checked", checked)
       if (checked.length >= 5) {
         setFilterError(filterErrorTooMany as errorText)
       } else {

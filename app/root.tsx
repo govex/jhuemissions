@@ -19,20 +19,54 @@ import {
 
   export async function loader({ request }: Route.LoaderArgs) {
     const origin = new URL(request.url).origin;
-    let places = await fetch(origin + '/data/places_rows.json').then(res => res.json());
-    let schools = await fetch(origin + '/data/business_area_rows.json').then(res => res.json());
-    let map = await fetch(origin + '/data/map_rows.json').then(res => res.json());
-    let bookings = await fetch(origin + '/data/bookings_rows.json').then(res => res.json());
-    let timeline = await fetch(origin + '/data/timeline_rows.json').then(res => res.json());
-    let airports = await fetch(origin + '/data/airports_rows.json').then(res => res.json());
-    let topline_jhu = await fetch(origin + '/data/alljhutopline_rows.json').then(res => res.json());
-    let topline_school = await fetch(origin + '/data/school_topline_rows.json').then(res => res.json());
-    let traveler_jhu = await fetch(origin + '/data/traveler_topline_rows.json').then(res => res.json());
-    let map_jhu = await fetch(origin + '/data/map_alljhu_rows.json').then(res => res.json());
-    let timeline_jhu = await fetch(origin + '/data/timeline_alljhu_rows.json').then(res => res.json());
-    let school_percent = await fetch(origin + '/data/school_percent_rows.json').then(res => res.json());
-    let traveler_percent = await fetch(origin + '/data/traveler_percent_rows.json').then(res => res.json());
-    const fiscalYearOptions = Array.from(new Set(timeline.sort((a,b)=> a.date - b.date).map(m => m.fiscalyear))).map((m,i) => {return {label: m, value: m, order: i}});
+    const fetchJson = async (path: string) => {
+      const response = await fetch(origin + path);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ${path}: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    };
+
+    const [
+      places,
+      schools,
+      map,
+      bookings,
+      timeline,
+      airports,
+      topline_jhu,
+      topline_school,
+      traveler_jhu,
+      map_jhu,
+      timeline_jhu,
+      school_percent,
+      traveler_percent,
+    ] = await Promise.all([
+      fetchJson('/data/places_rows.json'),
+      fetchJson('/data/business_area_rows.json'),
+      fetchJson('/data/map_rows.json'),
+      fetchJson('/data/bookings_rows.json'),
+      fetchJson('/data/timeline_rows.json'),
+      fetchJson('/data/airports_rows.json'),
+      fetchJson('/data/alljhutopline_rows.json'),
+      fetchJson('/data/school_topline_rows.json'),
+      fetchJson('/data/traveler_topline_rows.json'),
+      fetchJson('/data/map_alljhu_rows.json'),
+      fetchJson('/data/timeline_alljhu_rows.json'),
+      fetchJson('/data/school_percent_rows.json'),
+      fetchJson('/data/traveler_percent_rows.json'),
+    ]);
+
+    const parseTimelineDate = (date: string): number => {
+      if (!date || typeof date !== 'string') return 0;
+      const parts = date.split('-').map(Number);
+      if (parts.length !== 3 || parts.some(isNaN)) return 0;
+      const [month, day, year] = parts;
+      return new Date(year, month - 1, day).getTime();
+    };
+    const sortedTimeline = timeline.sort((a: {date: string}, b: {date: string}) => parseTimelineDate(a.date) - parseTimelineDate(b.date));
+    const uniqueFiscalYears = Array.from(new Set(sortedTimeline.map((m: {fiscalyear: string}) => m.fiscalyear)));
+    const fiscalYearOptions = uniqueFiscalYears.map((m, i) => ({ label: m, value: m, order: i }));
     let filters = {school: "All JHU", years: [fiscalYearOptions.find(f => f.order === Math.max(...fiscalYearOptions.map(m => m.order)))?.label]};
 
     return {

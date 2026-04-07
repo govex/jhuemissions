@@ -1,6 +1,6 @@
 import { BarChart, type BarSeriesType, type BarElementOwnerState } from "@mui/x-charts";
 import { styled } from '@mui/material';
-import { animated, useSpring } from 'react-spring';
+import { animated } from 'react-spring';
 import styles from "./barChart.module.scss";
 import cx from "classnames";
 import { type FC, useState, useEffect } from "react";
@@ -106,7 +106,7 @@ export default function BarChartVariants<FC>({
                     return {
                         label: y,
                         color: colorScale(y),
-                        data: flatData.filter(f => f.fiscalyear === y).map(m => m[valueField]),
+                        data: flatData.filter(f => f.fiscalyear === y).map(m => +m[valueField]),
                         type: "bar",
                         id: `${y}`
                     } as BarSeriesType;
@@ -183,7 +183,7 @@ export default function BarChartVariants<FC>({
                 setOverflowScroll(false)
             }
         }
-    },[marginLeft])
+    },[marginLeft, parentRect.width])
     useEffect(()=>{
         if (!stack && groupLabels && groupLabels?.length > 15) {
             setRealHeight(groupLabels.length * 42)            
@@ -207,7 +207,7 @@ export default function BarChartVariants<FC>({
         } else {
             setRender(false);
         }
-    },[marginLeft, seriesData, maxVal, groupLabels])
+    },[marginLeft, seriesData, chartData, maxVal, groupLabels])
     useEffect(() => {
         if (data !== undefined && chartData.length === 0) {
             setIsEmpty(true)
