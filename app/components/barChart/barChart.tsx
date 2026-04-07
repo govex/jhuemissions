@@ -122,6 +122,9 @@ export default function BarChartVariants<FC>({
                     if (schoolIdx !== -1) {
                         let spliced = yearData.splice(schoolIdx, 1);
                         reordered = [spliced[0], ...yearData];
+                    } else if (yearData.length > 0) {
+                        const placeholder = { ...yearData[0], school: schoolValue, [valueField]: 0 };
+                        reordered = [placeholder, ...yearData];
                     }
                     return {
                         label: y,
