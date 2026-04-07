@@ -147,6 +147,8 @@ export default function BarChartVariants<FC>({
                 if (schoolIdx !== -1) {
                     let spliced = labels.splice(schoolIdx, 1);
                     labels = [spliced[0], ...labels];
+                } else {
+                    labels = [schoolValue, ...labels];
                 }
             }
             if (stack) {
@@ -163,7 +165,7 @@ export default function BarChartVariants<FC>({
             setGroupLabels(!schoolFilter && !stack
                 ? labels.map(m => {
                     let opt = schoolOptions.find(s => s.value === m)
-                    return opt.label
+                    return opt?.label
                     })
                 : labels
             );
@@ -192,6 +194,7 @@ export default function BarChartVariants<FC>({
         }
     },[groupLabels, parentRect.height])
     const [render, setRender] = useState(false);
+    const [isEmpty, setIsEmpty] = useState(false);
     useEffect(()=>{
         if (
             marginLeft > 0 &&
@@ -205,6 +208,13 @@ export default function BarChartVariants<FC>({
             setRender(false);
         }
     },[marginLeft, seriesData, maxVal, groupLabels])
+    useEffect(() => {
+        if (data !== undefined && chartData.length === 0) {
+            setIsEmpty(true)
+        } else {
+            setIsEmpty(false)
+        }
+    }, [data, chartData])
     const Bar = styled(animated.rect)(({ ownerState }:{ownerState: BarElementOwnerState}) => {
         let seriesData = chartData.filter(f => f[labelField] === ownerState.id);
         let dp = seriesData?.[ownerState.dataIndex] ? seriesData[ownerState.dataIndex][valueField] : undefined
@@ -220,7 +230,9 @@ export default function BarChartVariants<FC>({
 
     return (
         <div className={cx(styles.base, overflowScroll ? styles.overflowscroll : "")}>
-            <BarChart 
+            {isEmpty
+                ? <div className={styles.noData}>No data available</div>
+                : <BarChart 
                 className={styles.bar11}
                 loading={!render}
                 margin={{top: overflowScroll ? 80 : 50,left: stack ? 70 : marginLeft, right: 50}}
@@ -267,6 +279,7 @@ export default function BarChartVariants<FC>({
                     }
                 }}
             />
+            }
         </div>
     )    
 }

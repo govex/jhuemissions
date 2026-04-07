@@ -20,6 +20,16 @@
         margin-top: 0;
     }
 }
+.noDataOverlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #888;
+    font-size: 0.875rem;
+    font-style: italic;
+    pointer-events: none;
+}
 .legendTitle {
     font-size: 1rem;
     color: rgba(0, 0, 0, 0.6);

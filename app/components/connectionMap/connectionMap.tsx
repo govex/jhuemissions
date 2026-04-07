@@ -212,7 +212,7 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                 setConnections(lines);
                 if (lines.length > 1) {
                     let displayableYear = lines.find(f => f.yearData.length > 0);
-                    setDisplayYear(displayableYear?.year)
+                    setDisplayYear(displayableYear?.year ?? lines[0].year)
                 } else {
                     setDisplayYear(lines[0].year)
                 }
@@ -379,6 +379,9 @@ export default function ConnectionMap<FC>({ parentRect, data, years, colorScale,
                 {!loading && countryPaths}
                 {!loading && displayPaths}
             </svg>
+            {!loading && connections !== undefined && displayPaths === undefined &&
+                <div className={styles.noDataOverlay}>No data available for this selection.</div>
+            }
             <div className={styles.annotations}>
                 {!!connections && annotations()}
             </div>
